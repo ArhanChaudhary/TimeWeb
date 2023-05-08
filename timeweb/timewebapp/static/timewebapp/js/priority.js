@@ -195,12 +195,32 @@ class Priority {
                 dom_description.append(document.createTextNode(line));
                 dom_description.append("<br>");
             }
-        } else {
-            dom_description.remove();
         }
 
         dom_assignment.find(".work-input-unit-of-time-checkbox").attr("id", `work-input-label-${sa.id}`);
         dom_assignment.find(".work-input-unit-of-time-widget").attr("for", `work-input-label-${sa.id}`);
+    }
+    updateAssignmentDOM(assignment_container, sa) {
+        const dom_assignment = assignment_container.children(".assignment");
+        dom_assignment.toggleClass("needs-more-info", sa.needs_more_info);
+        dom_assignment.find(".title-text").text(sa.name);
+        const dom_title_link_anchor = dom_assignment.find(".title-link-anchor");
+        if (sa.external_link) {
+            dom_title_link_anchor.attr("href", sa.external_link);
+            if (dom_title_link_anchor.prop("href").startsWith(location.origin)) {
+                dom_title_link_anchor.attr("href", "//" + sa.external_link);
+            }
+        } else {
+            dom_title_link_anchor.remove();
+        }
+        const dom_description = dom_assignment.find(".description");
+        dom_description.empty();
+        if (sa.description) {
+            for (const line of sa.description.split("\n")) {
+                dom_description.append(document.createTextNode(line));
+                dom_description.append("<br>");
+            }
+        }
     }
     updateAssignmentHeaderMessagesAndSetPriorityData() {
         const that = this;
@@ -217,7 +237,8 @@ class Priority {
             that.params.autofill_no_work_done = [];
         }
         that.assignments_to_sort = $();
-        that.new_ids = [];
+        that.new_assignments = $();
+        that.just_edited_assignments = $();
         that.existing_ids = {};
         $(".assignment-container").each(function() {
             const assignment_container = $(this);
@@ -232,10 +253,14 @@ class Priority {
             let assignment_container;
             if (sa.id in that.existing_ids) {
                 assignment_container = that.existing_ids[sa.id];
+                if (sa.just_edited) {
+                    that.just_edited_assignments = that.just_edited_assignments.add(assignment_container);
+                    that.updateAssignmentDOM(assignment_container, sa);
+                }
             } else {
-                that.new_ids.push(sa.id);
                 assignment_container = $($("#assignment-template").html());
                 that.populateAssignmentDOM(assignment_container, sa);
+                that.new_assignments = that.new_assignments.add(assignment_container);
             }
             that.assignments_to_sort = that.assignments_to_sort.add(assignment_container);
         }
@@ -255,10 +280,13 @@ class Priority {
             }
 
             sa.setParabolaValues();
-            if (that.params.first_sort && !sa.sa.needs_more_info && !sa.sa.fixed_mode && dom_assignment.hasClass("refresh-dynamic-mode")) {
-                // Fix dynamic start if y or anything else was changed
-                // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
-                sa.refreshDynamicMode({ shouldAutotuneParams: { skip_break_days_check: true } });
+            if (sa.sa.refesh_dynamic_mode) {
+                delete sa.sa.refesh_dynamic_mode;
+                if (!sa.sa.needs_more_info && !sa.sa.fixed_mode) {
+                    // Fix dynamic start if y or anything else was changed
+                    // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
+                    sa.refreshDynamicMode({ shouldAutotuneParams: { skip_break_days_check: true } });
+                }
             }
 
             let delete_starred_assignment_after_sorting = false;
@@ -1266,18 +1294,13 @@ class Priority {
             });
 
 		that.updateInfoHeader();
-        const new_assignments = that.assignments_to_sort.filter(function() {
-            const dom_assignment = $(this).children(".assignment");
-            const sa = utils.loadAssignmentData(dom_assignment);
-            return that.new_ids.includes(sa.id);
-        });
         if (VIEWING_DELETED_ASSIGNMENTS) {
-            $("#extra-navs-assignment-positioner").prepend(new_assignments);
+            $("#extra-navs-assignment-positioner").prepend(that.new_assignments);
         } else {
-            $("#extra-navs-assignment-positioner").append(new_assignments);
+            $("#extra-navs-assignment-positioner").append(that.new_assignments);
         }
 
-        new_assignments.each(function() {
+        that.new_assignments.add(that.just_edited_assignments).each(function() {
             const dom_assignment = $(this).children(".assignment");
             utils.ui.setAssignmentScaleUtils(dom_assignment);
             const sa = new VisualAssignment(dom_assignment);
@@ -1343,7 +1366,17 @@ class Priority {
                     opacity: 0,
                 });
                 previous_margin_bottoms += margin_bottom;
-                delete sa.just_created;
+            } else if (sa.just_edited) {
+                dom_assignment.addClass("transition-disabler");
+                dom_assignment.css("--priority-color", "white");
+                dom_assignment[0].offsetHeight;
+                dom_assignment.removeClass("transition-disabler");
+                delete sa.just_edited;
+                setTimeout(() => {
+                    that.colorAssignment(assignment_container, priority_percentage);
+                }, 200);
+            } else {
+                that.colorAssignment(assignment_container, priority_percentage);
             }
         }
         if (that.scroll_assignment_animation_resolvers.length) {

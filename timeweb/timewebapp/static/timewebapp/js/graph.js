@@ -1,7 +1,11 @@
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 class Assignment {
     constructor(dom_assignment) {
-        this.sa = utils.loadAssignmentData(dom_assignment);
+        this.dom_assignment = dom_assignment;
+        this.refreshSA();
+    }
+    refreshSA() {
+        this.sa = utils.loadAssignmentData(this.dom_assignment);
         this.assign_day_of_week = this.sa.assignment_date?.getDay();
         this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.dynamic_start; // X-coordinate of the start of the red line
         this.red_line_start_y = this.sa.fixed_mode ? 0 : this.sa.works[this.red_line_start_x - this.sa.blue_line_start]; // Y-coordinate of the start of the red line
@@ -283,11 +287,13 @@ class VisualAssignment extends Assignment {
 
     constructor(dom_assignment) {
         super(dom_assignment);
-        this.dom_assignment = dom_assignment;
         this.graph = dom_assignment.find(".graph");
         this.fixed_graph = dom_assignment.find(".fixed-graph");
         this.set_skew_ratio_using_graph = false;
         this.draw_mouse_point = true;
+    }
+    refreshSA() {
+        super.refreshSA();
         this.complete_due_date = new Date(this.sa.assignment_date.valueOf());
         this.complete_due_date.setDate(this.complete_due_date.getDate() + Math.floor(this.sa.complete_x));
         if (this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
@@ -318,11 +324,7 @@ class VisualAssignment extends Assignment {
         // this method is still ran for assignments that have already been deleted, which messes up global VisualAssignment variables
         if (!document.contains(this.dom_assignment[0])) return;
 
-        if (!this.sa.fixed_mode) {
-            // Use sa because dynamic_start is changed in priority.js; needed to redefine starts
-            this.red_line_start_x = this.sa.dynamic_start;
-            this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-        }
+        this.refreshSA();
         const assignment_footer = this.dom_assignment.find(".assignment-footer");
         if (assignment_footer.is(":visible")) {
             this.width = this.fixed_graph.width();
@@ -339,18 +341,24 @@ class VisualAssignment extends Assignment {
         this.graph[0].height = this.height * VisualAssignment.scale;
         this.fixed_graph[0].width = this.width * VisualAssignment.scale;
         this.fixed_graph[0].height = this.height * VisualAssignment.scale;
-        if (this.dom_assignment.hasClass("open-assignment") || this.dom_assignment.hasClass("assignment-is-closing")) {
-            this.drawFixed();
-            this.draw();
-            // Don't hide graph hover point label on set skew ratio end if enabled
-            if (!e.isTrigger) {
-                const hover_point_label = this.dom_assignment.find(".hover-point-label");
-                hover_point_label.addClass("transition-disabler hide-label").removeClass("move-left");
-                hover_point_label.css("--x", 0);
-                hover_point_label.css("--y", 0);
-                hover_point_label[0].offsetHeight;
-                hover_point_label.removeClass("transition-disabler");
+        if (!this.sa.needs_more_info) {
+            if (this.dom_assignment.hasClass("open-assignment") || this.dom_assignment.hasClass("assignment-is-closing")) {
+                this.drawFixed();
+                this.draw();
+                // Don't hide graph hover point label on set skew ratio end if enabled
+                if (!e.isTrigger) {
+                    const hover_point_label = this.dom_assignment.find(".hover-point-label");
+                    hover_point_label.addClass("transition-disabler hide-label").removeClass("move-left");
+                    hover_point_label.css("--x", 0);
+                    hover_point_label.css("--y", 0);
+                    hover_point_label[0].offsetHeight;
+                    hover_point_label.removeClass("transition-disabler");
+                }
             }
+        } else if (this.dom_assignment.hasClass("open-assignment")) {
+            this.sa.needs_more_info = false;
+            this.dom_assignment.click();
+            this.sa.needs_more_info = true;
         }
     }
     extractRawCoordinatesFromGraphMoveEvent(e) {

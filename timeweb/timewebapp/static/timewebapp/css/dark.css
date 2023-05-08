@@ -51,7 +51,12 @@ select {
 .assignment-header-button:focus, .assignment-header-button:hover {
     --background-color: rgb(86, 116, 129);
 }
-.left-side-of-header.fancy-coloring, .left-side-of-header.fancy-coloring a {
+.assignment.transition-disabler .fancy-coloring,
+.assignment.transition-disabler .fancy-coloring .title-link-anchor {
+    transition: none !important;
+}
+.left-side-of-header.fancy-coloring,
+.left-side-of-header.fancy-coloring .title-link-anchor {
     --color: var(--priority-color);
     color: var(--color) !important;
     transition: color calc(var(--priority-color-transition-speed) * var(--animation-speed));
