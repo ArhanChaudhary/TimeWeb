@@ -25,17 +25,6 @@ class Priority {
         that.today_total_completion_time = 0;
         that.tomorrow_total_completion_time = 0;
     }
-
-    percentageToColor(priority_percentage) {
-        const that = this;
-        const percentage_as_decimal = priority_percentage / 100;
-        const low_hsv = utils.formatting.rgbToHSV(SETTINGS.lowest_priority_color.r, SETTINGS.lowest_priority_color.g, SETTINGS.lowest_priority_color.b);
-        const high_hsv = utils.formatting.rgbToHSV(SETTINGS.highest_priority_color.r, SETTINGS.highest_priority_color.g, SETTINGS.highest_priority_color.b);
-        const h = low_hsv.h + (high_hsv.h - low_hsv.h) * percentage_as_decimal;
-        const s = low_hsv.s + (high_hsv.s - low_hsv.s) * percentage_as_decimal;
-        const v = low_hsv.v + (high_hsv.v - low_hsv.v) * percentage_as_decimal;
-        return utils.formatting.hsvToRGB(h, s, v);
-    }
     // https://www.desmos.com/calculator/nhivlbqdzf
     // I will not be explaining anything nor answering any questions
     // goodbye
@@ -915,6 +904,22 @@ class Priority {
         }
         return priority_percentage;
     }
+    colorAssignment(assignment_container, priority_percentage) {
+        const that = this;
+        const dom_assignment = assignment_container.children(".assignment");
+        if (Number.isNaN(priority_percentage) || !SETTINGS.show_priority) {
+            dom_assignment.css("--priority-color", "var(--color)");
+            return;
+        }
+        const percentage_as_decimal = priority_percentage / 100;
+        const low_hsv = utils.formatting.rgbToHSV(SETTINGS.lowest_priority_color.r, SETTINGS.lowest_priority_color.g, SETTINGS.lowest_priority_color.b);
+        const high_hsv = utils.formatting.rgbToHSV(SETTINGS.highest_priority_color.r, SETTINGS.highest_priority_color.g, SETTINGS.highest_priority_color.b);
+        const h = low_hsv.h + (high_hsv.h - low_hsv.h) * percentage_as_decimal;
+        const s = low_hsv.s + (high_hsv.s - low_hsv.s) * percentage_as_decimal;
+        const v = low_hsv.v + (high_hsv.v - low_hsv.v) * percentage_as_decimal;
+        const priority_color = utils.formatting.hsvToRGB(h, s, v);
+        dom_assignment.css("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
+    }
     addAssignmentShortcut(dom_assignment, priority_data) {
         const that = this;
         // Loops through every google classroom assignment that needs more info AND has a tag (representing their class) to add "delete assignments of this class"
@@ -1175,13 +1180,7 @@ class Priority {
                         marginBottom: "0",
                     }, 1500 * SETTINGS.animation_speed, "easeOutCubic");
                 }
-                // A jQuery animation isn't needed for the background of ".animate-color" because it is transitioned using css
-                if (Number.isNaN(priority_percentage) || !SETTINGS.show_priority) {
-                    dom_assignment.css("--priority-color", "var(--color)");
-                } else {
-                    const priority_color = that.percentageToColor(priority_percentage);
-                    dom_assignment.css("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
-                }
+                that.colorAssignment(assignment_container, priority_data);
             });
             that.addAssignmentShortcut(dom_assignment, priority_data);
             if (!first_available_tutorial_assignment && ![
