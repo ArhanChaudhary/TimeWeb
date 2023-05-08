@@ -1473,6 +1473,11 @@ inLineWrapperQuery: function($first_assignment_container) {
     });
     return ret;
 },
+getPseudoStyle: function($element, pseudo, style) {
+    const ret = window.getComputedStyle($element[0], pseudo)[style];
+    if (Number.isFinite(parseFloat(ret))) return parseFloat(ret);
+    return ret;
+},
 initSA: function(sa) {
     let x_transform;
     if (isExampleAccount) {

@@ -4,7 +4,7 @@
 {% block js %}
     <script nonce="{{request.csp_nonce}}">
         $(window).one("load", function() {
-            $("#id_body").css("--nothing-height", "auto").expandableTextareaHeight().trigger("input");
+            $("#id_body").css("--nothing-height", "auto");
         })
         function submitContactForm(token) {
             $("#contact-form")[0].submit();

@@ -272,7 +272,43 @@ class Crud {
             that.setCrudHandlers();
         }, 0);
         
-        that.addInfoButtons();
+        Crud.info('#id_name', 'left', 'after',
+            `Only enter an assignment's name to mark it as "needs more info"
+            
+            Disables functionality but useful as a reminder for short assignments`
+        ).css({
+            marginTop: -23,
+            marginLeft: "auto",
+            marginRight: 7,
+        });
+        Crud.info('#id_unit', 'left', 'after',
+            `This is how your assignment will be split and divided up
+            
+            i.e. If this assignment is reading a book, enter "Page" or "Chapter"`, 
+        ).css({
+            marginTop: -23,
+            marginLeft: "auto",
+            marginRight: 7,
+        });
+        Crud.info('#id_works', 'left', 'after',
+            `This is also your initial work input, so changing this value will vertically translate all of your other work inputs accordingly`,
+        ).css({
+            marginRight: -17,
+            bottom: -9,
+            right: 23,
+        });
+        Crud.info('#id_funct_round', 'left', 'after',
+            "", // overridden in replaceUnit
+        ).css({
+            marginRight: -17,
+            bottom: -9,
+            right: 23,
+        });
+        Crud.info('label[for="id_soft"]', 'left', 'append',
+            `Soft due dates are automatically incremented if you haven't finished the assignment by then`,
+        ).css({
+            marginLeft: 4,
+        });
     }
     showForm() {
         const that = this;
@@ -343,7 +379,7 @@ class Crud {
         const that = this;
 
         // Can't directly juse .slice() it because safari returns the psuedo's content without quotes
-        let val = $("#id_unit").val().trim() || $("#id_y ~ .field-widget").getPseudoStyle("::after", "content");
+        let val = $("#id_unit").val().trim() || utils.getPseudoStyle($("#id_y ~ .field-widget"), "::after", "content");
         if (val.substring(0, 1) === "\"" && val.substring(val.length - 1) === "\"")
             val = val.slice(1, -1);
         let plural = pluralize(val),
@@ -706,7 +742,6 @@ class Crud {
         //         widget_input.val(Crud.hoursToMinutes(widget_input.val()));
         //     }
         // });
-        $("#id_description").expandableTextareaHeight();
         $("#id_y, #id_x, #id_assignment_date, #id_min_work_time, #id_time_per_unit").on("focusout", () => {
             let time_per_unit = $("#id_time_per_unit");
             if ($("#time_per_unit-widget-checkbox").prop("checked")) {
@@ -871,44 +906,31 @@ class Crud {
             window.location.href = url.href;
         });
     }
-    addInfoButtons() {
-        $("#id_name").info('left',
-            `Only enter an assignment's name to mark it as "needs more info"
-            
-            Disables functionality but useful as a reminder for short assignments`, 
-        "after").css({
-            marginTop: -23,
-            marginLeft: "auto",
-            marginRight: 7,
-        });
-        $("#id_unit").info('left',
-            `This is how your assignment will be split and divided up
-            
-            i.e. If this assignment is reading a book, enter "Page" or "Chapter"`, 
-        "after").css({
-            marginTop: -23,
-            marginLeft: "auto",
-            marginRight: 7,
-        });
-        $("#id_works").info('left',
-            `This is also your initial work input, so changing this value will vertically translate all of your other work inputs accordingly`,
-        "after").css({
-            marginRight: -17,
-            bottom: -9,
-            right: 23,
-        });
-        $("#id_funct_round").info('left',
-            "", // overridden in replaceUnit
-        "after").css({
-            marginRight: -17,
-            bottom: -9,
-            right: 23,
-        });
-        $("label[for=\"id_soft\"]").info('left',
-            `Soft due dates are automatically incremented if you haven't finished the assignment by then`,
-        "append").css({
-            marginLeft: 4,
-        });
+    static info(element, facing, position, text) {
+        const info_button = $($("#info-button-template").html());
+        info_button.find(".info-button-text").addClass(`info-${facing}`).text(text);
+        info_button.on("mousedown", function(e) {
+            if ($(document.activeElement).is(this)) { 
+                // I have to do a settimeout because, I have no idea why, but on touch devices
+                // an extra mouseout event is fired if you click the info button text container
+                // AFTER the last mousedown event so the info button text doesn't hide properly
+                setTimeout(() => $(this).blur().addClass("prevent-hover"), 0);
+                e.preventDefault();
+            } 
+        }).on("mouseout", function(e) {
+            const new_mouse_element = $(e.relatedTarget);
+            if (new_mouse_element.is(".info-button") || new_mouse_element.parents(".info-button").length) return;
+            $(this).removeClass("prevent-hover");
+        // prevent soft due date from getting clicked
+        }).click(() => false);
+        switch (position) {
+            case "prepend":
+                return info_button.prependTo(element);
+            case "after":
+                return info_button.insertAfter(element);
+            default:
+                return info_button.appendTo(element);
+        }
     }
     // Delete assignment
     static transitionDeleteAssignment($dom_assignment) {

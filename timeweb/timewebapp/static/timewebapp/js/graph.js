@@ -1588,13 +1588,13 @@ class VisualAssignment extends Assignment {
                 let title_top = dom_left_side_of_header[0].offsetTop;
                 let title_height = dom_left_side_of_header.height();
                 if (SETTINGS.vertical_tag_position === "Bottom") {
-                    var pseudo_height = dom_title.getPseudoStyle("::after", "height");
+                    var pseudo_height = utils.getPseudoStyle(dom_title, "::after", "height");
                     if (pseudo_height === "auto") {
                         pseudo_height = 0;
                     }
                     pseudo_height -= parseFloat(dom_title.css("--smush-daysleft"));
                 } else if (SETTINGS.vertical_tag_position === "Top") {
-                    var pseudo_height = dom_title.getPseudoStyle("::before", "height");
+                    var pseudo_height = utils.getPseudoStyle(dom_title, "::before", "height");
                     if (pseudo_height === "auto") {
                         pseudo_height = 0;
                     }
