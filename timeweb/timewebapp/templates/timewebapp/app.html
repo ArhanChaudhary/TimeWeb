@@ -35,7 +35,7 @@
 {% endblock %}
 
 {% block extra_header_elements %}
-  {% if not view_deleted_assignments_in_app_view %}
+  {% if not VIEWING_DELETED_ASSIGNMENTS %}
     <div id="image-new-container" tabindex="0">
       <img width="42" height="42" src="{% static 'timewebapp/images/plus.webp' %}" alt draggable="false"/>
       <span id="new-assignment-text">New Assignment</span>
@@ -48,11 +48,11 @@
     <img alt id="background-image" src="{{ user.settingsmodel.background_image.url }}" width="{{ user.settingsmodel.background_image.width }}" height="{{ user.settingsmodel.background_image.height }}" draggable="false">
   {% endif %}
   <div id="tutorial-overlay"></div>
-  <div id="overlay">
+  <div id="overlay" class="hide-form">
     <div id="form-wrapper">
-      <form method="POST" autocomplete="off">
+      <form autocomplete="off">
         <img id="cancel-button" width="20" height="20" src="{% static 'timewebapp/images/x.webp' %}" alt="Cancel" draggable="false" tabindex="0">
-        <div id="new-title">{{submit}}</div>
+        <div id="new-title"></div>
         <input id="field-group-picker-checkbox" type="checkbox" hidden>
         <label id="field-group-picker" for="field-group-picker-checkbox">
           <span class="field-group-picker-label" id="standard-field-group-label">Standard</span>
@@ -64,7 +64,6 @@
           </div>
         </label>
         <div id="fields-wrapper">
-          {% csrf_token %}
           {% for field in form.visible_fields %}
 
             {% if field.name == "name" %}
@@ -77,22 +76,23 @@
                 <div class="instant-margin-transition">
             {% endif %}
 
-            <div class="field-wrapper {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %} has-widget {% endif %}
-              {% comment %} tells crud.js the field was predicted {% endcomment %}
-              {% if field.name == 'x' and x_was_predicted or field.name == 'y' and y_was_predicted %} disabled-field {% endif %}
-              {% if field.name == 'y' %} disable-widget-along-with-field {% endif %}" 
-            id="id-{{ field.name }}-field-wrapper">
+            <div class="field-wrapper
+              {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %} has-widget {% endif %}
+              {% if field.name == 'y' %} disable-widget-along-with-field {% endif %}
+              {% if field.name == "x" or field.name == "y" %} has-magic-wand-icon {% endif %}" 
+              id="id-{{ field.name }}-field-wrapper"
+            >
               {% if field.name == "break_days" %}
                 <label id="break-days-label-title">Work Days</label>
                 {% include 'timewebapp/widgets/work_days.html' %}
               {% else %}
                 {{ field.label_tag }}
-                {{ field }}
                 {% if field.name == "x" or field.name == "y" %}
                   <svg class="magic-wand-icon" viewBox="2.19 10 488.31 488.28">
                     <use href="#magic_wand-svg"></use>
                   </svg>
                 {% endif %}
+                {{ field }}
               {% endif %}
               {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %}
                 {% if field.name == "x" %}
@@ -107,23 +107,17 @@
                   <label class="field-widget" for="{{ field.name }}-widget-checkbox"></label>
                 {% endif %}
               {% endif %}
-              {% for error in field.errors %}
-                {% comment %} Only adds form errors to the name field in the example account {% endcomment %}
-                {% if user.email != EXAMPLE_ACCOUNT_EMAIL or field.name == "name" %}
-                  <div class="assignment-form-error-note" id="error_{{ field.auto_id }}">{{ error|escape }}</div>
-                {% endif %}
-              {% endfor %}
             </div>
           {% endfor %}
             </div>
           </div>
         </div>
-        <button {% if invalid_form_pk %}value="{{ invalid_form_pk }}"{% endif %}type="submit" name="submit-button" id="submit-assignment-button" class="generic-button" title="(Enter)">{{submit}}</button>
+        <button type="submit" id="submit-assignment-button" class="generic-button"></button>
       </form>
     </div>
   </div>
   {% comment %} add tabindex because some js makes main focusable {% endcomment %}
-  <div id="assignments-container" class="{% if view_deleted_assignments_in_app_view %}viewing-deleted-assignments{% endif %}
+  <div id="assignments-container" class="{% if VIEWING_DELETED_ASSIGNMENTS %}viewing-deleted-assignments{% endif %}
   {% if user.settingsmodel.background_image %}{{ user.settingsmodel.background_image_text_shadow_width }}-text-shadow-width{% endif %}
   {% if user.settingsmodel.priority_color_borders %}priority-color-borders{% endif %}" tabindex="-1">
     <script nonce="{{request.csp_nonce}}">
@@ -148,8 +142,8 @@
     </script>
     <div id="extra-navs-positioner">
       {% comment %} <span> so :last-child is forwards-compatible {% endcomment %}
-      <span>
-        {% if not view_deleted_assignments_in_app_view %}
+      <span id="extra-navs-assignment-positioner">
+        {% if not VIEWING_DELETED_ASSIGNMENTS %}
           <div id="assignments-header" {% if user.settingsmodel.background_image %}class="grey-highlight"{% endif %}>
             <span id="todo-wrapper">
               <span id="estimated-total-time-label">Todo:</span>
@@ -172,145 +166,19 @@
             </div>
           </div>
         {% endif %}
-        {% for assignment in assignment_models %}
-          {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
-          <div class="assignment-container {% if user.settingsmodel.background_image %}grey-highlight{% endif %}"
-          {% if assignment.pk == just_created_assignment_id or user.settingsmodel.enable_tutorial and assignment.hidden == False and assignment.name == EXAMPLE_ASSIGNMENT_NAME %}
-            id="animate-in"
-          {% elif assignment.pk == just_updated_assignment_id %}
-            id="animate-color"
-          {% endif %}>
-            <div class="assignment {% if assignment.needs_more_info %}needs-more-info{% endif %} {% if refresh_dynamic_mode_all or refresh_dynamic_mode == assignment.pk %}refresh-dynamic-mode{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-              {% comment %} priority-color-strip must be a first child of .assignment so it expands its entire height when opened {% endcomment %}
-              <div class="priority-color-strip"></div>
-              <div class="assignment-header">
-                <div class="tags tags-{{ user.settingsmodel.horizontal_tag_position|lower }} tags-{{ user.settingsmodel.vertical_tag_position|lower }}">
-                  <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">
-                    {% comment %} Remove whitespace to remove inline-black gap (minify-html does not fix this) {% endcomment %}
-                    {% for tag in assignment.tags %}<div class="tag-wrapper">
-                        <div class="tag-name">{{ tag }}</div>
-                        <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-id="{{ assignment.pk }}">
-                          <span class="icon-slash x-first-slash"></span>
-                          <span class="icon-slash x-second-slash"></span>
-                        </div>
-                      </div>{% endfor %}</span>
-                  <div class="tag-add" data-assignment-id="{{ assignment.pk }}" tabindex="-1">
-                    <span class="icon-slash plus-first-slash"></span>
-                    <span class="icon-slash plus-second-slash"></span>
-                    <span class="info-button-text info-bottom tag-add-box">
-                      <div class="tag-add-overflow-hidden-container">
-                        <input class="tag-add-input" placeholder="New Tag" tabindex="-1">
-                        <div class="tag-add-button">
-                          <span class="icon-slash plus-first-slash"></span>
-                          <span class="icon-slash plus-second-slash"></span>
-                        </div>
-                      </div>
-                    </span>
-                    <div class="tag-add-text">Add Tag</div>
-                  </div>
-                </div>
-                {% comment %}
-                note: confirm with the .assignment-header > :nth-last-child(2) selector before changing
-                any .assignment-header first child element tags
-                {% endcomment %}
-                <div class="left-side-of-header {% if user.settingsmodel.appearance == "dark" or user.settingsmodel.appearance == "automatic" %}fancy-coloring{% endif %}">
-                  <span class="title">
-                    {% comment %} Don't make <a> .title so the psuedo elements don't become clickable {% endcomment %}
-                    <span class="title-text">{{ assignment.name }}</span>{% if assignment.external_link %}<a class="title-link-anchor" target="_blank" rel="noopener" href="{{ assignment.external_link }}" title="Assignment Link" tabindex="-1"
-                      ><svg class="title-link-icon" width="12" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
-                          <use href="#external_link-svg"></use>
-                        </svg>
-                      </a>
-                    {% endif %}
-                  </span>
-                  {% if assignment.description %}
-                    <div class="description">{{ assignment.description|linebreaksbr }}</div>
-                  {% endif %}
-                </div>
-                {% if not view_deleted_assignments_in_app_view %}
-                  <div class="middle-of-header">
-                    <svg width="20px" height="20px" class="arrow-container">
-                      <polygon points="5,0 5,20 15,10" fill="currentColor">
-                        <animate class="rising-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
-                        <animate class="falling-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
-                        <animate class="falling-arrow-animation-instant" from="20,5 0,5 10,15" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
-                      </polygon>
-                    </svg>
-                    <svg class="status-image" preserveAspectRatio="none">
-                      <use></use>
-                    </svg>
-                    <div class="align-to-status-message-container">
-                      <span class="status-message"></span>
-                    </div>
-                  </div>
-                {% endif %}
-                <div class="right-side-of-header">
-                  <span class="completion-time"></span>
-                  {% if view_deleted_assignments_in_app_view %}
-                    <div class="assignment-header-button" title="Restore Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-                      <svg viewBox="252 252.18 247.73 247.64" class="restore-button" width="24" height="24" preserveAspectRatio="none">
-                        <use href="#restore-svg"></use>
-                      </svg>
-                    </div>
-                  {% else %}
-                    <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-                      <svg class="tick-button" width="25" preserveAspectRatio="none">
-                        <use href="#tick-svg"></use>
-                      </svg>
-                    </div>
-                  {% endif %}
-                  <div class="assignment-header-button" title="Edit Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-                    <svg viewBox="3.00 3.00 18.00 18.00" class="update-button" width="22" height="22" preserveAspectRatio="none">
-                      <use href="#edit-svg"></use>
-                    </svg>
-                  </div>
-                  <div class="assignment-header-button block-selection" title="Delete Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-                    <svg viewBox="0.21 -1277.63 1039.42 1279.13" class="delete-button" height="25" preserveAspectRatio="none">
-                      <use href="#delete-svg"></use>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-              <div class="assignment-footer">
-                <div class="graph-container">
-                  <div class="hover-point-label hide-label"></div>
-                  <canvas class="fixed-graph"></canvas>
-                  <canvas class="graph">Your browser does not support the canvas tag.</canvas>
-                  <table>
-                    <tbody class="text-display-container">
-                      <tr>
-                        <th></th>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div class="graph-footer">
-                  {% if not view_deleted_assignments_in_app_view %}
-                    <button class="delete-work-input-button">Delete <span class="hide-on-small-mobile">Work </span>Input</button>
-                    <div class="work-input-textbox-wrapper">
-                      <input id="work-input-label-{{ assignment.id }}" type="checkbox" class="work-input-unit-of-time-checkbox">
-                      <input class="work-input-textbox" placeholder="Enter Units Done" type="number" step="0.01"/>
-                      <label for="work-input-label-{{ assignment.id }}" class="work-input-unit-of-time-widget" tabindex="-1"></label>
-                    </div>
-                    <button class="submit-work-button">Submit <span class="hide-on-small-mobile">Work </span>Input</button>
-                    <br>
-                    <button class="fixed-mode-button" data-fixed-mode-label="Fixed Mode" data-dynamic-mode-label="Dynamic Mode"></button>
-                    <button class="skew-ratio-button" data-label="Set Curvature" data-active-label="Hover the graph" data-active-label-touch="Drag the graph">Set Curvature</button>
-                    <button class="display-in-text-button" data-in-text-label="Text Display" data-in-graph-label="Graph Display"></button>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-        {% if view_deleted_assignments_in_app_view %}
-          <div id="no-assignments-message" {% if user.settingsmodel.background_image %}class="grey-highlight"{% endif %}>You don't have any deleted assignments...</div>
+        {% comment %} 
+        assignments go here
+        appropriately change priority.js if dom layout for the span children changes
+        (before #no-assignments-message and after #assignments-header)
+        {% endcomment %}
+        {% if VIEWING_DELETED_ASSIGNMENTS %}
+          <div id="no-assignments-message" {% if user.settingsmodel.background_image %}class="grey-highlight"{% endif %}>You don't have any deleted assignments on this page...</div>
         {% endif %}
       </span>
       <div id="extra-navs">
         {% comment %} extra-navs already has a filter style {% endcomment %}
         <span {% if user.settingsmodel.background_image %}class="grey-highlight"{% endif %}>
-          {% if view_deleted_assignments_in_app_view %}
+          {% if VIEWING_DELETED_ASSIGNMENTS %}
             {% if show_previous_page %}
               <span id="previous-page">Previous Page</span>
             {% endif %}
@@ -337,6 +205,123 @@
       </div>
     </div>
   </div>
+  <template id="assignment-template">
+    {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
+    <div class="assignment-container {% if user.settingsmodel.background_image %}grey-highlight{% endif %}">
+      <div class="assignment" tabindex="0">
+        {% comment %} priority-color-strip must be a first child of .assignment so it expands its entire height when opened {% endcomment %}
+        <div class="priority-color-strip"></div>
+        <div class="assignment-header">
+          <div class="tags tags-{{ user.settingsmodel.horizontal_tag_position|lower }} tags-{{ user.settingsmodel.vertical_tag_position|lower }}">
+            <span class="tag-sortable-container"></span>
+            <div class="tag-add" tabindex="-1">
+              <span class="icon-slash plus-first-slash"></span>
+              <span class="icon-slash plus-second-slash"></span>
+              <span class="info-button-text info-bottom tag-add-box">
+                <div class="tag-add-overflow-hidden-container">
+                  <input class="tag-add-input" placeholder="New Tag" tabindex="-1">
+                  <div class="tag-add-button">
+                    <span class="icon-slash plus-first-slash"></span>
+                    <span class="icon-slash plus-second-slash"></span>
+                  </div>
+                </div>
+              </span>
+              <div class="tag-add-text">Add Tag</div>
+            </div>
+          </div>
+          {% comment %}
+          note: confirm with the .assignment-header > :nth-last-child(2) selector before changing
+          any .assignment-header first child element tags
+          {% endcomment %}
+          <div class="left-side-of-header {% if user.settingsmodel.appearance == "dark" or user.settingsmodel.appearance == "automatic" %}fancy-coloring{% endif %}">
+            <span class="title">
+              {% comment %} Don't make <a> .title so the psuedo elements don't become clickable {% endcomment %}
+              <span class="title-text"></span
+              {% comment %} Remove whitespace to remove inline-black gap (minify-html does not fix this) {% endcomment %}
+              ><a class="title-link-anchor" target="_blank" rel="noopener" title="Assignment Link" tabindex="-1">
+                <svg class="title-link-icon" width="12" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
+                  <use href="#external_link-svg"></use>
+                </svg>
+              </a>
+            </span>
+            <div class="description"></div>
+          </div>
+          {% if not VIEWING_DELETED_ASSIGNMENTS %}
+            <div class="middle-of-header">
+              <svg width="20px" height="20px" class="arrow-container">
+                <polygon points="5,0 5,20 15,10" fill="currentColor">
+                  <animate class="rising-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
+                  <animate class="falling-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
+                  <animate class="falling-arrow-animation-instant" from="20,5 0,5 10,15" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
+                </polygon>
+              </svg>
+              <svg class="status-image" preserveAspectRatio="none">
+                <use></use>
+              </svg>
+              <div class="align-to-status-message-container">
+                <span class="status-message"></span>
+              </div>
+            </div>
+          {% endif %}
+          <div class="right-side-of-header">
+            <span class="completion-time"></span>
+            {% if VIEWING_DELETED_ASSIGNMENTS %}
+              <div class="assignment-header-button" title="Restore Assignment" tabindex="0">
+                <svg viewBox="252 252.18 247.73 247.64" class="restore-button" width="24" height="24" preserveAspectRatio="none">
+                  <use href="#restore-svg"></use>
+                </svg>
+              </div>
+            {% else %}
+              <div class="assignment-header-button" title="Finish Assignment for Today" tabindex="0">
+                <svg class="tick-button" width="25" preserveAspectRatio="none">
+                  <use href="#tick-svg"></use>
+                </svg>
+              </div>
+            {% endif %}
+            <div class="assignment-header-button" title="Edit Assignment" tabindex="0">
+              <svg viewBox="3.00 3.00 18.00 18.00" class="update-button" width="22" height="22" preserveAspectRatio="none">
+                <use href="#edit-svg"></use>
+              </svg>
+            </div>
+            <div class="assignment-header-button block-selection" title="Delete Assignment" tabindex="0">
+              <svg viewBox="0.21 -1277.63 1039.42 1279.13" class="delete-button" height="25" preserveAspectRatio="none">
+                <use href="#delete-svg"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="assignment-footer">
+          <div class="graph-container">
+            <div class="hover-point-label hide-label"></div>
+            <canvas class="fixed-graph"></canvas>
+            <canvas class="graph">Your browser does not support the canvas tag.</canvas>
+            <table>
+              <tbody class="text-display-container">
+                <tr>
+                  <th></th>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="graph-footer">
+            {% if not VIEWING_DELETED_ASSIGNMENTS %}
+              <button class="delete-work-input-button">Delete <span class="hide-on-small-mobile">Work </span>Input</button>
+              <div class="work-input-textbox-wrapper">
+                <input type="checkbox" class="work-input-unit-of-time-checkbox">
+                <input class="work-input-textbox" placeholder="Enter Units Done" type="number" step="0.01"/>
+                <label class="work-input-unit-of-time-widget" tabindex="-1"></label>
+              </div>
+              <button class="submit-work-button">Submit <span class="hide-on-small-mobile">Work </span>Input</button>
+              <br>
+              <button class="fixed-mode-button" data-fixed-mode-label="Fixed Mode" data-dynamic-mode-label="Dynamic Mode"></button>
+              <button class="skew-ratio-button" data-label="Set Curvature" data-active-label="Hover the graph" data-active-label-touch="Drag the graph">Set Curvature</button>
+              <button class="display-in-text-button" data-in-text-label="Text Display" data-in-graph-label="Graph Display"></button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
   <template id="delete-gc-assignments-from-class-template">
     <div class="delete-gc-assignments-from-class shortcut {% if user.settingsmodel.background_image %}grey-highlight{% endif %}">
       <div class="shortcut-line-left"></div>
@@ -399,7 +384,7 @@
   <template id="tag-template">
     <div class="tag-wrapper">
       <div class="tag-name"></div>
-      <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-id="{{ assignment.pk }}">
+      <div class="tag-delete">
         <span class="icon-slash x-first-slash"></span>
         <span class="icon-slash x-second-slash"></span>
       </div>

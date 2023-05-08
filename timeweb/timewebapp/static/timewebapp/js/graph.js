@@ -1,7 +1,11 @@
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 class Assignment {
     constructor(dom_assignment) {
-        this.sa = utils.loadAssignmentData(dom_assignment);
+        this.dom_assignment = dom_assignment;
+        this.refreshSA();
+    }
+    refreshSA() {
+        this.sa = utils.loadAssignmentData(this.dom_assignment);
         this.assign_day_of_week = this.sa.assignment_date?.getDay();
         this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.dynamic_start; // X-coordinate of the start of the red line
         this.red_line_start_y = this.sa.fixed_mode ? 0 : this.sa.works[this.red_line_start_x - this.sa.blue_line_start]; // Y-coordinate of the start of the red line
@@ -279,14 +283,17 @@ class VisualAssignment extends Assignment {
     static SKEW_RATIO_SNAP_DIFF = 0.05
     static BUTTON_ERROR_DISPLAY_TIME = 1000
     static TOTAL_ARROW_SKEW_RATIO_STEPS = 100
+    static scale = window.devicePixelRatio || 2
 
     constructor(dom_assignment) {
         super(dom_assignment);
-        this.dom_assignment = dom_assignment;
         this.graph = dom_assignment.find(".graph");
         this.fixed_graph = dom_assignment.find(".fixed-graph");
         this.set_skew_ratio_using_graph = false;
         this.draw_mouse_point = true;
+    }
+    refreshSA() {
+        super.refreshSA();
         this.complete_due_date = new Date(this.sa.assignment_date.valueOf());
         this.complete_due_date.setDate(this.complete_due_date.getDate() + Math.floor(this.sa.complete_x));
         if (this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
@@ -299,7 +306,6 @@ class VisualAssignment extends Assignment {
             this.date_string_options = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'};
             this.date_string_options_no_weekday = {year: 'numeric', month: 'long', day: 'numeric'};
         }
-        this.scale = window.devicePixelRatio || 2;
     }
     initUI() {
         const first_click = !this.dom_assignment.hasClass('has-been-clicked');
@@ -318,12 +324,7 @@ class VisualAssignment extends Assignment {
         // this method is still ran for assignments that have already been deleted, which messes up global VisualAssignment variables
         if (!document.contains(this.dom_assignment[0])) return;
 
-        if (!this.sa.fixed_mode) {
-            // Use sa because dynamic_start is changed in priority.js; needed to redefine starts
-            this.red_line_start_x = this.sa.dynamic_start;
-            this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-        }
-        this.scale = window.devicePixelRatio || 2; // Zoom in/out
+        this.refreshSA();
         const assignment_footer = this.dom_assignment.find(".assignment-footer");
         if (assignment_footer.is(":visible")) {
             this.width = this.fixed_graph.width();
@@ -336,22 +337,28 @@ class VisualAssignment extends Assignment {
         }
         this.wCon = (this.width - (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 15)) / this.sa.complete_x;
         this.hCon = (this.height - 55) / this.sa.y;
-        this.graph[0].width = this.width * this.scale;
-        this.graph[0].height = this.height * this.scale;
-        this.fixed_graph[0].width = this.width * this.scale;
-        this.fixed_graph[0].height = this.height * this.scale;
-        if (this.dom_assignment.hasClass("open-assignment") || this.dom_assignment.hasClass("assignment-is-closing")) {
-            this.drawFixed();
-            this.draw();
-            // Don't hide graph hover point label on set skew ratio end if enabled
-            if (!e.isTrigger) {
-                const hover_point_label = this.dom_assignment.find(".hover-point-label");
-                hover_point_label.addClass("disable-hover-point-label-transition hide-label").removeClass("move-left");
-                hover_point_label.css("--x", 0);
-                hover_point_label.css("--y", 0);
-                hover_point_label[0].offsetHeight;
-                hover_point_label.removeClass("disable-hover-point-label-transition");
+        this.graph[0].width = this.width * VisualAssignment.scale;
+        this.graph[0].height = this.height * VisualAssignment.scale;
+        this.fixed_graph[0].width = this.width * VisualAssignment.scale;
+        this.fixed_graph[0].height = this.height * VisualAssignment.scale;
+        if (!this.sa.needs_more_info) {
+            if (this.dom_assignment.hasClass("open-assignment") || this.dom_assignment.hasClass("assignment-is-closing")) {
+                this.drawFixed();
+                this.draw();
+                // Don't hide graph hover point label on set skew ratio end if enabled
+                if (!e.isTrigger) {
+                    const hover_point_label = this.dom_assignment.find(".hover-point-label");
+                    hover_point_label.addClass("transition-disabler hide-label").removeClass("move-left");
+                    hover_point_label.css("--x", 0);
+                    hover_point_label.css("--y", 0);
+                    hover_point_label[0].offsetHeight;
+                    hover_point_label.removeClass("transition-disabler");
+                }
             }
+        } else if (this.dom_assignment.hasClass("open-assignment")) {
+            this.sa.needs_more_info = false;
+            this.dom_assignment.click();
+            this.sa.needs_more_info = true;
         }
     }
     extractRawCoordinatesFromGraphMoveEvent(e) {
@@ -550,7 +557,6 @@ class VisualAssignment extends Assignment {
         }
         const len_works = this.sa.works.length - 1;
         const last_work_input = this.sa.works[len_works];
-        const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
         const assignment_container = this.dom_assignment.parents(".assignment-container");
 
         // draw() always runs setParabolaValues but I'll leave it like this because it's easier to maintain and for forward compatibility
@@ -583,7 +589,7 @@ class VisualAssignment extends Assignment {
             this.last_draw_at_works = draw_at_works;
         }
         const screen = this.graph[0].getContext("2d");
-        screen.scale(this.scale, this.scale);
+        screen.scale(VisualAssignment.scale, VisualAssignment.scale);
         screen.clearRect(0, 0, this.width, this.height);
 
         const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION);
@@ -653,7 +659,7 @@ class VisualAssignment extends Assignment {
             // converting from minutes to hours can result in hidden decimal places, so we round so the user isnt overwhelmed
             const point_str = `(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${Math.floor(funct_mouse_x * 100) / 100})`;
             if (hover_point_label.hasClass("hide-label")) {
-                hover_point_label.addClass("disable-hover-point-label-transition");
+                hover_point_label.addClass("transition-disabler");
             }
             hover_point_label.css("--x", point_x);
             hover_point_label.css("--y", point_y);
@@ -661,7 +667,7 @@ class VisualAssignment extends Assignment {
             hover_point_label.toggleClass("move-left", point_x + screen.measureText(point_str).width + 8 > this.width - 5);
             if (hover_point_label.hasClass("hide-label")) {
                 hover_point_label[0].offsetHeight;
-                hover_point_label.removeClass("disable-hover-point-label-transition hide-label");
+                hover_point_label.removeClass("transition-disabler hide-label");
             }
             screen.beginPath();
 
@@ -719,7 +725,7 @@ class VisualAssignment extends Assignment {
                 center(Priority.generate_UNFINISHED_FOR_TODAY_status_message(this, todo, last_work_input), 2);
             }
         }
-        screen.scale(1 / this.scale, 1 / this.scale);
+        screen.scale(1 / VisualAssignment.scale, 1 / VisualAssignment.scale);
     }
     static GRAPH_Y_AXIS_MARGIN = 55;
     static SMALLER_SMALLER_MARGIN_X = 11;
@@ -731,7 +737,7 @@ class VisualAssignment extends Assignment {
     //hard (the entire function)
     drawFixed() {
         const screen = this.fixed_graph[0].getContext("2d");
-        screen.scale(this.scale, this.scale);
+        screen.scale(VisualAssignment.scale, VisualAssignment.scale);
         let gradient = screen.createLinearGradient(0, 0, 0, this.height * 4 / 3);
         gradient.addColorStop(0, "white");
         gradient.addColorStop(1, "hsl(0, 0%, 83%)");
@@ -1619,7 +1625,7 @@ class VisualAssignment extends Assignment {
         }
     }
     makeGCAnchorVisible() {
-        if (!this.sa.is_google_classroom_assignment) return;
+        if (!this.sa.external_link) return;
         const title = this.dom_assignment.find(".title");
         const anchor = this.dom_assignment.find(".title-link-anchor");
         const title_text = this.dom_assignment.find(".title-text");
@@ -1630,30 +1636,21 @@ class VisualAssignment extends Assignment {
             title_text.text(sliced);
         }
     }
-    displayTruncateWarning() {
-        // remove for now
-        return;
-        const dom_left_side_of_header = this.dom_assignment.find(".left-side-of-header");
-        dom_left_side_of_header.toggleClass("display-truncate-warning", dom_left_side_of_header.find(".description").hasOverflown());
-    }
-    canOpenAssignment() {
-        return !this.sa.needs_more_info;
-    }
 }
 window.VisualAssignment = VisualAssignment;
-$(function() {
-$(".assignment").click(function(e/*, params={ initUI: true }*/) {
+$(document).click(function(e) {
     const target = $(e.target);
+    const dom_assignment = target.closest(".assignment");
+    if (!dom_assignment.length) return;
     const targetInFooter = !!target.parents(".assignment-footer").length; // only check the children not the actual element so the sides of an assignment can be clicked
-    const targetInTags = !!target.parents(".tags").length || target.is(".tags");
-    const targetInButton = !!target.parents(".assignment-header-button").length || target.is(".assignment-header-button");
-    const targetInAnchor = !!target.parents(".title-link-anchor").length || target.is(".title-link-anchor");
+    const targetInTags = !!target.closest(".tags").length;
+    const targetInButton = !!target.closest(".assignment-header-button").length;
+    const targetInAnchor = !!target.closest(".title-link-anchor").length;
     const dontFire = targetInTags || targetInButton || targetInAnchor || targetInFooter;
     if (dontFire) return;
-    const dom_assignment = $(this);
     const sa = new VisualAssignment(dom_assignment);
     
-    if (!sa.canOpenAssignment()) {
+    if (sa.sa.needs_more_info) {
         dom_assignment.find(".update-button").click();
         return;
     }
@@ -1696,9 +1693,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     assignment_footer.stop(false, true);
     dom_assignment.addClass("open-assignment");
     sa.positionTags();
-    sa.displayTruncateWarning();
     assignment_footer.css("display", "block");
     dom_assignment.find(".rising-arrow-animation")[0]?.beginElement();
     sa.initUI();
-});
 });

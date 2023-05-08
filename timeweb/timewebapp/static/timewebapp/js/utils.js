@@ -163,6 +163,8 @@ tickClock: function() {
             // Don't reload in the next day to preserve changes made in the simulation
             // Don't reload in the example account because date_now set in the example account causes an infinite reload loop  
             if (utils.in_simulation || isExampleAccount) return;
+            // even though this may be unnecessary i don't care because this will happen very infrequently and making this
+            // perform optimally is a waste of time
             reloadWhenAppropriate();
         }
 
@@ -203,8 +205,10 @@ tickClock: function() {
 },
 setClickHandlers: {
     tickButtons: function() {
-        $(".tick-button").parent().click(function() {
-            const $this = $(this);
+        $(document).click(function(e) {
+            const $this = $(e.target).closest($(".tick-button").parent());
+            if (!$this.length) return;
+
             const dom_assignment = $this.parents(".assignment");
             const sa = new VisualAssignment(dom_assignment);
             sa.setParabolaValues();
@@ -304,16 +308,18 @@ setClickHandlers: {
     // cannot use arrow function to preserve `this`
     confirmAction: function(params) {
         const assignment_ids_to_delete = params.assignments_in_wrapper.map(function() {
-            return utils.loadAssignmentData($(this)).id;
+            const dom_assignment = $(this);
+            return utils.loadAssignmentData(dom_assignment).id;
         }).toArray();
         const success = function() {
-            new Crud().transitionDeleteAssignment(params.assignments_in_wrapper);
+            Crud.transitionDeleteAssignment(params.assignments_in_wrapper);
         }
         $.ajax({
             type: "POST",
             url: "/api/delete-assignment",
             data: {assignments: JSON.stringify(assignment_ids_to_delete)},
             success: success,
+            fakeSuccessArguments: [],
             error: ajaxUtils.error,
         });
     },
@@ -377,16 +383,18 @@ setClickHandlers: {
     confirmAction: function(params) {
         const success = function() {
             params.$this.off("click");
-            new Crud().transitionDeleteAssignment(params.assignments_in_wrapper);
+            Crud.transitionDeleteAssignment(params.assignments_in_wrapper);
         }
         const assignment_ids_to_delete = params.assignments_in_wrapper.map(function() {
-            return utils.loadAssignmentData($(this)).id;
+            const dom_assignment = $(this);
+            return utils.loadAssignmentData(dom_assignment).id;
         }).toArray();
         $.ajax({
             type: "POST",
             url: "/api/delete-assignment",
             data: {assignments: JSON.stringify(assignment_ids_to_delete)},
             success: success,
+            fakeSuccessArguments: [],
             error: ajaxUtils.error,
         });
     },
@@ -423,9 +431,7 @@ setClickHandlers: {
     },
 },
 addTagHandlers: function() {
-    function transitionCloseTagBox($tag_add) {
-        const tag_add_box = $tag_add.find(".tag-add-box");
-
+    function transitionCloseTagBox(tag_add_box) {
         tag_add_box.css({
             height: "unset",
             overflow: "visible",
@@ -441,101 +447,106 @@ addTagHandlers: function() {
             tag_add_box.find(".tag-add-input").attr("tabindex", "-1");
         });
     }
-    // TODO: might be easier to attach the click to $(document) but will do later
-    $(".tag-add").click(tagAddClick);
+    
     let tag_names = new Set();
-    function tagAddClick(e) {
-        const $this = $(this);
-        const dom_assignment = $this.parents(".assignment");
-        // Close add tag box if "Add Tag" is clicked again
-        if (($(e.target).hasClass("tag-add") || $(e.target).parent(".tag-add").length) && dom_assignment.hasClass("open-tag-add-box")) {
-            dom_assignment.removeClass("open-tag-add-box");
-            transitionCloseTagBox($this);
-            return;
-        }
+    $(document).click(function(e) {
+        const $this = $(e.target).closest(".tag-add-button");
+        if (!$this.length) return;
+        
         // Plus button was clicked
-        if ($(e.target).is(".tag-add-button, .tag-add-button > .icon-slash")) {
-            const sa = utils.loadAssignmentData($this);
+        const dom_assignment = $this.parents(".assignment");
+        const sa = utils.loadAssignmentData(dom_assignment);
 
-            const checked_tag_names = $this.find(".tag-add-selection-item.checked .tag-add-selection-item-name").map(function() {
-                return $(this).text();
-            }).toArray();
-            // Push all checked tag names not already in tag_names to tag_names
-            checked_tag_names.forEach(tag_names.add, tag_names);
-            
-            const inputted_tag_name = $this.find(".tag-add-input").val().trim();
-            if (inputted_tag_name && inputted_tag_name !== "Too Many Tags!" && !tag_names.has(inputted_tag_name)) {
-                tag_names.add(inputted_tag_name);
-            }
-            // Nothing is checked or inputted
-            if (!tag_names.size) {
-                if (utils.ui.close_on_success) {
-                    utils.ui.close_on_success = false;
-                    $this.find(".tag-add-input").blur();
-                }
-                return;
-            }
-            tag_names = new Set([...tag_names].filter(tag_name => !sa.tags.includes(tag_name)));
-
-            if (sa.tags.length + tag_names.size > MAX_NUMBER_OF_TAGS) {
-                $(this).find(".tag-add-button").addClass("tag-add-red-box-shadow");
-                $(this).find(".tag-add-input").val("Too Many Tags!");
-                tag_names = new Set();
-                return;
-            }
-
+        const checked_tag_names = dom_assignment.find(".tag-add-selection-item.checked .tag-add-selection-item-name").map(function() {
+            return $(this).text();
+        }).toArray();
+        // Push all checked tag names not already in tag_names to tag_names
+        checked_tag_names.forEach(tag_names.add, tag_names);
+        
+        const inputted_tag_name = dom_assignment.find(".tag-add-input").val().trim();
+        if (inputted_tag_name && inputted_tag_name !== "Too Many Tags!" && !tag_names.has(inputted_tag_name)) {
+            tag_names.add(inputted_tag_name);
+        }
+        // Nothing is checked or inputted
+        if (!tag_names.size) {
             if (utils.ui.close_on_success) {
                 utils.ui.close_on_success = false;
-                $this.find(".tag-add-input").blur();
+                dom_assignment.find(".tag-add-input").blur();
             }
-            // Close box and add tags visually
-            dom_assignment.removeClass("open-tag-add-box");
-            transitionCloseTagBox($this);
-            for (let tag_name of tag_names) {
-                const tag = $($("#tag-template").html());
-                tag.find(".tag-name").text(tag_name);
-                tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-id", sa.id);
-                tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
+            return;
+        }
+        tag_names = new Set([...tag_names].filter(tag_name => !sa.tags.includes(tag_name)));
 
-                tag.addClass("tag-add-transition-disabler");
-                // Need to use jquery instead of css to set marginLeft
-                tag.css({
-                    marginLeft: -tag.outerWidth(true),
-                    opacity: "0",
-                    transform: "scale(0.6)",
-                });
-                tag[0].offsetHeight;
-                tag.removeClass("tag-add-transition-disabler");
-                tag.css({
-                    marginLeft: "",
-                    opacity: "",
-                    transform: "",
-                });
-
-                tag.prev().css("z-index", "1");
-                tag.one("transitionend", function() {
-                    tag.prev().css("z-index", "");
-                });
-            }            
-            if (!tag_names.size) return;
-            sa.tags.push(...tag_names);
-            ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
-            // There are too many conditions on whether to sort or not, so just sort every time
-
-            // sa.needs_more info for GC class tags or for first_tag sorting for non GC assignments
-            // "important" and "not important" because they were designed to affect priority
-            // if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
-                new Priority().sort();
-            // }
+        if (sa.tags.length + tag_names.size > MAX_NUMBER_OF_TAGS) {
+            $(this).find(".tag-add-button").addClass("tag-add-red-box-shadow");
+            $(this).find(".tag-add-input").val("Too Many Tags!");
             tag_names = new Set();
             return;
         }
-        // Tag add textbox was selected or tags were selected
-        if (dom_assignment.hasClass("open-tag-add-box")) return;
+
+        if (utils.ui.close_on_success) {
+            utils.ui.close_on_success = false;
+            dom_assignment.find(".tag-add-input").blur();
+        }
+        // Close box and add tags visually
+        dom_assignment.removeClass("open-tag-add-box");
+        transitionCloseTagBox(dom_assignment.find(".tag-add-box"));
+        for (let tag_name of tag_names) {
+            const tag = $($("#tag-template").html());
+            tag.find(".tag-name").text(tag_name);
+            tag.appendTo(dom_assignment.find(".tag-sortable-container"));
+
+            tag.addClass("transition-disabler");
+            // Need to use jquery instead of css to set marginLeft
+            tag.css({
+                marginLeft: -tag.outerWidth(true),
+                opacity: "0",
+                transform: "scale(0.6)",
+            });
+            tag[0].offsetHeight;
+            tag.removeClass("transition-disabler");
+            tag.css({
+                marginLeft: "",
+                opacity: "",
+                transform: "",
+            });
+
+            tag.prev().css("z-index", "1");
+            tag.one("transitionend", function() {
+                tag.prev().css("z-index", "");
+            });
+        }            
+        if (!tag_names.size) return;
+        sa.tags.push(...tag_names);
+        ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
+        // There are too many conditions on whether to sort or not, so just sort every time
+
+        // sa.needs_more info for GC class tags or for first_tag sorting for non GC assignments
+        // "important" and "not important" because they were designed to affect priority
+        // if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
+            new Priority().sort();
+        // }
+        tag_names = new Set();
+    });
+
+    $(document).click(function(e) {
+        const target = $(e.target)
+        const clicked_add_tag = target.hasClass("tag-add") || target.parent(".tag-add").length;
+        if (!clicked_add_tag) return;
+        
+        // Tag add textbox was clicked or tags were selected
+        const dom_assignment = target.parents(".assignment");
+        if (dom_assignment.hasClass("open-tag-add-box")) {
+            // Close add tag box if "Add Tag" is clicked again
+            dom_assignment.removeClass("open-tag-add-box");
+            transitionCloseTagBox(dom_assignment.find(".tag-add-box"));
+            return;
+        }
+
+        // Tag add pop up was clicked
         dom_assignment.addClass("open-tag-add-box");
-        $this.find(".tag-add-button").removeClass("tag-add-red-box-shadow").attr("tabindex", "0");
-        $this.find(".tag-add-input").val("").attr("tabindex", "");
-        const container_for_tags = $this.find(".tag-add-overflow-hidden-container");
+        dom_assignment.find(".tag-add-button").removeClass("tag-add-red-box-shadow").attr("tabindex", "0");
+        dom_assignment.find(".tag-add-input").val("").attr("tabindex", "");
 
         // This code handles the logic for determining which tags should be added to the tag add dropdown. Let's break this down:
 
@@ -563,36 +574,38 @@ addTagHandlers: function() {
         final_allTags = final_allTags.filter(e => !current_assignment_tags.includes(e));
         if (!isTouchDevice || !final_allTags.length) {
             // showing the entire keyboard when you want to add tags can get annoying on mobile
-            $this.find(".tag-add-input").focus();
+            dom_assignment.find(".tag-add-input").focus();
         }
 
 
 
         // The tag add box can be reopened while the transitionend from the transitionCloseTagBox function hasn't yet fired, causing all the tags to disppear
         // Trigger the transitionend if this is the case, and since transitionCloseTagAddBox uses .one, it will be disabled after
-        const tag_add_box = $this.find(".tag-add-box");
+        const tag_add_box = dom_assignment.find(".tag-add-box");
         tag_add_box.trigger("transitionend");
 
         for (let tag of final_allTags) {
             const tag_add_selection_item = $($("#tag-add-selection-item-template").html());
             tag_add_selection_item.find(".tag-add-selection-item-name").first().text(tag);
-            container_for_tags.append(tag_add_selection_item);
+            dom_assignment.find(".tag-add-overflow-hidden-container").append(tag_add_selection_item);
             tag_add_selection_item.click(function() {
                 $(this).find(".tag-add-checkbox").prop("checked", !$(this).hasClass("checked"));
                 $(this).toggleClass("checked");
             });
         }
         
-    }
-    $(".tag-delete").click(tagDelete);
-    function tagDelete() {
-        const $this = $(this);
+    });
+    $(document).click(function(e) {
+        const $this = $(e.target).closest(".tag-delete");
+        if (!$this.length) return;
+
         const tag_wrapper = $this.parents(".tag-wrapper");
         if (tag_wrapper.hasClass("tag-is-deleting")) return;
         tag_wrapper.addClass("keep-delete-open");
         
-        const sa = utils.loadAssignmentData($this);
-        const tag_name_to_delete = [$this.attr("data-tag-deletion-name")];
+        const dom_assignment = $this.parents(".assignment");
+        const sa = utils.loadAssignmentData(dom_assignment);
+        const tag_name_to_delete = [$this.siblings(".tag-name").text()];
         // Remove data locally from dat
         sa.tags = sa.tags.filter(tag_name => !tag_name_to_delete.includes(tag_name));
 
@@ -616,24 +629,28 @@ addTagHandlers: function() {
             tag_wrapper.prev().css("z-index", "");
             tag_wrapper.remove();
         });
-        $this.parents(".tags").find(".tag-add-button").removeClass("tag-add-red-box-shadow");
+        dom_assignment.find(".tag-add-button").removeClass("tag-add-red-box-shadow");
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
-    }
-    $(".tag-add").focusout(function() {
-        const $this = $(this);
+    });
+    $(document).focusout(function(e) {
+        const $this = $(e.target).closest(".tag-add");
+        if (!$this.length) return;
+
         const dom_assignment = $this.parents(".assignment");
         setTimeout(function() {
             // const tag_add_text_clicked = $(e.currentTarget).is($this) && $(document.activeElement).hasClass("assignment");
 
             // If the user unfocuses the closed tag modal which they previously clicked to close, this will run and add the transitionend event in transitionCloseTagBox to the already closed tag-add-box, which is unwanted and causes bugs
             // I can't just do !$(e.target).is($this) because the tag modal may already be open without the user already previously clicking .tag-add to close it, and the transitionend event is needed in this case
-            // So, only return when the tag modal is closed by adding || $this.find(".tag-add-box").css("height") === 0
-            if ($(document.activeElement).parents(".tag-add").length || $(document.activeElement).is($this) || parseFloat($this.find(".tag-add-box").css("height")) === 0) return;
+            // So, only return when the tag modal is closed by adding || dom_assignment.find(".tag-add-box").css("height") === 0
+            if ($(document.activeElement).closest(".tag-add").length || parseFloat(dom_assignment.find(".tag-add-box").css("height")) === 0) return;
             dom_assignment.removeClass("open-tag-add-box");
-            transitionCloseTagBox($this);
+            transitionCloseTagBox(dom_assignment.find(".tag-add-box"));
         }, 0);
     });
-    $(".tag-sortable-container").sortable({
+},
+makeAssignmentTagsSortable: function(dom_assignment) {
+    dom_assignment.find(".tag-sortable-container").sortable({
         animation: 150,
         // some mobile phones consider a tap to be a drag,
         // preventing tag deletion
@@ -649,8 +666,9 @@ addTagHandlers: function() {
         },
         onEnd: function() {
             const $this = $(this.el);
-            const sa = utils.loadAssignmentData($this);
-            sa.tags = $this.find(".tag-wrapper").filter(function() {
+            const dom_assignment = $this.parents(".assignment");
+            const sa = utils.loadAssignmentData(dom_assignment);
+            sa.tags = dom_assignment.find(".tag-wrapper").filter(function() {
                 // Also remove z-index if it wasnt reset back to none from dragging the tag around
                 return !$(this).css("z-index","").hasClass("tag-is-deleting");
             }).map(function() {
@@ -667,190 +685,237 @@ addTagHandlers: function() {
     });
 },
 setKeybinds: function() {
-$(document).keydown(function(e) {
-// it's important to not modify e.key because then the event object itself will be modified
-const e_key = e.key.toLowerCase();
-if (e.ctrlKey || e.metaKey
-    || VIEWING_DELETED_ASSIGNMENTS && ["backspace", "s", "f", "n"].includes(e_key)
-    || e.originalEvent.repeat && ["backspace", "s", "f", "0"].includes(e_key)
-    || SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS) return;
-const form_is_showing = $("#overlay").is(":visible");
-const form_is_hidden = !form_is_showing;
-switch (e_key) {
-    case "n":
-    case "e":
-    case "d":
-    case "r":
-    case "backspace":
-    case "s":
-    case "f":
-    case "0":
-    case "o":
-    case "c":
-    case "t":
-        if (!["input", "textarea"].includes($(document.activeElement).prop("tagName").toLowerCase()))
-        switch (e_key) {
-            case "n":
-                if (form_is_showing) return;
-                $("#image-new-container").click();
-                break;
-            case "t":
-                $("#assignments-container").scrollTop(0);
-                break;
-            case "e":
-            case "d":
-            case "r":
-            case "backspace":
-            case "s":
-            case "f":
-            case "0":
-            case "o":
-            case "c":
-                let assignment_container = $(":hover").filter(".assignment-container");
-                if (!assignment_container.length) assignment_container = $(document.activeElement).parents(".assignment-container");
-                let dom_assignment = assignment_container.children(".assignment");
-                if (assignment_container.length) {
-                    if (!dom_assignment.hasClass("has-been-clicked")) {
-                        new VisualAssignment(dom_assignment).initUI();
+    const keybinds = {
+        escape: {
+            do: function(e) {
+                $("#form-wrapper #cancel-button").click();
+            },
+        },
+        arrowup: {
+            require_hidden_form: true,
+            do: function(e) {
+                const open_assignments_on_screen = $(".open-assignment").map(function() {
+                    const sa = new VisualAssignment($(this));
+                    return sa.assignmentGraphIsOnScreen() ? sa : null;
+                }).toArray();
+                if (open_assignments_on_screen.length !== 0) {
+                    // Prevent arrow scroll
+                    e.preventDefault();
+                    for (const sa of open_assignments_on_screen) {
+                        sa.setParabolaValues();
+                        sa.arrowSkewRatio(e.key);
                     }
-                    switch (e_key) {
-                        case "o":
-                        case "c":
-                            dom_assignment.click();
-                            break;
-                        case "e":
-                            if (form_is_showing) return;
-                            assignment_container.find(".update-button").parents(".assignment-header-button").focus().click();
-                            break;
-                        case "d": {
-                            const click_delete_button = $.Event("click");
-                            click_delete_button.shiftKey = e.shiftKey;
-                            assignment_container.find(".delete-button").parents(".assignment-header-button").focus().trigger(click_delete_button);
-                            break;
-                        }
-                        case "r":
-                            assignment_container.find(".restore-button").parents(".assignment-header-button").focus().click();
-                            break;
-                        case "f":
-                            assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").parents(".assignment-header-button").focus().click();
-                            break;
-                        case "0":
-                            if (!dom_assignment.hasClass("open-assignment")) {
-                                dom_assignment.find(".falling-arrow-animation-instant")[0].beginElement()
-                            }
-                            dom_assignment.find(".work-input-textbox").val("0");
-                            dom_assignment.find(".submit-work-button").click();
-                            break;
-                        case "backspace":
-                        case "s":
-                            // I would animate the arrow for backspace too but 
-                            // that only works when an assignment is open
-                            if (dom_assignment.hasClass("open-assignment")) {
-                            switch (e_key) {
-                                case "backspace":
-                                    var graph_button = assignment_container.find(".delete-work-input-button");
-                                    break;
-                                case "s":
-                                    var graph_button = assignment_container.find(".skew-ratio-button");
-                                    break;
-                            }
-                            // We can't use a normal .click().focus() or else
-                            // a graph button out of view scrolls it all the way to the middle of the page
-                            graph_button.click();
-                            // scroll AFTER it is clicked, the click even may call Priority.sort and further
-                            // alter the position of the graph button
-                            graph_button[0].scrollIntoView({block: "nearest"});
-                            setTimeout(() => graph_button.focus(), 0);
-                            }
-                            break;
-                    }
-                    break;
+                } else {
+                    // Allow arrow scroll
+                    // Relies on the fact that #assignments-container is the scrolling element
+                    $("#assignments-container").focus();
                 }
-        }
-        break;
-    case "escape":
-        // doesn't work on daterangepicker inputs because DateRangePicker.prototype.keydown prevents default the event
-        new Crud().hideForm();
-        break;
-    case "arrowdown":
-    case "arrowup":
-        if (["textarea"].includes($(document.activeElement).prop("tagName").toLowerCase())) return;
-        const open_assignments_on_screen = $(".open-assignment").map(function() {
-            const sa = new VisualAssignment($(this));
-            return sa.assignmentGraphIsOnScreen() ? sa : null;
-        }).toArray();
-        if (open_assignments_on_screen.length !== 0) {
-            // Prevent arrow scroll
-            e.preventDefault();
-            for (const sa of open_assignments_on_screen) {
-                sa.setParabolaValues();
-                sa.arrowSkewRatio(e.key);
-            }
-        } else {
-            // Allow arrow scroll
-            // Relies on the fact that #assignments-container is the scrolling element
-            $("#assignments-container").focus();
-        }
-        break;
+            },
+        },
+        enter: {
+            do: function(e) {
+                const $this = $(e.target).closest(".tag-add-input");
+                if ($this.length) {
+                    utils.ui.close_on_success = true;
+                    $this.parents(".assignment").find(".tag-add-button").click();
+                }
+            },
+        },
+        n: {
+            ignore_in_deleted_assignments_view: true,
+            require_no_focused_input: true,
+            require_hidden_form: true,
+            do: function(e) {
+                $("#image-new-container").click();
+            },
+        },
+        t: {
+            require_no_focused_input: true,
+            do: function(e) {
+                $("#assignments-container").scrollTop(0);
+            },
+        },
+        o: {
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            do_override: function(assignment_container) {
+                const dom_assignment = assignment_container.children(".assignment");
+                dom_assignment.click();
+            },
+        },
+        e: {
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            element_to_click: function(assignment_container) {
+                return assignment_container.find(".update-button").parents(".assignment-header-button");
+            },
+        },
+        d: {
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            element_to_click: function(assignment_container) {
+                return assignment_container.find(".delete-button").parents(".assignment-header-button");
+            },
+        },
+        r: {
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            element_to_click: function(assignment_container) {
+                return assignment_container.find(".restore-button").parents(".assignment-header-button");
+            },
+        },
+        f: {
+            ignore_in_deleted_assignments_view: true,
+            ignore_repeat: true,
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            require_visible_element: true,
+            element_to_click: function(assignment_container) {
+                return assignment_container.find(".tick-button").parents(".assignment-header-button");
+            },
+        },
+        0: {
+            require_no_focused_input: true,
+            ignore_repeat: true,
+            require_hovered_assignment: true,
+            do_override: function(assignment_container) {
+                const dom_assignment = assignment_container.children(".assignment");
+                if (!dom_assignment.hasClass("open-assignment")) {
+                    dom_assignment.find(".falling-arrow-animation-instant")[0].beginElement();
+                }
+                dom_assignment.find(".work-input-textbox").val("0");
+                dom_assignment.find(".submit-work-button").click();
+            },
+        },
+        backspace: {
+            ignore_in_deleted_assignments_view: true,
+            ignore_repeat: true,
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            require_open_assignment: true,
+            element_to_click: function(assignment_container) {
+                return assignment_container.find(".delete-work-input-button");
+            },
+        },
+        s: {
+            ignore_in_deleted_assignments_view: true,
+            ignore_repeat: true,
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            require_open_assignment: true,
+            element_to_click: function(assignment_container) {
+                return assignment_container.find(".skew-ratio-button");
+            },
+        },
     }
-    });
-    $(".tag-add-input").keydown(function(e) {
-        if (e.key === "Enter") {
-            utils.ui.close_on_success = true;
-            $(this).parents(".tags").find(".tag-add-button").click();
+    keybinds.arrowdown = {
+        require_hidden_form: true,
+        do: keybinds.arrowup.do,
+    }
+    keybinds.c = {
+        require_no_focused_input: true,
+        require_hovered_assignment: true,
+        do_override: keybinds.o.do_override,
+    }
+    $(document).keydown(function(e) {
+        // it's important to not modify e.key because then the event object itself will be modified
+        const e_key = e.key.toLowerCase();
+        const keybind = keybinds[e_key];
+        if (
+            !keybind
+            || e.ctrlKey
+            || e.metaKey
+            || SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS
+            || keybind.ignore_in_deleted_assignments_view && VIEWING_DELETED_ASSIGNMENTS
+            || keybind.ignore_repeat && e.originalEvent.repeat
+        ) return;
+
+        if (!keybind.require_no_focused_input) {
+            if (keybind.require_hidden_form && $("#overlay").hasClass("show-form"))
+                return;
+            keybind.do(e);
+            return;
         }
+
+        if (["input", "textarea"].includes($(document.activeElement).prop("tagName").toLowerCase()))
+            return;
+
+        if (!keybind.require_hovered_assignment) {
+            if (keybind.require_hidden_form && $("#overlay").hasClass("show-form"))
+                return;
+            keybind.do(e);
+            return;
+        }
+
+        let assignment_container = $(":hover").filter(".assignment-container");
+        if (!assignment_container.length) {
+            assignment_container = $(document.activeElement).parents(".assignment-container");
+        }
+        const dom_assignment = assignment_container.children(".assignment");
+        if (!assignment_container.length)
+            return;
+
+        if (!dom_assignment.hasClass("has-been-clicked")) {
+            new VisualAssignment(dom_assignment).initUI();
+        }
+
+        if (keybind.require_open_assignment && !dom_assignment.hasClass("open-assignment"))
+            return;
+
+        if (keybind.do_override) {
+            keybind.do_override(assignment_container);
+            return;
+        }
+
+        const element_to_click = keybind.element_to_click(assignment_container);
+        if (keybind.require_visible_element && !element_to_click.is(":visible") || !element_to_click.length)
+            return;
+
+        const $click = $.Event("click");
+        $click.shiftKey = e.shiftKey;
+        element_to_click.trigger($click);
+        element_to_click[0].scrollIntoView({block: "nearest"});
+        setTimeout(() => element_to_click.focus(), 0);
     });
 },
 displayFullDueDateOnHover: function() {
-    $(".title").on("mouseover mousemove click", function(e) {
-        $(this).toggleClass("show-long-daysleft", e.offsetY > $(this).height());
+    $(document).on("mouseover mousemove click", function(e) {
+        const $this = $(e.target).closest(".title");
+        if (!$this.length) return;
+
+        $this.toggleClass("show-long-daysleft", e.offsetY > $this.height());
         // could probably validate with touchstart event instead of isTouchDevice
-        if (isTouchDevice && e.offsetY > $(this).height()) return false;
-    }).on("mouseout", function() {
-        $(this).removeClass("show-long-daysleft");
+        if (isTouchDevice && e.offsetY > $this.height()) return false;
+    }).on("mouseout", function(e) {
+        const $this = $(e.target).closest(".title");
+        if (!$this.length) return;
+
+        $this.removeClass("show-long-daysleft");
     });
 },
-setAssignmentScaleUtils: function() {
-    // width * percentx = width+10
-    // percentx = 1 + 10/width
-    $(window).resize(function() {
-        $("#assignments-container").css('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
-        $(".assignment").each(function() {
-            const $this = $(this);
-            const sa = new VisualAssignment($this);
-            sa.positionTags();
-            sa.displayTruncateWarning();
-            sa.makeGCAnchorVisible();
-        });
-    });
-    // #animate-in is initially display: hidden in priority.js, delay adding the scale
-    document.fonts.ready.then(function() {
-        setTimeout(function() {
-            // height * percenty = height+5
-            // percenty = 1 + 5/height
-            $("#assignments-container").css('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
-            $(".assignment").each(function() {
-                if (1 + 10/$(this).height() > 1.05) return;
-                $(this).css('--scale-percent-y',`${1 + 10/$(this).height()}`);
-            });
-        }, 0);
-    });
+setAssignmentsContainerScaleUtils: function() {
+    // width * percentx = widt + 10
+    // percentx = 1 + 10 / width
+    if (SETTINGS.animation_speed === 0) {
+        $("#assignments-container").css('--scale-percent-x', '1');
+    } else {
+        $("#assignments-container").css('--scale-percent-x', `${1 + 10 / $("#assignments-header").width()}`);
+    }
+},
+setAssignmentScaleUtils: function(dom_assignment) {
+    if (SETTINGS.animation_speed === 0) {
+        dom_assignment.css('--scale-percent-y', '1');
+    } else {
+        const scale = 1 + 10 / dom_assignment.height();
+        // height * percenty = height + 10
+        // percenty = 1 + 10 / height
+        if (scale <= 1.05) {
+            dom_assignment.css('--scale-percent-y', scale);
+        }
+    }
 },
 setAnimationSpeed: function() {
     $("main").css('--animation-speed', SETTINGS.animation_speed);
-    if (SETTINGS.animation_speed !== 0) return;
-
-    $(".assignment").each(function() {
-        this.style.setProperty('--scale-percent-x', '1', 'important');
-        this.style.setProperty('--scale-percent-y', '1', 'important');
-    });
-},
-assignmentLinks: function() {
-    $(".title-link-anchor").each(function() {
-        if (this.href.startsWith(location.origin)) {
-            $(this).attr("href", "//" + this.getAttributeNode("href").value);
-        }
-    });
 },
 overlayAround: function({element: $element, duration=1000, margin=15 } = {}) {
     $(window).off("resize.tutorial-overlay");
@@ -891,7 +956,7 @@ tutorial: function() {
                         while (tutorial_alerts.length > 0) {
                             tutorial_alerts.pop();
                         }
-                        const assignment_container = $("#animate-in");
+                        const assignment_container = $(".animate-in");
                         const dom_assignment = assignment_container.children(".assignment");
                         const sa = utils.loadAssignmentData(dom_assignment);
 
@@ -905,8 +970,9 @@ tutorial: function() {
                                 dom_assignment.removeClass("assignment-is-closing open-assignment");
                                 dat = dat.filter(_sa => _sa.id !== sa.id);
                                 // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
-                                new Priority().sort({ dont_swap: true });
+                                new Priority().sort();
                             },
+                            fakeSuccessArguments: [],
                             // no error, fail silently
                         });
                     }
@@ -931,7 +997,7 @@ tutorial: function() {
                     {
                         wait: 1500,
                         do: () => utils.ui.overlayAround({
-                            element: $("#animate-in > .assignment"),
+                            element: $(".animate-in > .assignment"),
                         }),
                     },
                     {
@@ -947,9 +1013,9 @@ tutorial: function() {
                     {
                         wait: 300,
                         do: () => {
-                            $("#animate-in > .assignment").focus().click();
+                            $(".animate-in > .assignment").focus().click();
                             utils.ui.overlayAround({
-                                element: $("#animate-in > .assignment"),
+                                element: $(".animate-in > .assignment"),
                                 margin: 10,
                                 duration: 800,
                             });
@@ -958,7 +1024,7 @@ tutorial: function() {
                     {
                         wait: 2250,
                         do: () => utils.ui.overlayAround({
-                            element: $("#animate-in .graph"),
+                            element: $(".animate-in .graph"),
                             margin: 5,
                         }),
                     },
@@ -976,7 +1042,7 @@ tutorial: function() {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
                             element: () => {
-                                const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                const rect = $(".animate-in .graph")[0].getBoundingClientRect();
                                 return {
                                     top: rect.top + rect.height - 55,
                                     left: rect.left,
@@ -1002,7 +1068,7 @@ tutorial: function() {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
                             element: () => {
-                                const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                const rect = $(".animate-in .graph")[0].getBoundingClientRect();
                                 return {
                                     top: rect.top,
                                     left: rect.left,
@@ -1027,10 +1093,10 @@ tutorial: function() {
                         wait: 300,
                         do: () => {
                             utils.ui.overlayAround({
-                                element: $("#animate-in .graph"),
+                                element: $(".animate-in .graph"),
                                 margin: 5,
                             });
-                            $("#animate-in .fixed-graph").addClass("blur");
+                            $(".animate-in .fixed-graph").addClass("blur");
                         }
                     },
                     {
@@ -1048,7 +1114,7 @@ tutorial: function() {
                         do: () => {
                             utils.ui.overlayAround({
                                 element: () => {
-                                    const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                    const rect = $(".animate-in .graph")[0].getBoundingClientRect();
                                     return {
                                         top: rect.top + rect.height - 51,
                                         left: rect.left + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 9,
@@ -1059,7 +1125,7 @@ tutorial: function() {
                                 duration: 1250,
                                 margin: 20,
                             });
-                            $("#animate-in .fixed-graph").removeClass("blur");
+                            $(".animate-in .fixed-graph").removeClass("blur");
                         }
                     },
                     {
@@ -1075,7 +1141,7 @@ tutorial: function() {
                     {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
-                            element: $("#animate-in .tick-button").parent(),
+                            element: $(".animate-in .tick-button").parent(),
                             margin: 0,
                             duration: 1500,
                         }),
@@ -1093,14 +1159,14 @@ tutorial: function() {
                     {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
-                            element: $("#animate-in > .assignment"),
+                            element: $(".animate-in > .assignment"),
                             margin: 10,
                             duration: 900,
                         }),
                     },
                     {
                         wait: 1500,
-                        do: () => $("#animate-in .tick-button").click(),
+                        do: () => $(".animate-in .tick-button").click(),
                     },
                     {
                         wait: 1750,
@@ -1234,35 +1300,30 @@ saveAndLoadStates: function() {
             return true;
         }
     });
-
-    // Ensure fonts load for the graph
-    document.fonts.ready.then(function() {
+    $(window).one("load", function() {
         if (SETTINGS.enable_tutorial || VIEWING_DELETED_ASSIGNMENTS) return;
-        // setTimeout so the assignments are clicked after the click handlers are set
-        setTimeout(function() {
-            // Reopen closed assignments
-            if ("open_assignments" in sessionStorage) {
-                const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
-                $(".assignment").each(function() {
-                    const was_open = open_assignments.includes($(this).attr("data-assignment-id"));
-                    if (!was_open) return;
+        // Reopen closed assignments
+        if ("open_assignments" in sessionStorage) {
+            const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
+            $(".assignment").each(function() {
+                const dom_assignment = $(this);
+                const was_open = open_assignments.includes(dom_assignment.attr("data-assignment-id"));
+                if (!was_open) return;
 
-                    // if you edit an open assignment and make it needs more info
-                    // ensure it isn't clicked
-                    const dom_assignment = $(this);
-                    const sa = new VisualAssignment(dom_assignment);
-                    if (sa.canOpenAssignment()) {
-                        dom_assignment.click();
-                    }
-                });
-            }
+                // if you edit an open assignment and make it needs more info
+                // ensure it isn't clicked
+                const sa = new VisualAssignment(dom_assignment);
+                if (!sa.sa.needs_more_info) {
+                    dom_assignment.click();
+                }
+            });
+        }
 
-            // Scroll to original position
-            // Needs to scroll after assignments are opened
-            if ("scroll" in sessionStorage) {
-                $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
-            }
-        }, 0);
+        // Scroll to original position
+        // Needs to scroll after assignments are opened
+        if ("scroll" in sessionStorage) {
+            $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
+        }
     });
 },
 navClickHandlers: function() {
@@ -1368,10 +1429,7 @@ navClickHandlers: function() {
 
 }
 },
-loadAssignmentData: function($element_with_id_attribute, directly_is_pk=false) {
-    if (directly_is_pk) return dat.find(assignment => assignment.id == $element_with_id_attribute);
-    return dat.find(assignment => assignment.id == $element_with_id_attribute.attr("data-assignment-id"));
-},
+loadAssignmentData: $element_with_id_attribute => dat.find(assignment => assignment.id === parseInt($element_with_id_attribute.attr("data-assignment-id"))),
 getRawDateNow: function(params={ dont_stem_off_date_now: false }) {
     const raw_date_now = new Date();
     if (!params.dont_stem_off_date_now) {
@@ -1415,51 +1473,11 @@ inLineWrapperQuery: function($first_assignment_container) {
     });
     return ret;
 },
-}
-
-window.SETTINGS = JSON.parse(document.getElementById("settings-model").textContent);
-SETTINGS.animation_speed = +SETTINGS.animation_speed;
-if (!SETTINGS.seen_latest_changelog) {
-    latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);
-    setTimeout(function() {
-        const update_wrapper = document.createElement("ul");
-        for (const update of latest_changelog.updates) {
-            const li = document.createElement("li");
-            li.innerHTML = update;
-            update_wrapper.appendChild(li);
-        }
-        const bugfixes_wrapper = document.createElement("ul");
-        for (const bugfix of latest_changelog.bugfixes) {
-            const li = document.createElement("li");
-            li.innerHTML = bugfix;
-            bugfixes_wrapper.appendChild(li);
-        }
-        update_wrapper.appendChild(bugfixes_wrapper);
-        const jconfirm = $.alert({
-            title: `Hey there! A new update is here :D!<br><br>${latest_changelog.version} (${latest_changelog.date})`,
-            content: update_wrapper.outerHTML + "This can also be viewed on TimeWeb's <a href=\"/changelog\">changelog</a>.",
-            backgroundDismiss: false,
-            onClose: function() {
-                SETTINGS.seen_latest_changelog = true;
-                ajaxUtils.changeSetting({setting: "seen_latest_changelog", value: SETTINGS.seen_latest_changelog});
-            }
-        });
-        setTimeout(function() {
-            jconfirm.$content.prop("style").setProperty("opacity", "0.85", "important");
-            jconfirm.$titleContainer.css("padding-bottom", 5);
-        }, 0);
-    }, 500);
-}
-SETTINGS.def_break_days = SETTINGS.def_break_days.map(Number);
-window.date_now = new Date(utils.getRawDateNow({ dont_stem_off_date_now: true }).toDateString());
-SETTINGS.highest_priority_color = utils.formatting.hexToRGB(SETTINGS.highest_priority_color);
-SETTINGS.lowest_priority_color = utils.formatting.hexToRGB(SETTINGS.lowest_priority_color);
-if (isExampleAccount) {
-    x_transform = mathUtils.daysBetweenTwoDates(date_now, new Date(2021, 4, 3));
-}
-// Load in assignment data
-window.dat = JSON.parse(document.getElementById("assignment-models").textContent);
-for (let sa of dat) {
+initSA: function(sa) {
+    let x_transform;
+    if (isExampleAccount) {
+        x_transform = mathUtils.daysBetweenTwoDates(date_now, new Date(2021, 4, 3));
+    }
     if (sa.assignment_date) {
         sa.assignment_date = new Date(sa.assignment_date);
         // NOTE: compare all dates in the front end in the user's time zone
@@ -1581,23 +1599,125 @@ for (let sa of dat) {
     if (isExampleAccount) {
         sa.break_days = sa.break_days.map(break_day => (break_day + x_transform) % 7);
     }
-};
+},
+bezier: function(mX1, mY1, mX2, mY2) {
+    function calcBezier(t, a1, a2) {
+        const a = 1 - 3 * a2 + 3 * a1;
+        const b = 3 * a2 - 6 * a1;
+        const c = 3 * a1;
+        return ((a * t + b) * t + c) * t;
+    }
+
+    function getSlope(t, a1, a2) {
+        const a = 1 - 3 * a2 + 3 * a1;
+        const b = 3 * a2 - 6 * a1;
+        const c = 3 * a1;
+        return 3 * a * t * t + 2 * b * t + c;
+    }
+
+    if (mX1 === mY1 && mX2 === mY2) {
+        return x => x;
+    }
+    return x => {
+        let guessT = x;
+        for (let i = 0; i < 4; i++) {
+            const currentSlope = getSlope(guessT, mX1, mX2);
+            if (currentSlope === 0) break;
+            const currentX = calcBezier(guessT, mX1, mX2) - x;
+            guessT -= currentX / currentSlope;
+        }
+        return calcBezier(guessT, mY1, mY2);
+    };
+}
+}
+
+window.SETTINGS = JSON.parse(document.getElementById("settings-model").textContent);
+SETTINGS.animation_speed = +SETTINGS.animation_speed;
+if (!SETTINGS.seen_latest_changelog) {
+    latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);
+    setTimeout(function() {
+        const update_wrapper = document.createElement("ul");
+        for (const update of latest_changelog.updates) {
+            const li = document.createElement("li");
+            li.innerHTML = update;
+            update_wrapper.appendChild(li);
+        }
+        const bugfixes_wrapper = document.createElement("ul");
+        for (const bugfix of latest_changelog.bugfixes) {
+            const li = document.createElement("li");
+            li.innerHTML = bugfix;
+            bugfixes_wrapper.appendChild(li);
+        }
+        update_wrapper.appendChild(bugfixes_wrapper);
+        const jconfirm = $.alert({
+            title: `Hey there! A new update is here :D!<br><br>${latest_changelog.version} (${latest_changelog.date})`,
+            content: update_wrapper.outerHTML + "This can also be viewed on TimeWeb's <a href=\"/changelog\">changelog</a>.",
+            backgroundDismiss: false,
+            onClose: function() {
+                SETTINGS.seen_latest_changelog = true;
+                ajaxUtils.changeSetting({setting: "seen_latest_changelog", value: SETTINGS.seen_latest_changelog});
+            }
+        });
+        setTimeout(function() {
+            jconfirm.$content.prop("style").setProperty("opacity", "0.85", "important");
+            jconfirm.$titleContainer.css("padding-bottom", 5);
+        }, 0);
+    }, 500);
+}
+SETTINGS.def_break_days = SETTINGS.def_break_days.map(Number);
+window.date_now = new Date(utils.getRawDateNow({ dont_stem_off_date_now: true }).toDateString());
+SETTINGS.highest_priority_color = utils.formatting.hexToRGB(SETTINGS.highest_priority_color);
+SETTINGS.lowest_priority_color = utils.formatting.hexToRGB(SETTINGS.lowest_priority_color);
+// Load in assignment data
+window.dat = JSON.parse(document.getElementById("assignment-models").textContent);
+for (const sa of dat) {
+    utils.initSA(sa);
+}
 // Use DOMContentLoaded because $(function() { fires too slowly
 document.addEventListener("DOMContentLoaded", function() {
     if (!VIEWING_DELETED_ASSIGNMENTS) {
-        if (SETTINGS.gc_integration_enabled) ajaxUtils.createGCAssignments();
-        utils.ui.setClickHandlers.tickButtons();
         utils.ui.setClickHandlers.assignmentsHeaderUI();
-        utils.ui.setClickHandlers.assignmentSorting();
     }
     utils.ui.setClickHandlers.shortcuts();
     utils.ui.setKeybinds();
     utils.ui.displayFullDueDateOnHover();
-    utils.ui.setAssignmentScaleUtils();
     setTimeout(() => {
+        if (!VIEWING_DELETED_ASSIGNMENTS) {
+            if (SETTINGS.gc_integration_enabled) ajaxUtils.createGCAssignments();
+            utils.ui.setClickHandlers.tickButtons();
+            utils.ui.setClickHandlers.assignmentSorting();
+        }
+        let resizeTimeout;
+        $(window).on("resize", function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                const $assignment = $(".assignment");
+                const sas = new Array($assignment.length);
+                sas.fill(undefined);
+                Object.seal(sas);
+                // yes, this is faster
+                $assignment.each(function(i) {
+                    const dom_assignment = $(this);
+                    const sa = new VisualAssignment(dom_assignment);
+                    sas[i] = sa;
+                });
+                $assignment.each(function(i) {
+                    const sa = sas[i];
+                    utils.ui.setAssignmentScaleUtils(sa.dom_assignment);
+                });
+                $assignment.each(function(i) {
+                    const sa = sas[i];
+                    sa.positionTags();
+                });
+                $assignment.each(function(i) {
+                    const sa = sas[i];
+                    sa.makeGCAnchorVisible();
+                });
+            }, 250);
+        });
         utils.ui.addTagHandlers();
         utils.ui.setAnimationSpeed();
-        utils.ui.assignmentLinks();
+        utils.ui.setAssignmentsContainerScaleUtils();
     }, 0);
     utils.ui.saveAndLoadStates();
     utils.ui.navClickHandlers();

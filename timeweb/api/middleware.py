@@ -4,7 +4,9 @@ from django.urls import resolve
 from django.core.exceptions import RequestDataTooBig
 from django.utils import timezone
 
-from .urls import EXCLUDE_FROM_UPDATING_STATE
+from .urls import EXCLUDE_FROM_UPDATING_STATE, CONDITIONALLY_EXCLUDE_FROM_STATE_EVALUATION
+
+import json
 
 class APIValidationMiddleware:
     def __init__(self, get_response):
@@ -21,12 +23,11 @@ class APIValidationMiddleware:
         
         if request.method in ("POST", "DELETE", "PATCH"):
             if request.method == "POST":
-                device_uuid = request.POST['device_uuid']
-                tab_creation_time = request.POST['tab_creation_time']
-            elif request.method in ("DELETE", "PATCH"):
+                body = request.POST
+            else:
                 body = QueryDict(request.body)
-                device_uuid = body['device_uuid']
-                tab_creation_time = body['tab_creation_time']
+            device_uuid = body['device_uuid']
+            tab_creation_time = body['tab_creation_time']
             same_device = device_uuid == request.user.settingsmodel.device_uuid
             created_tab_after_last_api_call = int(tab_creation_time)/1000 > request.user.settingsmodel.device_uuid_api_timestamp.timestamp()
             should_reload = not same_device and not created_tab_after_last_api_call
@@ -38,7 +39,10 @@ class APIValidationMiddleware:
                 return HttpResponse(status=409)
 
         res = self.get_response(request)
-        if resolved.url_name in EXCLUDE_FROM_UPDATING_STATE:
+        if (
+            resolved.url_name in EXCLUDE_FROM_UPDATING_STATE or
+            resolved.url_name in CONDITIONALLY_EXCLUDE_FROM_STATE_EVALUATION and not json.loads(res.content.decode('utf-8')).get('update_state')
+        ):
             return res
         request.user.settingsmodel.device_uuid = device_uuid
         request.user.settingsmodel.device_uuid_api_timestamp = timezone.now()

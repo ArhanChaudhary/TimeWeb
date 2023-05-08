@@ -7,8 +7,9 @@ document.addEventListener("DOMContentLoaded", function() {
         },
     });
     $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+        assert(!("success" in options) || "fakeSuccessArguments" in options);
         if (ajaxUtils?.disable_ajax) {
-            options.success?.();
+            options.success?.(...options.fakeSuccessArguments);
             jqXHR.abort();
             return;
         }
@@ -111,16 +112,16 @@ $(function() {
             transform: '',
         });
         logo.find("img").css("width", "");
-        welcome.toggle(!collision(welcome, logo, { margin: 30 })); // Do this toggle after the logo's css is reset or it might clip into the logo
+        welcome.toggle(!collision(welcome, logo, { margin: 60 })); // Do this toggle after the logo's css is reset or it might clip into the logo
         if (left_icon_text.length)
-            left_icon_text.toggle(!collision(left_icon_text, logo, { margin: 30 }));
+            left_icon_text.toggle(!collision(left_icon_text, logo, { margin: 45 }));
     
         if (!collision(username, logo, { margin: 30 })) return;
         logo.css({
-            left: 5 + left_icon_width,
+            left: 10 + left_icon_width,
             transform: "none",
         });
-        welcome.toggle(!collision(welcome, logo, { margin: 30 }));
+        welcome.toggle(!collision(welcome, logo, { margin: 60 }));
     
         if (!collision(username, logo, { margin: 10 })) return;
         // compress the logo
@@ -182,9 +183,7 @@ error: function(response, textStatus) {
 
             },
             "reload this page": {
-                action: function() {
-                    reloadWhenAppropriate();
-                },
+                action: () => reloadWhenAppropriate(),
             },
             "try again": {
                 action: () => {
@@ -216,7 +215,6 @@ changeSetting: function(kwargs={}) {
     });
 },
 GCIntegrationError: function(jqXHR) {
-    sessionStorage.removeItem("ajaxs");
     if (jqXHR.status !== 302) return;
     const reauthorization_url = jqXHR.responseText;
     $.alert({
@@ -240,49 +238,49 @@ GCIntegrationError: function(jqXHR) {
     });
 },
 createGCAssignments: function() {
-    let ajaxs = JSON.parse(sessionStorage.getItem("ajaxs")) || [
+    const ajaxs = [
         {type: "POST", url: '/api/create-gc-assignments', data: {order: "descending"}},
         {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
         {type: "POST", url: '/api/update-gc-courses'},
         {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
     ];
-    let ajaxCallback = function(response, textStatus, jqXHR={} /* in case .success is manually called if ajax is disabled */) {
-        // indicates: this ajax didn't create any assignments, go to the next
-        // ajax in ajaxs
-        if (jqXHR.status === 204) {
-            // If the last ajaxs ajax reloads, ajaxs in sessionStorage will be []
-            // .shift on an empty array returns undefined, which is truthy
-            // So, it won't redo all the ajaxs, eliminating the need for a
-            // request session to manually prevent the ajaxs from being redone
-            // aka the legacy variable CREATING_GC_ASSIGNMENTS_FROM_FRONTEND
-            let ajax = ajaxs.shift();
-            if (!ajax) {
-                sessionStorage.removeItem("ajaxs");
-                return;
-            }
-            $.ajax({
-                type: ajax.type,
-                url: ajax.url,
-                data: ajax.data,
-                error: ajaxUtils.GCIntegrationError,
-                success: ajaxCallback,
-            });
-        // indicates: this ajax means google classroom assignments were
-        // created
-        } else if (jqXHR.status === 205) {
-            sessionStorage.setItem("ajaxs", JSON.stringify(ajaxs));
-            reloadWhenAppropriate();
+    let ajaxCallback = function(response) {
         // indicates: this ajax means we have to terminate everything and
         // restart the later queue from the beginning
 
         // raised if:
         // concurrent requests are made
         // update-gc-courses doesn't add any new courses (saves last ajax)
-        } else if (jqXHR.status === 200) {
-            sessionStorage.removeItem("ajaxs");
+        if (response.next === "stop") return;
+
+        // indicates: this ajax means google classroom assignments were
+        // created
+        if (response.assignments) {
+            for (let sa of response.assignments) {
+                utils.initSA(sa);
+                sa.just_created = true;
+                dat.push(sa);
+            }
+            new Priority().sort();
+        }
+
+        // indicates: this ajax didn't create any assignments, go to the next
+        // ajax in ajaxs
+        if (response.next === "continue") {
+            let ajax = ajaxs.shift();
+            if (!ajax) return;
+
+            $.ajax({
+                type: ajax.type,
+                url: ajax.url,
+                data: ajax.data,
+                error: ajaxUtils.GCIntegrationError,
+                success: ajaxCallback,
+                fakeSuccessArguments: [{next: "stop"}],
+            });
         }
     }
-    ajaxCallback(undefined, undefined, {status: 204});
+    ajaxCallback({next: "continue"});
 },
 batchRequest: function(batchCallbackName, batchCallback, kwargs={}) {
     switch (batchCallbackName) {
@@ -373,7 +371,7 @@ alertInvalidState: function() {
 
             },
             reload: {
-                action: reloadWhenAppropriate,
+                action: () => reloadWhenAppropriate(),
             },
         },
         onDestroy: function() {

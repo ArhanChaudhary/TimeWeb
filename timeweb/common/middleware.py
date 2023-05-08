@@ -54,7 +54,7 @@ class CommonRatelimit:
             group = "api"
         else:
             group = resolved._func_path
-        if not group.startswith("django") and is_ratelimited(request, group=group, key=utils.get_client_ip, rate=DEFAULT_GLOBAL_RATELIMIT, method=ratelimit.ALL, increment=True):
+        if not settings.DEBUG and not group.startswith("django") and is_ratelimited(request, group=group, key=utils.get_client_ip, rate=DEFAULT_GLOBAL_RATELIMIT, method=ratelimit.ALL, increment=True):
             raise Ratelimited
         return self.get_response(request)
 
