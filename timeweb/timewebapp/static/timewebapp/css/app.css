@@ -28,6 +28,9 @@ main.finished-header-transition #assignments-container {
     /* ensure the initial transition visual doesnt break */
     height: 100%;
 }
+main.disable-scrolling {
+    pointer-events: none;
+}
 main:not(.animate) {
     transition: box-shadow 1.4s cubic-bezier(.32,1.01,.53,1.15);
 }
@@ -225,7 +228,6 @@ main.background-image-exists {
     position: relative;
     /* Ensures this stacks above .assignment-container::after */
     z-index: 1;
-    scroll-margin: 20px;
     transition: all .2s ease-in-out,
                 opacity calc(.375s * var(--animation-speed)) ease-in-out,
                 box-shadow calc(var(--priority-color-transition-speed) * var(--animation-speed)),
@@ -445,8 +447,8 @@ main.background-image-exists {
     white-space: nowrap;
     font-size: 0.75em;
 }
-.title[data-priority]::before {
-    content: attr(data-priority) !important;
+.title[data-add-priority-percentage]::before {
+    content: "Priority: " attr(data-priority-percentage) "%" !important;
     transform: translateY(-100%) translateY(var(--smush-priority));
 }
 .title[data-daysleft]::after {
@@ -1031,10 +1033,6 @@ do this because midde-of-header is hidden in the delete assignments view */
     bottom: 0;
     right: 0;
     left: 0;
-    /* opacity < 1 on just_created assignmnets creates a new stacking content
-    for them and positions it behind extra-navs; add z-index: -1 to stop that */
-    z-index: -1;
-
     display: flex;
     visibility: hidden;
     justify-content: center;

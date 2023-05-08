@@ -1599,6 +1599,35 @@ initSA: function(sa) {
     if (isExampleAccount) {
         sa.break_days = sa.break_days.map(break_day => (break_day + x_transform) % 7);
     }
+},
+bezier: function(mX1, mY1, mX2, mY2) {
+    function calcBezier(t, a1, a2) {
+        const a = 1 - 3 * a2 + 3 * a1;
+        const b = 3 * a2 - 6 * a1;
+        const c = 3 * a1;
+        return ((a * t + b) * t + c) * t;
+    }
+
+    function getSlope(t, a1, a2) {
+        const a = 1 - 3 * a2 + 3 * a1;
+        const b = 3 * a2 - 6 * a1;
+        const c = 3 * a1;
+        return 3 * a * t * t + 2 * b * t + c;
+    }
+
+    if (mX1 === mY1 && mX2 === mY2) {
+        return x => x;
+    }
+    return x => {
+        let guessT = x;
+        for (let i = 0; i < 4; i++) {
+            const currentSlope = getSlope(guessT, mX1, mX2);
+            if (currentSlope === 0) break;
+            const currentX = calcBezier(guessT, mX1, mX2) - x;
+            guessT -= currentX / currentSlope;
+        }
+        return calcBezier(guessT, mY1, mY2);
+    };
 }
 }
 

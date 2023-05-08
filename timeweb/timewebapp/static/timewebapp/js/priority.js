@@ -20,7 +20,6 @@ class Priority {
         const that = this;
         that.due_date_incremented_notices = [];
         that.priority_data_list = [];
-        that.scroll_assignment_animation_resolvers = [];
         that.total_completion_time = 0;
         that.today_total_completion_time = 0;
         that.tomorrow_total_completion_time = 0;
@@ -948,6 +947,53 @@ class Priority {
         const priority_color = utils.formatting.hsvToRGB(h, s, v);
         dom_assignment.css("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
     }
+    colorAssignments($assignment_container) {
+        const that = this;
+        $assignment_container.each(function() {
+            const assignment_container = $(this);
+            const dom_title = assignment_container.find(".title");
+            const priority_percentage = parseInt(dom_title.attr("data-priority-percentage"));
+            that.colorAssignment(assignment_container, priority_percentage);
+        });
+    }
+    animateInAssignments($assignment_container, animateStep, callback) {
+        $assignment_container.each(function(i) {
+            const assignment_container = $(this);
+
+            // animating-in-reference: undefined
+            // not animating-in-reference and animateStep: () => animateStep(assignment_container)
+            // not animating-in-reference and not animateStep: undefined
+
+            // animating-in-reference or not animateStep: undefined
+            // else: () => animateStep(assignment_container)
+            assignment_container.animate(
+                {
+                    top: 0,
+                    opacity: 1,
+                    marginBottom: 0,
+                },
+                {
+                    start: function() {
+                        if (animateStep) {
+                            $(".animating-in-reference").removeClass("animating-in-reference");
+                            assignment_container.addClass("animating-in-reference");
+                        }
+                    },
+                    duration: 1500 * SETTINGS.animation_speed,
+                    easing: "easeOutCubic",
+                    step: animateStep ? () => animateStep(assignment_container) : undefined,
+                    complete: function() {
+                        if (animateStep) {
+                            assignment_container.removeClass("animating-in-reference");
+                        }
+                        assignment_container.removeClass("is-being-created");
+                        if (i === $assignment_container.length - 1 && callback)
+                            callback();
+                    }
+                },
+            );
+        });
+    }
     addAssignmentShortcut(dom_assignment, priority_data) {
         const that = this;
         // Loops through every google classroom assignment that needs more info AND has a tag (representing their class) to add "delete assignments of this class"
@@ -1184,32 +1230,18 @@ class Priority {
                 Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY
             ].includes(priority_data.status_value);
             const dom_title = dom_assignment.find(".title");
+            dom_title.attr("data-priority-percentage", priority_percentage);
 
-            const old_add_priority_percentage = !!dom_title.attr("data-priority");
-            dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
+            const old_add_priority_percentage = dom_assignment.attr("data-add-priority-percentage") !== undefined;
+            if (add_priority_percentage) {
+                dom_title.attr("data-add-priority-percentage", "");
+            } else {
+                dom_title.removeAttr("data-add-priority-percentage");
+            }
             if (old_add_priority_percentage !== add_priority_percentage && sa.id in that.existing_ids) {
                 new VisualAssignment(dom_assignment).positionTags();
             }
 
-            const is_animate_color = assignment_container.hasClass("animate-color");
-            const just_created_cache = sa.just_created;
-            new Promise(function(resolve) {
-                if (sa.just_created || is_animate_color) {
-                    that.scroll_assignment_animation_resolvers.push(resolve);
-                } else {
-                    resolve();
-                }
-            }).then(function() {
-                if (just_created_cache) {
-                    // Don't make this a CSS animation because margin-bottom is used a lot on .assignment-container and it's easier if it doesn't have a css transition
-                    assignment_container.animate({
-                        top: "0",
-                        opacity: "1",
-                        marginBottom: "0",
-                    }, 1500 * SETTINGS.animation_speed, "easeOutCubic");
-                }
-                that.colorAssignment(assignment_container, priority_data);
-            });
             that.addAssignmentShortcut(dom_assignment, priority_data);
             if (!first_available_tutorial_assignment && ![
                     Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT,
@@ -1308,38 +1340,65 @@ class Priority {
             sa.makeGCAnchorVisible();
         });
 
-        let assignment_container_to_scroll_to;
-        let first_just_created;
+        let top_assignment_container_to_scroll_to;
+        let bottom_assignment_container_to_scroll_to;
+        let no_top;
+        let no_bottom;
 
         // another tops for after new_assignments are added to the dom
         let tops2 = new Array(that.priority_data_list.length);
         tops2.fill(undefined);
         Object.seal(tops2);
+
         for (const [i, priority_data] of that.priority_data_list.entries()) {
             const assignment_container = that.assignments_to_sort.eq(priority_data.index);
             const dom_assignment = assignment_container.children(".assignment");
             const sa = utils.loadAssignmentData(dom_assignment);
 
             tops2[i] = assignment_container.offset().top;
-            if (first_just_created && !assignment_container_to_scroll_to && !sa.just_created) {
-                assignment_container_to_scroll_to = assignment_container;
-            }
-            if (sa.just_created && !first_just_created) {
-                first_just_created = assignment_container;
+            if (sa.just_created) {
+                no_top = true;
+                top_assignment_container_to_scroll_to = assignment_container;
+                for (let j = i - 1; j >= 0; j--) {
+                    const priority_data = that.priority_data_list[j];
+                    const assignment_container = that.assignments_to_sort.eq(priority_data.index);
+                    const dom_assignment = assignment_container.children(".assignment");
+                    const sa = utils.loadAssignmentData(dom_assignment);
+                    if (!sa.just_created) {
+                        no_top = false;
+                        top_assignment_container_to_scroll_to = assignment_container;
+                        break;
+                    }
+                }
+                no_bottom = true;
+                bottom_assignment_container_to_scroll_to = assignment_container;
+                for (let j = i + 1; j <= that.priority_data_list.length - 1; j++) {
+                    const priority_data = that.priority_data_list[j];
+                    const assignment_container = that.assignments_to_sort.eq(priority_data.index);
+                    const dom_assignment = assignment_container.children(".assignment");
+                    const sa = utils.loadAssignmentData(dom_assignment);
+                    if (!sa.just_created) {
+                        no_bottom = false;
+                        bottom_assignment_container_to_scroll_to = assignment_container;
+                        break;
+                    }
+                }
             }
         }
-        if (!assignment_container_to_scroll_to) {
-            assignment_container_to_scroll_to = first_just_created;
-        }
-        const last_assignment_container = that.assignments_to_sort.eq(that.priority_data_list[that.priority_data_list.length - 1].index);
+
+        const last_assignment_container = that.assignments_to_sort.eq(that.priority_data_list[that.priority_data_list.length - 1]?.index);
+        // note: does not work when tops2 is [] as it will be tops2[-1]
         const last_assignment_container_bottom = tops2[tops2.length - 1] + last_assignment_container.height();
         let previous_margin_bottoms = 0;
+        let animate_in_assignments = $();
         for (const [i, priority_data] of that.priority_data_list.entries()) {
+            const priority_percentage = that.priorityDataToPriorityPercentage(priority_data);
             const assignment_container = that.assignments_to_sort.eq(priority_data.index);
             const dom_assignment = assignment_container.children(".assignment");
             const sa = utils.loadAssignmentData(dom_assignment);
 
             if (sa.just_created) {
+                delete sa.just_created;
                 // this needs to be included before the resolver because assignment_container_to_scroll_to might be assignment_container itself
                 // and the positioning wont be correct
                 const margin_bottom = assignment_container.outerHeight();
@@ -1364,8 +1423,9 @@ class Priority {
                     ),
                     marginBottom: -margin_bottom,
                     opacity: 0,
-                });
+                }).addClass("is-being-created");
                 previous_margin_bottoms += margin_bottom;
+                animate_in_assignments = animate_in_assignments.add(assignment_container);
             } else if (sa.just_edited) {
                 dom_assignment.addClass("transition-disabler");
                 dom_assignment.css("--priority-color", "white");
@@ -1379,45 +1439,166 @@ class Priority {
                 that.colorAssignment(assignment_container, priority_percentage);
             }
         }
-        if (that.scroll_assignment_animation_resolvers.length) {
-            const dom_assignment_to_scroll_to = assignment_container_to_scroll_to.children(".assignment");
-            const rect = dom_assignment_to_scroll_to[0].getBoundingClientRect();
-            const scroll_margin_top = parseFloat(dom_assignment_to_scroll_to.css("scroll-margin-top"));
-            const scroll_margin_bottom = parseFloat(dom_assignment_to_scroll_to.css("scroll-margin-bottom"));
-            const on_screen = rect.top > scroll_margin_top + parseFloat($("header").css("--header-height")) && rect.top + rect.height + scroll_margin_bottom < window.innerHeight;
+        
+        (() => {
+            if (!animate_in_assignments.length) return;
+            // Instead of using scrollIntoView, I have my own implementation for several reasons:
 
-            new Promise(function(resolve) {
-                if (on_screen) {
-                    resolve();
+            // 1) visibility transition on #overlay stops scrollIntoView
+            // 2) scrollIntoView doesn't always work and I need random setTimeout(..., 0) wrappers
+            // 3) I don't trust native scrollIntoView across browsers (inconsistent)
+            // 4) manually scrolling interrupts scrollIntoView
+            // 5) annoying to determine when scrollIntoView ends
+
+            const scroll_margin = no_bottom ? 45 : 30;
+            const ideal_duration = 750;
+            const min_speed = 250;
+            const max_speed = 1000;
+            const finish_wait = 150;
+
+            const scroll_parent = $("#assignments-container");
+            const initial_top = scroll_parent.scrollTop();
+            const parent_height = scroll_parent.height();
+
+            function calculate_assignment_container_to_scroll_to() {
+                // let's say the element is animating in from the bottom
+                // bottom_assignment_container_to_scroll_to is the one right below the viewport, assume scroll_margin is 0 for now
+                // the two numbers in bottom_element_is_below will be exactly equal to each other, so nothing will happen
+                // and the scrolling function is returned early
+                // however, in reality when the assignmented is animated in it may be off screen as it pushes
+                // bottom_assignment_container_to_scroll_to down
+                // so, give bottom_element_is_below it's height as an extra scroll margin to become more strict with
+                // determining which assignments are in view and the same thing in the other direction for
+                // top_assignment_container_to_scroll_to
+
+                if (!top_assignment_container_to_scroll_to || !bottom_assignment_container_to_scroll_to)
                     return;
+
+                const top_element_top = top_assignment_container_to_scroll_to.position().top;
+
+                const top_element_is_above = top_element_top/* + top_element_height*/ - scroll_margin < initial_top;
+                if (no_top)
+                    return $("#assignments-header");
+                if (top_element_is_above)
+                    return top_assignment_container_to_scroll_to;
+
+                const bottom_element_top = bottom_assignment_container_to_scroll_to.position().top;
+                const bottom_element_height = bottom_assignment_container_to_scroll_to.outerHeight();
+
+                const bottom_element_is_below = bottom_element_top + bottom_element_height/* - bottom_element_height*/ + scroll_margin > initial_top + parent_height;
+                if (bottom_element_is_below || no_bottom)
+                    return bottom_assignment_container_to_scroll_to;
+            }
+            function finished_scrolling() {
+                that.colorAssignments(animate_in_assignments);
+                that.animateInAssignments(animate_in_assignments, assignment_container => {
+                    if (Priority.scrollIntoViewSmoothlyStep || !assignment_container.hasClass("animating-in-reference"))
+                        return;
+                    const assignment_container_to_scroll_to = calculate_assignment_container_to_scroll_to();
+                    if (!assignment_container_to_scroll_to)
+                        return;
+                    const element_top = assignment_container_to_scroll_to.position().top;
+                    const element_height = assignment_container_to_scroll_to.outerHeight();
+
+                    scroll_parent.scrollTop(calculate_final_top(element_top, element_height, scroll_parent));
+                }, function() {
+                    if ($(".is-being-created").length)
+                        return;
+                    
+                    $("main").removeClass("disable-scrolling");
+                    $("#extra-navs").show();
+                });
+            }
+            function calculate_final_top(element_top, element_height, scroll_parent) {
+                const parent_height = scroll_parent.height();
+                const element_is_above = element_top - scroll_margin < initial_top;
+                const element_is_below = element_top + element_height + scroll_margin > initial_top + parent_height;
+                let ret;
+                if (element_is_above) {
+                    if (no_top) {
+                        ret = element_top;
+                    } else {
+                        ret = element_top + element_height;
+                    }
+                    ret -= scroll_margin;
+                } else if (element_is_below) {
+                    if (no_bottom) {
+                        ret = element_top + element_height - parent_height;
+                    } else {
+                        ret = element_top - parent_height;
+                    }
+                    ret += scroll_margin;
                 }
-                // https://stackoverflow.com/a/71181885/12230735
-                setTimeout(function() {
-                    dom_assignment_to_scroll_to[0].scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'nearest',
-                    });
-                }, 0);
-                let scrollTimeout;
-                $("#assignments-container").on("scroll.assignmentanimation", function() {
-                    $("#assignments-container").css("overflow-y", "hidden");
-                    clearTimeout(scrollTimeout);
-                    scrollTimeout = setTimeout(function() {
-                        $("#assignments-container").off('scroll.assignmentanimation').css("overflow-y", "");
-                        resolve();
-                    // assumes 20 fps is the lowest scroll handler refresh rate
-                    // 50ms * 20 = 1000ms
-                    }, 50);
-                }).trigger("scroll.assignmentanimation");
-            }).then(function() {
-                while (that.scroll_assignment_animation_resolvers.length)
-                    that.scroll_assignment_animation_resolvers.shift()();
-            });
+                // https://stackoverflow.com/a/5704386/12230735
+                return mathUtils.clamp(0, ret, scroll_parent[0].scrollHeight - scroll_parent[0].clientHeight);
+            }
+            const assignment_container_to_scroll_to = calculate_assignment_container_to_scroll_to();
+            if (!assignment_container_to_scroll_to) {
+                finished_scrolling();
+                return;
+            }
+
+            $("main").addClass("disable-scrolling");
+            if (no_bottom) {
+                assert(assignment_container_to_scroll_to === bottom_assignment_container_to_scroll_to);
+                if (assignment_container_to_scroll_to.hasClass("is-being-created")) {
+                    $("#extra-navs").hide();
+                }
+            }
+
+            const start_time = performance.now();
+            const curve = utils.bezier(0.29, 0.07, 0.51, 1);
+            function step() {
+                const element_top = assignment_container_to_scroll_to.position().top;
+                const element_height = assignment_container_to_scroll_to.outerHeight();
+                
+                const final_top = calculate_final_top(element_top, element_height, scroll_parent);
+
+                const now = performance.now();
+                const speed = mathUtils.clamp(min_speed / 1000, Math.abs(initial_top - final_top) / ideal_duration, max_speed / 1000);
+                const duration = Math.abs(initial_top - final_top) / speed;
+                const end_time = start_time + duration;
+
+                if (now < end_time + finish_wait) {
+                    window.requestAnimationFrame(Priority.scrollIntoViewSmoothlyStep);
+                    if (Priority.scrollIntoViewSmoothlyStep === step) {
+                        const remaining = Math.max(end_time - now, 0);
+                        const elapsed = duration - remaining;
+                        let progress;
+                        if (duration === 0) {
+                            progress = 1;
+                        } else {
+                            progress = curve(elapsed / duration);
+                        }
+                        scroll_parent.scrollTop(initial_top + (final_top - initial_top) * progress);
+                        return;
+                    }
+                } else if (Priority.scrollIntoViewSmoothlyStep === step) {
+                    delete Priority.scrollIntoViewSmoothlyStep;
+                } else {
+                    // lets say you minimize the window right after reloading the page
+                    // creating gc assignments makes scrollIntoViewSmoothlyStep change
+                    // when refocused, now >= end_time + finish_wait, but scrollIntoViewSmoothlyStep !== step
+                    // without this else, the new step is never ran because it skips the now < end_time + finish_wait animation frame
+                    window.requestAnimationFrame(Priority.scrollIntoViewSmoothlyStep);
+                }
+                finished_scrolling();
+            }
+            if (!Priority.scrollIntoViewSmoothlyStep) {
+                window.requestAnimationFrame(step);
+            }
+            Priority.scrollIntoViewSmoothlyStep = step;
+        })();
+
+        const first_assignment_container = that.assignments_to_sort.eq(that.priority_data_list[0]?.index);
+        const add_shortcut_margin = first_assignment_container.hasClass("add-line-wrapper");
+        if (that.params.first_sort) {
+            $("#assignments-header").addClass("transition-disabler");
         }
-        {
-            const first_assignment_container = that.assignments_to_sort.eq(that.priority_data_list[0].index);
-            const add_shortcut_margin = first_assignment_container.hasClass("add-line-wrapper");
-            $("#assignments-header").toggleClass("add-shortcut-margin", add_shortcut_margin);
+        $("#assignments-header").toggleClass("add-shortcut-margin", add_shortcut_margin);
+        if (that.params.first_sort) {
+            $("#assignments-header")[0].offsetHeight;
+            $("#assignments-header").removeClass("transition-disabler");
         }
     }
 }
