@@ -20,8 +20,6 @@ WEEKDAYS = (
     ("6",_("Sat")),
     ("0",_("Sun")),
 )
-def default_works():
-    return 0
 def empty_list():
     return []
 def list_with_zero():
@@ -37,6 +35,7 @@ class TimewebModel(models.Model):
     name = models.CharField(
         max_length=200,
         verbose_name=_('Name of this Assignment'),
+        blank=True,
     )
     # EVEN THOUGH assignment_date and x are both dates always with times at midnight
     # let's still use a DateTimeField
@@ -142,7 +141,7 @@ class TimewebModel(models.Model):
     is_google_classroom_assignment = models.BooleanField(
         default=False,
     )
-    google_classroom_assignment_link = models.URLField(
+    external_link = models.URLField(
         null=True,
         blank=True,
     )

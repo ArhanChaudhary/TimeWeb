@@ -30,18 +30,12 @@ class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
         initial = {
             "username": request.user.username,
         }
-        self.context['form'] = UsernameResetForm(initial=initial)
+        self.context['form'] = UsernameResetForm(initial=initial, request=request)
         return super().get(request)
 
     def post(self, request):
-        self.form = UsernameResetForm(data=request.POST)
-        form_is_valid = True
-        if not self.form.is_valid():
-            form_is_valid = False
-        elif request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL:
-            form_is_valid = False
-            self.form.add_error("username", ValidationError("You cannot modify the example account"))
-        if form_is_valid:
+        self.form = UsernameResetForm(data=request.POST, request=request)
+        if self.form.is_valid():
             return self.valid_form(request)
         else:
             return self.invalid_form(request)  

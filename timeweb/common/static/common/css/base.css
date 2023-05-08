@@ -1,4 +1,6 @@
 * {
+    /* prevent weird bounce effect on ios */
+    overscroll-behavior: none;
     font-weight: 600;
     /* keep this as selector as * so fonts arent inherited (for example .info-button) */
     touch-action: manipulation;

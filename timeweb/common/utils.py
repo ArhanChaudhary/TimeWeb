@@ -21,7 +21,10 @@ def get_client_ip(group, request):
 
 def _403_csrf(request, reason=""):
     # https://stackoverflow.com/questions/8508602/check-if-request-is-ajax-in-python/67734999#67734999
-    is_html_request = re.search(r'^text/html', request.META.get('HTTP_ACCEPT'))
+    if 'HTTP_ACCEPT' in request.META:
+        is_html_request = re.search(r'^text/html', request.META['HTTP_ACCEPT'])
+    else:
+        is_html_request = False
     if not is_html_request: # is ajax
         return HttpResponse("Your login session has expired or is invalid. Please refresh the page and then try again. Here's a cookie 🍪 to cheer you up.", status=403)
     return redirect("account_login")

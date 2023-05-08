@@ -18,8 +18,10 @@ django-minify-html==1.4.0
 django-multiselectfield==0.1.12
 django-pwa @ git+https://github.com/ArhanChaudhary/django-pwa.git@060de0e83e9798d1001f75087a693c4d7dd1dda8
 django-ratelimit==3.0.1
+django-request-logging==0.7.5
 django-storages==1.12.3
 django-timezone-field==4.2.1
+filelock==3.10.7
 google-api-core==2.0.1
 google-api-python-client==2.20.0
 google-auth==2.0.2
@@ -38,6 +40,7 @@ minify_html==0.10.7
 oauthlib==3.2.2
 packaging==21.0
 Pillow==9.3.0
+platformdirs==3.2.0
 protobuf==3.18.3
 psycopg2==2.9.3
 psycopg2-binary==2.9.3
@@ -55,9 +58,11 @@ rsa==4.7.2
 sendgrid==6.9.1
 six==1.16.0
 soupsieve==2.3.2.post1
-sqlparse==0.4.2
+sqlparse==0.4.4
 starkbank-ecdsa==2.0.3
 tornado==6.1
 uritemplate==3.0.1
+uritools==4.0.1
+urlextract==1.8.0
 urllib3==1.26.6
 webencodings==0.5.1

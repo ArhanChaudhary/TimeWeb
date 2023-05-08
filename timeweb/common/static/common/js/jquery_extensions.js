@@ -7,20 +7,16 @@
         const info_button = $($("#info-button-template").html());
         info_button.find(".info-button-text").addClass(`info-${facing}`).text(text);
         info_button.on("mousedown", function(e) {
-            console.log('mousedown');
             if ($(document.activeElement).is(this)) { 
                 // I have to do a settimeout because, I have no idea why, but on touch devices
                 // an extra mouseout event is fired if you click the info button text container
                 // AFTER the last mousedown event so the info button text doesn't hide properly
                 setTimeout(() => $(this).blur().addClass("prevent-hover"), 0);
                 e.preventDefault();
-                console.log("click again detected, preventing hover")
             } 
         }).on("mouseout", function(e) {
             const new_mouse_element = $(e.relatedTarget);
-            console.log("mouseout")
             if (new_mouse_element.is(".info-button") || new_mouse_element.parents(".info-button").length) return;
-            console.log("mouseout outside detected, removing prevent-hover")
             $(this).removeClass("prevent-hover");
         // prevent soft due date from getting clicked
         }).click(() => false);
@@ -44,17 +40,8 @@
     }
     $.fn.expandableTextareaHeight = function() {
         $(this).on("input", function() {
-            if ($(this).val().includes("\n")) {
-                // TODO: what the heck is e8f6a9f
-                // Use 0 instead of "auto" because firefox
-                // $(this).css("height", 0);
-                
-                $(this).css("height", "auto"); // Needed for expanding with text
-                $(this).css("height", this.scrollHeight);
-            } else {
-                $(this).css("height", $(this).css("--nothing-height"));
-            }
-
+            $(this).css("height", $(this).css("--nothing-height"));
+            $(this).css("height", this.scrollHeight);
         // there's sometimes a random scrollbar
         }).css("overflow-y", "hidden");
         return $(this);

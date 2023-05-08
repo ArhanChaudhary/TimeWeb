@@ -1,3 +1,3 @@
-TimeWeb is a time management application that visualizes, quantifies, and prioritizes your assignments' work. Unlike typical planners, TimeWeb simplifies the most complex of work schedules by graphing your work until they are due.
+TimeWeb is a time management application that visualizes, quantifies, and prioritizes your daily school or work assignments. Unlike typical planners, TimeWeb splits up and graphs all of your work until they are due. Every day, know what to do, when to do it, and how long it will take.
 
-https://timeweb.io/
+Take a look at TimeWeb's [example account](https://timeweb.io/example/) to get an idea of what you should expect your assignments page to look like.

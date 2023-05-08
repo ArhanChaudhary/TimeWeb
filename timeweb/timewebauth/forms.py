@@ -209,6 +209,12 @@ class UsernameResetForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
         self.fields['username'].label = "New username"
         self.label_suffix = ""
+    
+    def clean_username(self):
+        if self.request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL:
+            raise forms.ValidationError("You cannot modify the example account")
+        return self.cleaned_data["username"]

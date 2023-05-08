@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.forms.widgets import ClearableFileInput
 from django.template.loader import render_to_string
@@ -108,7 +109,13 @@ class SettingsForm(forms.ModelForm):
             "sorting_animation_threshold": "Only do the assignment sorting animation when there are this many assignments or less. Due to performance lag as the number of assignments increase, enter a higher number if your device is high-end and a lower number if your device is low-end.",
             "immediately_delete_completely_finished_assignments": "Deleted assignments can be viewed and restored in the deleted assignments view.",
             "background_image_text_shadow_width": "Controls the width of the shadow around text for when you have a background image. Make this thicker if the text is hard to read, and thinner if the text is too easy to read.",
-            "gc_assignments_always_midnight": mark_safe("Automatically changes Google Classroom assignments with a due time of 11:59 PM to 12:00 AM (midnight).<br><br>Google Classroom defaults assignments without a due time to 11:59 PM, so this setting attempts to prevent misleading due times that seem to be later than they actually are. However, <b>enable this setting with caution</b>, as it also incorrectly sets Google Classroom assignments with a manually assigned due time of 11:59 PM to midnight.<br><br>Note: does not apply to Google Classroom assignments that are due later today at 11:59 PM, are due on their assignment day, or have already been created."),
+            "gc_assignments_always_midnight": mark_safe('''
+                Automatically changes Google Classroom assignments with a due time of 11:59 PM to 12:00 AM.<br>
+                <br>
+                Google Classroom defaults assignments without a due time to 11:59 PM, so this setting attempts to prevent misleading due times that seem to be later than they actually are. However, <b>enable this setting with caution</b>, as it also incorrectly sets Google Classroom assignments with a manually assigned due time of 11:59 PM to 12:00 AM.<br>
+                <br>
+                Note: does not apply to Google Classroom assignments that are due later today at 11:59 PM, are due on their assignment day, or have already been created.
+            '''),
             "priority_color_borders": "Adds a priority colored border around every assignment.",
             "font": mark_safe('''
                 <div class="responsive-description-container">
@@ -125,6 +132,7 @@ class SettingsForm(forms.ModelForm):
             "should_alert_due_date_incremented": "Display an alert every time when soft due dates are incremented. Soft due dates increment when an assignment's due date passes but is still unfinished.",
             # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
+
     def __init__(self, *args, **kwargs):
         # See explanation in TimewebForm.__init__ if i want to parse time inputs for future time field settings
 
@@ -158,6 +166,7 @@ class SettingsForm(forms.ModelForm):
         # Weird {"field": None} logic because the default value is still evaluated even if the key is found for .get
         self.fields = {k: self.fields.get(k, SettingsForm.Meta.extra_fields.get(k, {"field": None})["field"]) for k in new_keyorder}
         self.label_suffix = ""
+
     def clean_default_dropdown_tags(self):
         default_dropdown_tags = self.cleaned_data["default_dropdown_tags"]
         if default_dropdown_tags is None:
@@ -170,6 +179,12 @@ class SettingsForm(forms.ModelForm):
         if any(len(tag) > MAX_TAG_LENGTH for tag in default_dropdown_tags):
             raise forms.ValidationError(_("One or more of your tags are too long (>%(n)d characters)") % {"n": MAX_TAG_LENGTH})
         return default_dropdown_tags
+
+    def clean_background_image(self):
+        background_image = self.cleaned_data["background_image"]
+        if background_image and background_image.size > settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE:
+            raise forms.ValidationError(_('This file is too big (>%(amount)d megabytes)') % {'amount': settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE/1048576})
+        return background_image
 
 # needs to be down here due to circular imports
 from timewebapp.views import MAX_TAG_LENGTH

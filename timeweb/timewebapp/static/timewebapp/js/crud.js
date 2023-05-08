@@ -159,22 +159,6 @@ class Crud {
         showDropdowns: true,
         singleDatePicker: true,
     }
-    static ALL_FOCUSABLE_FORM_INPUTS = (function() {
-        // use DOMContentLoaded instead of $(function() { so it is defined soon enough for showForm({params: show_instantly})
-        document.addEventListener("DOMContentLoaded", function() {
-            // https://stackoverflow.com/questions/7668525/is-there-a-jquery-selector-to-get-all-elements-that-can-get-focus
-            Crud.ALL_FOCUSABLE_FORM_INPUTS = $('#fields-wrapper').find("a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex], [contenteditable]")
-                .filter(function() {
-                    return !$(this).attr("name")?.endsWith("-widget-checkbox");
-                });
-        });
-    })()
-    static FORM_ANIMATION_DURATION = 300
-    static FORM_POSITION_TOP = 15
-    static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750 * SETTINGS.animation_speed
-    static STEP_SIZE_AUTO_LOWER_ROUND = 0.05
-    static SHORTCUT_DELETION_ANIMATION_THRESHOLD = 15
-
     // it is important to use .click instead of .prop("checked", true/false) so the animation click handler fires
     static STANDARD_FIELD_GROUP = () => {
         if ($("#form-wrapper #field-group-picker-checkbox").prop("checked")) {
@@ -195,7 +179,7 @@ class Crud {
         } else if (params.toggle) {
             Crud.TOGGLE_FIELD_GROUP();
         } else if (params.$dom_group) {
-            assert(params.$dom_group.hasClass("field-group"));
+            assert(params.$dom_group.hasClass("field-group") || params.$dom_group.length === 0);
             switch (params.$dom_group.attr("id")) {
                 case "first-field-group":
                     Crud.STANDARD_FIELD_GROUP();
@@ -207,15 +191,16 @@ class Crud {
             }
         }
     }
-    static alertEarlyDueDate() {
+    alertEarlyDueDate() {
+        const that = this;
         const picker = $("#id_x").data("daterangepicker");
         if (!(
             6 <= picker.startDate.hours() && picker.startDate.hours() <= 11
-        ) || Crud.alerted_early_due_time) return;
-        Crud.alerted_early_due_time = true;
+        ) || that.alerted_early_due_time) return;
+        that.alerted_early_due_time = true;
 
         $.alert({
-            title: "Your due time is early.",
+            title: `Your due time of ${picker.startDate.format("h:mm A")} is early.`,
             content: "TimeWeb assigns work past midnight for assignments due in the morning. To avoid this, set the due time to midnight.",
             backgroundDismiss: false,
             buttons: {
@@ -232,6 +217,11 @@ class Crud {
     }
     init() {
         const that = this;
+        // https://stackoverflow.com/questions/7668525/is-there-a-jquery-selector-to-get-all-elements-that-can-get-focus
+        Crud.ALL_FOCUSABLE_FORM_INPUTS = $('#fields-wrapper').find("a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex], [contenteditable]")
+            .filter(function() {
+                return !$(this).attr("name")?.endsWith("-widget-checkbox");
+            });
         setTimeout(() => {
             // no today's date button because it already defaults to today on new assignment
             // although a user might want a today button for editing an assignment date to today
@@ -275,85 +265,55 @@ class Crud {
                    var event = "focusout";
                 }
                 $(this).on(event, function() {
-                    // prevent hideform from doing this alert
-                    const form_is_showing = $("#overlay").is(":visible");
-                    if (form_is_showing)
-                        Crud.alertEarlyDueDate();
+                    if ($("#overlay").hasClass("show-form"))
+                        that.alertEarlyDueDate();
                 });
             })
             that.setCrudHandlers();
         }, 0);
         
         that.addInfoButtons();
-        if ($(".assignment-form-error-note").length) {
-            that.showForm({ show_instantly: true });
-        } else {
-            that.hideForm({ hide_instantly: true });
-        }
     }
-    showForm(params={show_instantly: false}) {
+    showForm() {
         const that = this;
-        if (params.show_instantly) {
-            $('#overlay').show().find("#form-wrapper").css("top", Crud.FORM_POSITION_TOP);
-            // cursed way to position magic wand icon
-            // TODO: ideally i want a span wrapper around input so i dont have to consult the dark arts to position the magic wand icon
-            $(".magic-wand-icon").each(function() {
-                const field_wrapper = $(this).parents(".field-wrapper");
-                const error_note = field_wrapper.find(".assignment-form-error-note");
-
-                // the class is just to determine whether or not the field was previously predicted
-                if (field_wrapper.hasClass("disabled-field")) {
-                    field_wrapper.removeClass("disabled-field");
-                    field_wrapper.find(".magic-wand-icon").click();
-                }
-
-                if (!error_note.length) return;
-                // ew
-                $(this).css("margin-bottom", error_note.height());
-            });
-        } else {
-            $(".magic-wand-icon").css("margin-bottom", "");
-            $("#overlay").fadeIn(Crud.FORM_ANIMATION_DURATION).find("#form-wrapper").animate({top: Crud.FORM_POSITION_TOP}, Crud.FORM_ANIMATION_DURATION);
-            setTimeout(() => $("form input:visible").first().focus(), 0);
-            $(".field-wrapper.disabled-field").each(function() {
-                $(this).find(".magic-wand-icon").click();
-            });
-        }
-        Crud.one_unit_of_work_alert_already_shown = false;
-        Crud.alerted_early_due_time = false;
-        that.old_unit_value = undefined;
+        $("#overlay").removeClass("hide-form").addClass("show-form").trigger("transitionend");
+        $(".field-wrapper.disabled-field").each(function() {
+            $(this).find(".magic-wand-icon").click();
+        });
+        delete that.one_unit_of_work_alert_already_shown;
+        delete that.alerted_early_due_time;
+        delete that.old_unit_value;
+        delete that.sa_id;
+        delete that.prevent_submission;
         that.replaceUnit();
 
         setTimeout(function() {
+            $("#form-wrapper form input:visible").first().focus();
             $("#id_description").trigger("input");
-            if ($("#form-wrapper #second-field-group .invalid").length) {
-                Crud.GO_TO_FIELD_GROUP({advanced: true});
-            }
-        }, 0);
+        }, 100);
     }
-    hideForm(params={hide_instantly: false}) {
+    hideForm() {
         const that = this;
 
-        if (params.hide_instantly) {
-            $("#overlay").hide().find("#form-wrapper");
-            $(".assignment-form-error-note").remove(); // Remove all error notes when form is exited
-        } else {
-            $("#overlay").fadeOut(Crud.FORM_ANIMATION_DURATION, function() {
-                // Remove all error notes when form is exited
-                $(".invalid").removeClass("invalid");
-                $(".assignment-form-error-note").remove();
-                Crud.GO_TO_FIELD_GROUP({standard: true});
-                // You may stll be focused on an <input> when the form is hidden, invalidating keybinds
-                $(document.activeElement).blur();
-            }).find("#form-wrapper").animate({top: 0}, Crud.FORM_ANIMATION_DURATION);
-            $("#form-wrapper input").each(function() {
-                // hideForm when not focused on an input (such as pressing escape) sometimes forgets to hide the daterangepicker
-                // manually do so
-                if ($(this).data("daterangepicker")?.container.is(":visible")) {
-                    $(this).trigger("blur");
-                }
-            });
-        }
+        $("#overlay").removeClass("show-form").addClass("hide-form").on("transitionend", function(e) {
+            // ?. in case transitionend is manually called
+            if (e.originalEvent && e.originalEvent.target !== this) return;
+
+            $(this).off("transitionend");
+            // Remove all error notes when form is exited
+            $(".invalid").removeClass("invalid");
+            $(".assignment-form-error-note").remove();
+            Crud.GO_TO_FIELD_GROUP({standard: true});
+            // You may stll be focused on an <input> when the form is hidden, invalidating keybinds
+            $(document.activeElement).blur();
+        });
+        $("#form-wrapper input").each(function() {
+            // hideForm when not focused on an input (such as pressing escape) sometimes forgets to hide the daterangepicker
+            // manually do so
+            if ($(this).data("daterangepicker")?.container.is(":visible")) {
+                $(this).trigger("blur");
+            }
+        });
     }
     replaceUnit() {
         const that = this;
@@ -499,18 +459,84 @@ class Crud {
         }
         that.old_unit_value = singular.toLowerCase();
     }
+    addErrorNotes(field_wrapper, error_list, is_potato) {
+        const that = this;
+
+        if (is_potato) {
+            $(document.activeElement).blur();
+            field_wrapper.addClass("potato");
+        }
+        const dom_errors = $("<div>").addClass("assignment-form-error-note");
+        for (const error of error_list) {
+            if (is_potato) {
+                dom_errors.append(error);
+            } else {
+                dom_errors.append(document.createTextNode(error));
+            }
+            dom_errors.append("<br>");
+        }
+        const field_wrapper_input = field_wrapper.find(Crud.ALL_FOCUSABLE_FORM_INPUTS).not(".field-widget-checkbox");
+        field_wrapper_input.addClass("invalid");
+        that.removeErrorNotes(field_wrapper.find(".assignment-form-error-note"));
+        field_wrapper.append(dom_errors);
+
+        dom_errors.addClass("transition-disabler");
+        // Need to use jquery instead of css to set marginLeft
+        dom_errors.css({
+            marginTop: -dom_errors.outerHeight(),
+            opacity: 0,
+            transform: "scale(0.9)",
+        });
+        dom_errors[0].offsetHeight;
+        dom_errors.removeClass("transition-disabler");
+        dom_errors.css({
+            marginTop: "",
+            opacity: "",
+            transform: "",
+        });
+
+        const ordered = Crud.ALL_FOCUSABLE_FORM_INPUTS.toArray();
+
+        const old_input = Crud.old_input;
+        const new_input = field_wrapper_input[0];
+        Crud.old_input = new_input;
+
+        const old_index = ordered.indexOf(old_input);
+        const new_index = ordered.indexOf(new_input);
+
+        if (new_index > old_index) {
+            clearTimeout(Crud.post_add_error_scroll);
+            Crud.post_add_error_scroll = setTimeout(function() {
+                delete Crud.post_add_error_scroll;
+                delete Crud.old_input;
+                Crud.GO_TO_FIELD_GROUP({$dom_group: field_wrapper.parents(".field-group")});
+            }, 0);
+        }
+    }
+    removeErrorNotes(dom_errors) {
+        dom_errors.css({
+            marginTop: -dom_errors.outerHeight(),
+            opacity: 0,
+            transform: "scale(0.9)",
+        }).one("transitionend", function() {
+            $(this).remove();
+        });
+    }
     setCrudHandlers() {
         const that = this;
         // Create and show a new form when user clicks new assignment
         $("#image-new-container").click(function() {
             Crud.setAssignmentFormFields(Crud.getDefaultAssignmentFormFields());
             $("#new-title").text("New Assignment");
-            $("#submit-assignment-button").text("Create Assignment").val('');
+            $("#submit-assignment-button").text("Create Assignment");
             that.showForm();
         });
-        // Populate form on edit
-        $('.update-button').parent().click(function() {
-            const sa = utils.loadAssignmentData($(this));
+        $(document).click(function(e) {
+            const $this = $(e.target).closest($('.update-button').parent());
+            if (!$this.length) return;
+
+            const dom_assignment = $this.parents(".assignment");
+            const sa = utils.loadAssignmentData(dom_assignment);
             $("#new-title").text("Edit Assignment");
             $("#submit-assignment-button").text("Edit Assignment");
             Crud.setAssignmentFormFields(Crud.generateAssignmentFormFields(sa));
@@ -519,15 +545,15 @@ class Crud {
                     $(this).toggleClass("invalid", !$(this).val());
                 });
             }
-
-            // Set button pk so it gets sent on post
-            $("#submit-assignment-button").val(sa.id);
             that.showForm();
+            that.sa_id = sa.id;
             if (!(sa.is_google_classroom_assignment && sa.needs_more_info))
-                Crud.alerted_early_due_time = true; // dont display the early due time alert in edit
+                that.alerted_early_due_time = true; // dont display the early due time alert in edit
         });
-        $('.delete-button, .restore-button').parent().click(function(e) {
-            const $this = $(this);
+        $(document).click(function(e) {
+            const $this = $(e.target).closest($('.delete-button, .restore-button').parent());
+            if (!$this.length) return;
+
             const dom_assignment = $this.parents(".assignment");
             if (dom_assignment.hasClass("assignment-is-deleting")) return;
             // shift + d while in the close assignment transition bugs it
@@ -541,10 +567,10 @@ class Crud {
             }).then(function() {
                 if ($this.children(".delete-button").length) {
                     if (e.shiftKey) {
-                        that.deleteAssignment(dom_assignment);
+                        Crud.deleteAssignment(dom_assignment);
                         return;
                     }
-                    const sa = utils.loadAssignmentData($this);
+                    const sa = utils.loadAssignmentData(dom_assignment);
                     $.alert({
                         title: `Are you sure you want to delete assignment "${sa.name}"?`,
                         content: utils.formatting.getReversibilityStatus(),
@@ -552,7 +578,7 @@ class Crud {
                             confirm: {
                                 keys: ['Enter'],
                                 action: function() {
-                                    that.deleteAssignment(dom_assignment);
+                                    Crud.deleteAssignment(dom_assignment);
                                 }
                             },
                             cancel: function() {
@@ -561,7 +587,7 @@ class Crud {
                         }
                     });
                 } else if ($this.children(".restore-button").length) {
-                    that.deleteAssignment(dom_assignment, {restore: true});
+                    Crud.deleteAssignment(dom_assignment, {restore: true});
                 }
             });
         });
@@ -573,19 +599,19 @@ class Crud {
             let second_minus_first = $("#form-wrapper #second-field-group .instant-margin-transition")[0].scrollHeight - $("#form-wrapper #first-field-group .instant-margin-transition")[0].scrollHeight;
             if ($("#form-wrapper #field-group-picker-checkbox").prop("checked")) {
                 $("#first-field-group").css("margin-bottom", -second_minus_first).one("transitionend", function() {
-                    $("#first-field-group").addClass("notransition");
+                    $("#first-field-group").addClass("transition-disabler");
                     $("#first-field-group").css("margin-bottom", "");
                     $("#first-field-group")[0].offsetHeight;
-                    $("#first-field-group").removeClass("notransition");
+                    $("#first-field-group").removeClass("transition-disabler");
                     $("#first-field-group .instant-margin-transition").css("margin-bottom", "");
                 });
                 $("#first-field-group .instant-margin-transition").css("margin-bottom", second_minus_first);
             } else {
                 $("#second-field-group").css("margin-bottom", second_minus_first).one("transitionend", function() {
-                    $("#second-field-group").addClass("notransition");
+                    $("#second-field-group").addClass("transition-disabler");
                     $("#second-field-group").css("margin-bottom", "");
                     $("#second-field-group")[0].offsetHeight;
-                    $("#second-field-group").removeClass("notransition");
+                    $("#second-field-group").removeClass("transition-disabler");
                     $("#second-field-group .instant-margin-transition").css("margin-bottom", "");
                 });
                 $("#second-field-group .instant-margin-transition").css("margin-bottom", -second_minus_first);
@@ -623,7 +649,7 @@ class Crud {
                 // be the field's value
                 field_wrapper.find(".field-widget-checkbox").prop("checked")
             )
-                field_wrapper.children(".field-widget").click();
+                field_wrapper.find(".field-widget").click();
             field_wrapper_input.attr("type", was_just_disabled ? "text" : field_wrapper.attr("original-type"));
             field_wrapper_input.prop("disabled", was_just_disabled).val(was_just_disabled ? "Predicted" : "");
         });
@@ -681,8 +707,6 @@ class Crud {
         //     }
         // });
         $("#id_description").expandableTextareaHeight();
-        Crud.one_unit_of_work_alert_already_shown = false;
-        Crud.alerted_early_due_time = false;
         $("#id_y, #id_x, #id_assignment_date, #id_min_work_time, #id_time_per_unit").on("focusout", () => {
             let time_per_unit = $("#id_time_per_unit");
             if ($("#time_per_unit-widget-checkbox").prop("checked")) {
@@ -712,79 +736,105 @@ class Crud {
                 // 1hr min work time => 5 days and 3h time_per_unit for this alert
                 time_per_unit >= Math.max(min_work_time, 30) * 3 &&
                 complete_x >= 5 &&
-                !Crud.one_unit_of_work_alert_already_shown
+                !that.one_unit_of_work_alert_already_shown
             )) return;
 
             $.alert({
                 title: "This assignment is <b>strongly not recommended</b> to be created with only one unit of work in this manner.",
                 content: "Please consider splitting up your assignment into either 1) smaller and more plentiful units of work or 2) units of time, by clearing the name of each unit of work field.",
                 onClose: function() {
-                    Crud.one_unit_of_work_alert_already_shown = true;
+                    that.one_unit_of_work_alert_already_shown = true;
                 }
             })
         });
-
-        $("#submit-assignment-button").click(function(e) {
-            // Custom error messages
-            if (utils.in_simulation) {
-                Crud.GO_TO_FIELD_GROUP({$dom_group: $("#form-wrapper form #first-field-group input:visible:first").parents(".field-group")});
-                $("#form-wrapper form #first-field-group input:visible:first")[0].setCustomValidity("You can't add or edit assignments in the simulation. This functionality is not yet supported :(");
-                return;
-            }
-            if (VIEWING_DELETED_ASSIGNMENTS) {
-                Crud.GO_TO_FIELD_GROUP({$dom_group: $("#id_name").parents(".field-group")});
-                $("#id_name")[0].setCustomValidity("You can't add or edit assignments in the deleted assignments view. Please restore this assignment first.");
-                return;
-            }
-            if ($("#id_name").is(":invalid")) {
-                Crud.GO_TO_FIELD_GROUP({$dom_group: $("#id_name").parents(".field-group")});
-                $("#id_name")[0].setCustomValidity("Please enter an assignment name");
-                return;
-            }
-            if ($("#id-x-field-wrapper.disabled-field").length) {
-                if ($("#id_y").val() !== "") return;
-                Crud.GO_TO_FIELD_GROUP({$dom_group: $("#id_y").parents(".field-group")});
-                $("#id_y")[0].setCustomValidity("Please enter a value for the due date prediction");
-                return;
-            }
-            if ($("#id-y-field-wrapper.disabled-field").length) {
-                if ($("#id_x").val() !== "") return;
-                Crud.GO_TO_FIELD_GROUP({$dom_group: $("#id_x").parents(".field-group")});
-                // daterangepicker sometimes doesn't open when initially in advanced inputs but idc
-                $("#id_x")[0].setCustomValidity("Please enter a value for the other field's prediction");
-                // gets in the way of daterangepicker
-                setTimeout(() => {
-                    $("#id_x")[0].setCustomValidity("");
-                }, 4500);
-                return;
-            }
-        });
-        $("#form-wrapper form input").on("input invalid", function(e) {
-            // Clear the custom validation message and don't make it show up again for every input
-            if (e.type === "input") {
-                this.setCustomValidity("");
-            }
-        });
-
-        let submitted = false;
         $("#form-wrapper form").submit(function(e) {
-            window.disable_loading = true;
-            // Prevent submit button spam clicking
-            if (submitted) {
-                e.preventDefault();
+            e.preventDefault();
+
+            if ($("#id_name").val() === "potato?") {
+                const potato_field_wrapper = $("#id_name").parents(".field-wrapper");
+                that.addErrorNotes(potato_field_wrapper, ["<a href=\"https://www.youtube.com/watch?v=Qijju-y_NzI\">potato.</a>"], true);
                 return;
             }
-            // hidden field
-            submitted = true;
-            // Enable disabled field on submit so it's sent with post
-            $("#id_time_per_unit, #id_funct_round").removeAttr("disabled");
+            if (utils.in_simulation || VIEWING_DELETED_ASSIGNMENTS) {
+                let error_messages;
+                if (utils.in_simulation) {
+                    error_messages = ["You can't add or edit assignments in the simulation. This functionality is not yet supported :("];
+                } else if (VIEWING_DELETED_ASSIGNMENTS) {
+                    error_messages = ["You can't add or edit assignments in the deleted assignments view. Please restore this assignment first"];
+                }
+                const first_visible_field_wrapper = $("#form-wrapper form #first-field-group input:visible:first").parents(".field-wrapper");
+                that.addErrorNotes(first_visible_field_wrapper, error_messages);
+                return;
+            }
+
+            if (that.prevent_submission) return;
+
             // JSON fields are picky with their number inputs, convert them to standard form
             $("#id_works").val() && $("#id_works").val(+$("#id_works").val());
-            $("<input />").attr("type", "hidden")
-                .attr("name", "utc_offset")
-                .attr("value", Intl.DateTimeFormat().resolvedOptions().timeZone)
-                .appendTo(this);
+            
+            const original_time_per_unit_disabled = $("#id_time_per_unit").attr("disabled");
+            const original_funct_round_disabled = $("#id_funct_round").attr("disabled");
+            $("#id_time_per_unit").removeAttr("disabled");
+            $("#id_funct_round").removeAttr("disabled");
+            const serialized = $(this).serialize();
+            $("#id_time_per_unit").attr("disabled", original_time_per_unit_disabled);
+            $("#id_funct_round").attr("disabled", original_funct_round_disabled);
+
+            let original_sumbit_button_text = $("#submit-assignment-button").text();
+            if (original_sumbit_button_text === "Submitting...")
+                original_sumbit_button_text = undefined;
             $("#submit-assignment-button").text("Submitting...");
+            that.prevent_submission = true;
+            $.ajax({
+                url: "/api/submit-assignment/",
+                type: "POST",
+                data: serialized + "&" + $.param({
+                    utc_offset: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    id: that.sa_id,
+                }),
+                success: function(response) {
+                    if (!response.valid) {
+                        delete that.prevent_submission;
+                        $(".invalid").removeClass("invalid");
+                        that.removeErrorNotes($(".assignment-form-error-note"));
+                        for (const [field_name, error_list] of Object.entries(response.errors)) {
+                            const field_wrapper = $(`#id-${ field_name }-field-wrapper`);
+                            that.addErrorNotes(field_wrapper, error_list);
+                        }
+                        return;
+                    }
+                    that.hideForm();
+                    for (const sa of response.assignments) {
+                        utils.initSA(sa);
+                        if (response.edited_assignment) {
+                            sa.just_edited = true;
+                            if (response.refresh_dynamic_mode) {
+                                sa.refresh_dynamic_mode = true;
+                            }
+                            // replace sa in dat with sa over here
+                            dat[dat.findIndex(_sa => _sa.id === sa.id)] = sa;
+                        } else {
+                            sa.just_created = true;
+                            dat.push(sa);
+                        }
+                    }
+                    new Priority().sort();
+                },
+                fakeSuccessArguments: [
+                    {
+                        errors: {
+                            name: [
+                                "You can't create nor edit assignments in the example account"
+                            ]
+                        }
+                    }
+                ],
+                error: ajaxUtils.error,
+                complete: function() {
+                    $("#submit-assignment-button").text(original_sumbit_button_text);
+                    delete that.prevent_submission;
+                }
+            });
         });
         $("#next-page").click(function() {
             if ($(".assignment").length) {
@@ -820,9 +870,6 @@ class Crud {
             url.searchParams.delete('everything_before');
             window.location.href = url.href;
         });
-        if ($("#next-page").length || $("#previous-page").length) {
-            $("#no-assignments-message").text("You don't have any deleted assignments on this page...")
-        }
     }
     addInfoButtons() {
         $("#id_name").info('left',
@@ -864,8 +911,7 @@ class Crud {
         });
     }
     // Delete assignment
-    transitionDeleteAssignment($dom_assignment) {
-        const that = this;
+    static transitionDeleteAssignment($dom_assignment) {
         const ids = new Set();
         $dom_assignment.each(function(i) {
             const dom_assignment = $(this);
@@ -885,30 +931,37 @@ class Crud {
                 if (i === $dom_assignment.length - 1) {
                     dat = dat.filter(sa => !ids.has(sa.id));
                     // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
-                    new Priority().sort({ dont_swap: true });
+                    new Priority().sort();
                 }
             }
             
-            if ($dom_assignment.length > Crud.SHORTCUT_DELETION_ANIMATION_THRESHOLD) {
+            const shortcut_deletion_animation_threshold = 15;
+            if ($dom_assignment.length > shortcut_deletion_animation_threshold) {
                 transition_callback();
-            } else {
-                // Opacity CSS transition
-                dom_assignment.css({
-                    opacity: "0",
-                    zIndex: dom_assignment.css("z-index")-2,
-                });
-                // Use css transitions because the animate property on assignment_container is reserved for other things in priority.js
-                assignment_container.animate({marginBottom: -(dom_assignment.height() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom")))}, 
-                    Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", transition_callback);
+                return;
             }
+            // Opacity CSS transition
+            dom_assignment.css({
+                opacity: 0,
+                zIndex: dom_assignment.css("z-index") - 2,
+            });
+            // Use css transitions because the animate property on assignment_container is reserved for other things in priority.js
+            assignment_container.animate(
+                {
+                    // don't do outerHeight to ignore shortcut heights
+                    marginBottom: -(dom_assignment.height() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom")))
+                },
+                750 * SETTINGS.animation_speed,
+                "easeOutCubic",
+                transition_callback
+            );
         });
     }
-    deleteAssignment(dom_assignment, params={restore: false}) {
-        const that = this;
+    static deleteAssignment(dom_assignment, params={restore: false}) {
         dom_assignment.addClass("assignment-is-deleting");
         // Send data to backend and animates its deletion
         const success = function() {
-            that.transitionDeleteAssignment(dom_assignment);
+            Crud.transitionDeleteAssignment(dom_assignment);
         }
         const sa = utils.loadAssignmentData(dom_assignment);
         if (params.restore)
@@ -917,6 +970,7 @@ class Crud {
                 url: "/api/restore-assignment",
                 data: {assignments: JSON.stringify([sa.id])},
                 success: success,
+                fakeSuccessArguments: [],
                 error: function() {
                     dom_assignment.removeClass("assignment-is-deleting");
                     ajaxUtils.error.bind(this)(...arguments);
@@ -929,6 +983,7 @@ class Crud {
                 url: "/api/delete-assignment",
                 data: {assignments: JSON.stringify([sa.id]), actually_delete: VIEWING_DELETED_ASSIGNMENTS},
                 success: success,
+                fakeSuccessArguments: [],
                 error: function() {
                     dom_assignment.removeClass("assignment-is-deleting");
                     ajaxUtils.error.bind(this)(...arguments);

@@ -5,7 +5,6 @@ html {
 #assignments-container {
     position: relative;
     overflow-y: auto;
-    opacity: 0;
     margin-top: -10px;
     padding-top: 10px;
     --scale-percent-y: 1.05;
@@ -28,6 +27,9 @@ main {
 main.finished-header-transition #assignments-container {
     /* ensure the initial transition visual doesnt break */
     height: 100%;
+}
+main.disable-scrolling {
+    pointer-events: none;
 }
 main:not(.animate) {
     transition: box-shadow 1.4s cubic-bezier(.32,1.01,.53,1.15);
@@ -83,7 +85,7 @@ main.background-image-exists {
     min-height: calc(var(--100vh) - var(--header-height) - 10px);
     position: relative;
 }
-#extra-navs-positioner > span {
+#extra-navs-assignment-positioner {
     display: flex;
     flex-flow: column;
 }
@@ -148,6 +150,10 @@ main.background-image-exists {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+    transition: margin-bottom 350ms ease-out;
+}
+#assignments-header.add-shortcut-margin {
+    margin-bottom: 5px;
 }
 #assignments-header > * {
     white-space: nowrap;
@@ -202,7 +208,7 @@ main.background-image-exists {
     padding: var(--outer-assignment-vertical-padding) var(--outer-assignment-horizontal-padding);
     --shortcut-border-radius: 6px;
 }
-.assignment-container.transform-instantly, .assignment-container.transform-instantly .assignment-footer {
+.assignment-container.transition-disabler .assignment-footer {
     transition: none !important;
 }
 #extra-navs-positioner {
@@ -222,7 +228,6 @@ main.background-image-exists {
     position: relative;
     /* Ensures this stacks above .assignment-container::after */
     z-index: 1;
-    scroll-margin: 20px;
     transition: all .2s ease-in-out,
                 opacity calc(.375s * var(--animation-speed)) ease-in-out,
                 box-shadow calc(var(--priority-color-transition-speed) * var(--animation-speed)),
@@ -233,11 +238,8 @@ main.background-image-exists {
     --priority-color-border-width: 1px;
     --box-shadow-priority: inset 0 0 0 var(--priority-color-border-width) var(--priority-color);
 }
-/* do not remove the :not() thing from here i wasted an hour debugging because of this */
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .priority-color-strip,
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring,
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly {
-    transition: none;
+.assignment.transition-disabler .priority-color-strip {
+    transition: none !important;
 }
 .assignment:not(.open-assignment):hover, .assignment:not(.open-assignment):focus {
     transform: scale(var(--scale-percent-x), var(--scale-percent-y));
@@ -265,9 +267,6 @@ main.background-image-exists {
     --margin-top-and-bottom: var(--outer-assignment-vertical-padding);
     margin-top: calc(-2 * var(--outer-assignment-vertical-padding) + var(--margin-top-and-bottom));
     margin-bottom: var(--margin-top-and-bottom);
-}
-.assignment-container.add-shortcut-margin {
-    margin-top: 5px;
 }
 .shortcut-text {
     white-space: nowrap;
@@ -374,6 +373,12 @@ main.background-image-exists {
     display: flex; /* things position weirdly when assignments are open without this for some reason */
     flex-direction: column; /* put description below name */
     position: relative;
+    /* 
+    https://stackoverflow.com/a/66689926/12230735
+    (the description can overflow .assignment-header and push .right-side-of-header
+    out of the screen to the right)
+    */
+    min-width: 0;
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
     --left-side-of-header-width: max(110px, calc(40px + 12vw));
@@ -448,8 +453,8 @@ main.background-image-exists {
     white-space: nowrap;
     font-size: 0.75em;
 }
-.title[data-priority]::before {
-    content: attr(data-priority) !important;
+.title[data-add-priority-percentage]::before {
+    content: "Priority: " attr(data-priority-percentage) "%" !important;
     transform: translateY(-100%) translateY(var(--smush-priority));
 }
 .title[data-daysleft]::after {
@@ -769,9 +774,6 @@ do this because midde-of-header is hidden in the delete assignments view */
 .tag-add-checkbox {
     appearance: revert;
 }
-.tag-add-transition-disabler {
-    transition: none !important;
-}
 .icon-slash {
     top: 0;
     bottom: 0;
@@ -909,9 +911,6 @@ do this because midde-of-header is hidden in the delete assignments view */
 }
 .hover-point-label.move-left {
     --translatex: calc(-100% - 10px);
-}
-.hover-point-label.disable-hover-point-label-transition {
-    transition: none;
 }
 .fixed-graph {
     position: absolute;
@@ -1352,7 +1351,7 @@ main.finished-header-transition #extra-navs {
         --negative-horizontal-margin: -9px;
     }
     .assignment-header > :nth-last-child(2) {
-        --assignment-header-text-right-margin: 10px;
+        --assignment-header-text-right-margin: 15px;
     }
     .assignment-header-button {
         margin-left: 0px;
