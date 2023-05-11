@@ -1521,11 +1521,13 @@ class Priority {
             }
 
             $("main").addClass("disable-scrolling");
-            if (no_bottom) {
-                assert(assignment_container_to_scroll_to === bottom_assignment_container_to_scroll_to);
-                if (assignment_container_to_scroll_to.hasClass("is-being-created")) {
-                    $("#extra-navs").hide();
-                }
+            if (no_bottom && assignment_container_to_scroll_to.hasClass("is-being-created")) {
+                // assignment_container_to_scroll_to after the first no_bottom condition will usually be bottom_assignment_container_to_scroll_to
+                // but not always because no_top and no_bottom can both be true if animate_in_assignments is dat
+                // this case will be refuted by assignment_container_to_scroll_to.hasClass("is-being-created") which
+                // both ensures the assignment is actually being animated in and makes the expression false in this case
+                // because #assignments-header doesn't have is-being-created
+                $("#extra-navs").hide();
             }
 
             const start_time = performance.now();
