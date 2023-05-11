@@ -52,7 +52,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     JSONToTextarea($("#id_default_dropdown_tags"));
-    $("#id_default_dropdown_tags").expandableTextareaHeight();
     setTimeout(function() {
         $("#id_default_dropdown_tags").trigger("input");
     }, 0);

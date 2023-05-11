@@ -154,20 +154,12 @@ tickClock: function() {
     // https://stackoverflow.com/questions/42879023/remove-leading-zeros-from-time-format
     str = str.replace(/^[0:]+(?=\d[\d:]{3})/,"");
     $("#estimated-completion-time").text(` (${str})`);
-    if (!VIEWING_DELETED_ASSIGNMENTS &&
+    if (
+        !VIEWING_DELETED_ASSIGNMENTS &&
         // Don't tickClock in simulation or else Priority.sort calls tickClock which calls Priority.sort again
         // this messes up current_translate_value *= 0.9
-        !utils.in_simulation) {
-        const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-        if (midnight.valueOf() !== date_now.valueOf()) {
-            // Don't reload in the next day to preserve changes made in the simulation
-            // Don't reload in the example account because date_now set in the example account causes an infinite reload loop  
-            if (utils.in_simulation || isExampleAccount) return;
-            // even though this may be unnecessary i don't care because this will happen very infrequently and making this
-            // perform optimally is a waste of time
-            reloadWhenAppropriate();
-        }
-
+        !utils.in_simulation
+    ) {
         // We can't simply define a setTimeout until every assignment's due date. Here's why:
         // 1) Due dates can be changed if an assignment is soft, outdating the setTimeout
         // 2) setTimeouts may not run if a device is on sleep or powered off, considering there is only one opportunity for it to run
@@ -1471,6 +1463,11 @@ inLineWrapperQuery: function($first_assignment_container) {
             }
         }
     });
+    return ret;
+},
+getPseudoStyle: function($element, pseudo, style) {
+    const ret = window.getComputedStyle($element[0], pseudo)[style];
+    if (Number.isFinite(parseFloat(ret))) return parseFloat(ret);
     return ret;
 },
 initSA: function(sa) {

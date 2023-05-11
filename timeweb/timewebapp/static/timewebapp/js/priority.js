@@ -947,53 +947,6 @@ class Priority {
         const priority_color = utils.formatting.hsvToRGB(h, s, v);
         dom_assignment.css("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
     }
-    colorAssignments($assignment_container) {
-        const that = this;
-        $assignment_container.each(function() {
-            const assignment_container = $(this);
-            const dom_title = assignment_container.find(".title");
-            const priority_percentage = parseInt(dom_title.attr("data-priority-percentage"));
-            that.colorAssignment(assignment_container, priority_percentage);
-        });
-    }
-    animateInAssignments($assignment_container, animateStep, callback) {
-        $assignment_container.each(function(i) {
-            const assignment_container = $(this);
-
-            // animating-in-reference: undefined
-            // not animating-in-reference and animateStep: () => animateStep(assignment_container)
-            // not animating-in-reference and not animateStep: undefined
-
-            // animating-in-reference or not animateStep: undefined
-            // else: () => animateStep(assignment_container)
-            assignment_container.animate(
-                {
-                    top: 0,
-                    opacity: 1,
-                    marginBottom: 0,
-                },
-                {
-                    start: function() {
-                        if (animateStep) {
-                            $(".animating-in-reference").removeClass("animating-in-reference");
-                            assignment_container.addClass("animating-in-reference");
-                        }
-                    },
-                    duration: 1500 * SETTINGS.animation_speed,
-                    easing: "easeOutCubic",
-                    step: animateStep ? () => animateStep(assignment_container) : undefined,
-                    complete: function() {
-                        if (animateStep) {
-                            assignment_container.removeClass("animating-in-reference");
-                        }
-                        assignment_container.removeClass("is-being-created");
-                        if (i === $assignment_container.length - 1 && callback)
-                            callback();
-                    }
-                },
-            );
-        });
-    }
     addAssignmentShortcut(dom_assignment, priority_data) {
         const that = this;
         // Loops through every google classroom assignment that needs more info AND has a tag (representing their class) to add "delete assignments of this class"
@@ -1490,23 +1443,52 @@ class Priority {
                     return bottom_assignment_container_to_scroll_to;
             }
             function finished_scrolling() {
-                that.colorAssignments(animate_in_assignments);
-                that.animateInAssignments(animate_in_assignments, assignment_container => {
-                    if (Priority.scrollIntoViewSmoothlyStep || !assignment_container.hasClass("animating-in-reference"))
-                        return;
-                    const assignment_container_to_scroll_to = calculate_assignment_container_to_scroll_to();
-                    if (!assignment_container_to_scroll_to)
-                        return;
-                    const element_top = assignment_container_to_scroll_to.position().top;
-                    const element_height = assignment_container_to_scroll_to.outerHeight();
+                animate_in_assignments.each(function(i) {
+                    const assignment_container = $(this);
+                    const dom_title = assignment_container.find(".title");
+                    const priority_percentage = parseInt(dom_title.attr("data-priority-percentage"));
+                    that.colorAssignment(assignment_container, priority_percentage);
+        
+                    // animating-in-reference: undefined
+                    // not animating-in-reference and animateStep: () => animateStep(assignment_container)
+                    // not animating-in-reference and not animateStep: undefined
+        
+                    // animating-in-reference or not animateStep: undefined
+                    // else: () => animateStep(assignment_container)
+                    assignment_container.animate(
+                        {
+                            top: 0,
+                            opacity: 1,
+                            marginBottom: 0,
+                        },
+                        {
+                            start: function() {
+                                $(".animating-in-reference").removeClass("animating-in-reference");
+                                assignment_container.addClass("animating-in-reference");
+                            },
+                            duration: 1500 * SETTINGS.animation_speed,
+                            easing: "easeOutCubic",
+                            step: () => {
+                                if (Priority.scrollIntoViewSmoothlyStep || !assignment_container.hasClass("animating-in-reference"))
+                                    return;
+                                const assignment_container_to_scroll_to = calculate_assignment_container_to_scroll_to();
+                                if (!assignment_container_to_scroll_to)
+                                    return;
+                                const element_top = assignment_container_to_scroll_to.position().top;
+                                const element_height = assignment_container_to_scroll_to.outerHeight();
+            
+                                scroll_parent.scrollTop(calculate_final_top(element_top, element_height, scroll_parent));
+                            },
+                            complete: () => {
+                                assignment_container.removeClass("is-being-created animating-in-reference");
+                                if (i !== animate_in_assignments.length - 1 || $(".is-being-created").length)
+                                    return
 
-                    scroll_parent.scrollTop(calculate_final_top(element_top, element_height, scroll_parent));
-                }, function() {
-                    if ($(".is-being-created").length)
-                        return;
-                    
-                    $("main").removeClass("disable-scrolling");
-                    $("#extra-navs").show();
+                                $("main").removeClass("disable-scrolling");
+                                $("#extra-navs").show();
+                            }
+                        },
+                    );
                 });
             }
             function calculate_final_top(element_top, element_height, scroll_parent) {

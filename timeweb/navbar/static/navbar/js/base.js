@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     let add_expand_all = false;
-    $(".major-category").reverse().each(function() {
+    $($(".major-category").toArray().reverse()).each(function() {
         const major_category = $(this);
         let major_category_dropdown = $($("#table-of-contents-major-category-template").html());
 

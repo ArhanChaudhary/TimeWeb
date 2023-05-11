@@ -29,10 +29,22 @@ window.addEventListener("beforeunload", function() {
     }, 0);
 });
 if (!CSS.supports("height", "1dvh")) {
-    function setVh() {
+    const setVh = () => {
         let vh = window.innerHeight * 0.01;
         document.documentElement.style.setProperty('--vh', `${vh}px`);
     }
     setVh();
     window.addEventListener('resize', () => requestAnimationFrame(setVh));
 }
+window.addEventListener("load", function() {
+    setTimeout(function() {
+        document.querySelectorAll("textarea").forEach(function(textarea) {
+            textarea.addEventListener("input", function() {
+                textarea.style.height = getComputedStyle(textarea).getPropertyValue("--nothing-height");
+                textarea.style.height = `${textarea.scrollHeight}px`;
+            });
+            textarea.style.overflowY = "hidden";        
+            textarea.dispatchEvent(new Event("input"));
+        });
+    }, 0);
+});
