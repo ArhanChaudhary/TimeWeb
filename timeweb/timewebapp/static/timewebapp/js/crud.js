@@ -326,7 +326,8 @@ class Crud {
         setTimeout(function() {
             $("#form-wrapper form input:visible").first().focus();
             $("#id_description").trigger("input");
-        }, 100);
+        // have a timeout so the edit button flashes when you click it
+        }, 75);
     }
     hideForm() {
         const that = this;
