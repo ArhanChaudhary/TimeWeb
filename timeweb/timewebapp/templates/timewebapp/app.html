@@ -121,24 +121,38 @@
   {% if user.settingsmodel.background_image %}{{ user.settingsmodel.background_image_text_shadow_width }}-text-shadow-width{% endif %}
   {% if user.settingsmodel.priority_color_borders %}priority-color-borders{% endif %}" tabindex="-1">
     <script nonce="{{request.csp_nonce}}">
-      (function() {
-        if ($("main").hasClass("finished-header-transition")) return
+      // Use an inline script so .animate is added as EARLY as possible, otherwise the unanimated frames can show up
+      if (
+        // expresion for animation ran
+        "animation-ran" in sessionStorage ||
+        {% if user.is_authenticated %}
+          {% if request.path == home or request.path == example %}
+            false
+          {% else %}
+            true
+          {% endif %} 
+        {% else %}
+          true
+        {% endif %}
+      ) {
+        $(() => $("#extra-navs-positioner").css("transition", "none"));
+      } else {
         // If the animation has not already been run, add the class "animate" to the elements that will be animated
         // The animation will happen instantly, because the transitions are only applied to :not(.animate)
         // Then, when the window loads, remove ".animate". This will cause the actual transition
         // Note: Using keyframes still required this same process
-        $("main, header, #assignments-container").addClass("animate");
+        $("#site").addClass("animate");
         sessionStorage.setItem("animation-ran", true);
         $(window).one('load', function() {
           if (isExampleAccount) setTimeout(utils.ui.exampleAccountAlertTutorial, 1000);
-          $("main, header, #assignments-container").removeClass("animate");
+          $("#site").removeClass("animate");
           // Run when the header animation completely ends since the header animation takes the longest
-          $("header").one("transitionend", function() {
+          $("#extra-navs-positioner").one("transitionend", function() {
             // Position content such that the scrollbar doesn't clip into the header
-            $("main").addClass("finished-header-transition");
+            $(this).css("transition", "none");
           });
         });
-      })();
+      }
     </script>
     <div id="extra-navs-positioner">
       {% comment %} <span> so :last-child is forwards-compatible {% endcomment %}

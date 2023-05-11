@@ -55,12 +55,6 @@
     </a>
 </header>
 <main tabindex="-1" {% if user.settingsmodel.background_image %}class="background-image-exists"{% endif %}>
-    {% comment %} Use an inline script so .animate is added as EARLY as possible, otherwise the unanimated frames can show up {% endcomment %}
-    <script nonce="{{request.csp_nonce}}">
-        if ("animation-ran" in sessionStorage || {% if user.is_authenticated %} {% if request.path == home or request.path == example %}false{% else %}true{% endif %} {% else %}true{% endif %}) {
-            $("main").addClass("finished-header-transition");
-        }
-    </script>
     {% block content %}{% endblock content %}
     <div id="loading-container">
         <div class="loading-circle"></div>
