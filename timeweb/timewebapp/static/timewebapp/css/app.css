@@ -72,6 +72,12 @@ main.background-image-exists {
 }
 #assignments-container.viewing-deleted-assignments .left-side-of-header {
     --left-side-of-header-width: initial;
+    /* 
+    https://stackoverflow.com/a/66689926/12230735
+    (the description can overflow .assignment-header and push .right-side-of-header
+    out of the screen to the right)
+    */
+    min-width: 0;
 }
 #assignments-container.viewing-deleted-assignments .assignment-container ~ #no-assignments-message {
     display: none;
@@ -373,12 +379,6 @@ main.background-image-exists {
     display: flex; /* things position weirdly when assignments are open without this for some reason */
     flex-direction: column; /* put description below name */
     position: relative;
-    /* 
-    https://stackoverflow.com/a/66689926/12230735
-    (the description can overflow .assignment-header and push .right-side-of-header
-    out of the screen to the right)
-    */
-    min-width: 0;
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
     --left-side-of-header-width: max(110px, calc(40px + 12vw));
