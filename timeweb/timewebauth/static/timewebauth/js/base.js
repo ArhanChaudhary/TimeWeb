@@ -33,9 +33,9 @@ $(window).one("load", function() {
     vws = shuffle(vws);
 
     let front_color = {
-        r: 55,
-        g: 161,
-        b: 164
+        r: 93,
+        g: 198,
+        b: 201
     };
     // let back_color = {r: 49, g: 75, b: 110}; (actual bottom color of the logo)
     let back_color = {
