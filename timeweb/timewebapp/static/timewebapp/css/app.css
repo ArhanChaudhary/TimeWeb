@@ -4,6 +4,7 @@ html {
 }
 #assignments-container {
     position: relative;
+    height: 100%;
     overflow-y: auto;
     margin-top: -10px;
     padding-top: 10px;
@@ -24,34 +25,39 @@ html {
 main {
     overflow-y: hidden;
 }
-main.finished-header-transition #assignments-container {
-    /* ensure the initial transition visual doesnt break */
-    height: 100%;
-}
 main.disable-scrolling {
     pointer-events: none;
 }
-main:not(.animate) {
-    transition: box-shadow 1.4s cubic-bezier(.32,1.01,.53,1.15);
+#site.animate main {
+    box-shadow: none;
+    padding-top: 10px;
 }
-header:not(.animate), header:not(.animate)::after {
-    transition: transform 1.7s cubic-bezier(.29,.81,.37,.99);
-}
-#assignments-container.animate {
+#site.animate #extra-navs-assignment-positioner {
     transform: translateY(max(-400px, calc(-100% - 20px)));
     /* transform:translateY(min(calc(400px, calc(100% + 20px))); */
 }
-#assignments-container:not(.animate) {
-    transition: transform 1.5s cubic-bezier(.29,.81,.37,.99);
+#site.animate #extra-navs-positioner {
+    min-height: calc(var(--100vh) - 10px);
 }
-main.animate {
-    box-shadow: none;
-}
-header.animate {
+#site.animate header {
     transform: translateY(calc(-1 * var(--header-height)));
 }
-header.animate::after {
+#site.animate header::after {
     transform: none;
+}
+#site:not(.animate) main {
+    transition: box-shadow 1.4s cubic-bezier(0.32, 1.01, 0.53, 1.15),
+                padding-top 1.7s cubic-bezier(0.29, 0.81, 0.37, 0.99);
+}
+#site:not(.animate) #extra-navs-assignment-positioner {
+    transition: transform 1.5s cubic-bezier(0.29, 0.81, 0.37, 0.99);
+}
+#site:not(.animate) #extra-navs-positioner {
+    transition: min-height 1.7s cubic-bezier(0.29, 0.81, 0.37, 0.99);
+}
+#site:not(.animate) header,
+#site:not(.animate) header::after {
+    transition: transform 1.7s cubic-bezier(0.29, 0.81, 0.37, 0.99);
 }
 main.background-image-exists {
     padding-left: 0;
@@ -1040,7 +1046,6 @@ do this because midde-of-header is hidden in the delete assignments view */
     right: 0;
     left: 0;
     display: flex;
-    visibility: hidden;
     justify-content: center;
     white-space: nowrap;
     flex-wrap: wrap;
@@ -1053,9 +1058,6 @@ do this because midde-of-header is hidden in the delete assignments view */
 }
 main:not(.background-image-exists) #extra-navs {
     filter: invert(0.3);
-}
-main.finished-header-transition #extra-navs {
-    visibility: initial;
 }
 #extra-navs span {
     white-space: nowrap;
