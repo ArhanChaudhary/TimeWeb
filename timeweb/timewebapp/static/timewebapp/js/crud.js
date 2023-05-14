@@ -592,7 +592,6 @@ class Crud {
             if (!$this.length) return;
 
             const dom_assignment = $this.parents(".assignment");
-            if (dom_assignment.hasClass("assignment-is-deleting")) return;
             // shift + d while in the close assignment transition bugs it
             // use transitionend to run this
             new Promise(function(resolve) {
@@ -981,6 +980,7 @@ class Crud {
         });
     }
     static deleteAssignment(dom_assignment, params={restore: false}) {
+        if (dom_assignment.hasClass("assignment-is-deleting")) return;
         dom_assignment.addClass("assignment-is-deleting");
         // Send data to backend and animates its deletion
         const success = function() {
