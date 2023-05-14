@@ -951,6 +951,7 @@ class Crud {
 
                 ids.add(sa.id);
                 if (i === $dom_assignment.length - 1) {
+                    // don't worry about losing the reference, .filter creates a shallow copy
                     dat = dat.filter(sa => !ids.has(sa.id));
                     // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
                     new Priority().sort();
