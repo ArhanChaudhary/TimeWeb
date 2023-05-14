@@ -1413,7 +1413,7 @@ class Priority {
             const initial_top = scroll_parent.scrollTop();
             const parent_height = scroll_parent.height();
 
-            function calculate_assignment_container_to_scroll_to() {
+            function calculate_assignment_container_to_scroll_to(ignore_no_top_bottom=false) {
                 // let's say the element is animating in from the bottom
                 // bottom_assignment_container_to_scroll_to is the one right below the viewport, assume scroll_margin is 0 for now
                 // the two numbers in bottom_element_is_below will be exactly equal to each other, so nothing will happen
@@ -1430,7 +1430,7 @@ class Priority {
                 const top_element_top = top_assignment_container_to_scroll_to.position().top;
 
                 const top_element_is_above = top_element_top/* + top_element_height*/ - scroll_margin < initial_top;
-                if (no_top)
+                if (no_top && !ignore_no_top_bottom)
                     return $("#assignments-header");
                 if (top_element_is_above)
                     return top_assignment_container_to_scroll_to;
@@ -1439,7 +1439,7 @@ class Priority {
                 const bottom_element_height = bottom_assignment_container_to_scroll_to.outerHeight();
 
                 const bottom_element_is_below = bottom_element_top + bottom_element_height/* - bottom_element_height*/ + scroll_margin > initial_top + parent_height;
-                if (bottom_element_is_below || no_bottom)
+                if (bottom_element_is_below || no_bottom && !ignore_no_top_bottom)
                     return bottom_assignment_container_to_scroll_to;
             }
             function finished_scrolling() {
@@ -1471,7 +1471,7 @@ class Priority {
                             step: () => {
                                 if (Priority.scrollIntoViewSmoothlyStep || !assignment_container.hasClass("animating-in-reference"))
                                     return;
-                                const assignment_container_to_scroll_to = calculate_assignment_container_to_scroll_to();
+                                const assignment_container_to_scroll_to = calculate_assignment_container_to_scroll_to(true);
                                 if (!assignment_container_to_scroll_to)
                                     return;
                                 const element_top = assignment_container_to_scroll_to.position().top;
