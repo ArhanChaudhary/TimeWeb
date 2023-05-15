@@ -147,9 +147,10 @@
           if (isExampleAccount) setTimeout(utils.ui.exampleAccountAlertTutorial, 1000);
           $("#site").removeClass("animate");
           // Run when the header animation completely ends since the header animation takes the longest
-          $("#extra-navs-positioner").one("transitionend", function() {
+          $("#extra-navs-positioner").on("transitionend", function(e) {
+            if (e.target !== this) return;
             // Position content such that the scrollbar doesn't clip into the header
-            $(this).css("transition", "none");
+            $(this).css("transition", "none").off("transitionend");
           });
         });
       }
