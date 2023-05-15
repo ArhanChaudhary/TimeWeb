@@ -909,7 +909,7 @@ setAssignmentScaleUtils: function(dom_assignment) {
 setAnimationSpeed: function() {
     $("main").css('--animation-speed', SETTINGS.animation_speed);
 },
-overlayAround: function({element: $element, duration=1000, margin=15 } = {}) {
+overlayAround: function({element: $element, duration, margin=15 } = {}) {
     $(window).off("resize.tutorial-overlay");
     if ($element === null) {
         $("#tutorial-overlay").css({
@@ -994,6 +994,7 @@ tutorial: function() {
                         wait: 1500,
                         do: () => utils.ui.overlayAround({
                             element: tutorial_assignment,
+                            duration: 1000,
                         }),
                     },
                     {
@@ -1022,6 +1023,7 @@ tutorial: function() {
                         do: () => utils.ui.overlayAround({
                             element: tutorial_assignment.find(".graph"),
                             margin: 5,
+                            duration: 1000,
                         }),
                     },
                     {
@@ -1073,6 +1075,7 @@ tutorial: function() {
                                 }
                             },
                             margin: 5,
+                            duration: 1000,
                         }),
                     },
                     {
@@ -1091,6 +1094,7 @@ tutorial: function() {
                             utils.ui.overlayAround({
                                 element: tutorial_assignment.find(".graph"),
                                 margin: 5,
+                                duration: 1000,
                             });
                             tutorial_assignment.find(".fixed-graph").addClass("blur");
                         }
