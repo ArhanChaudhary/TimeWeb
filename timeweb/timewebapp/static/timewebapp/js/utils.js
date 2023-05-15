@@ -991,7 +991,7 @@ tutorial: function() {
                         resolve: 'animate-example-assignment',
                     },
                     {
-                        wait: 1500,
+                        wait: 750,
                         do: () => utils.ui.overlayAround({
                             element: tutorial_assignment,
                             duration: 1000,
@@ -1053,7 +1053,7 @@ tutorial: function() {
                         }),
                     },
                     {
-                        wait: 1250,
+                        wait: 1500,
                         do: () => finished_resolver("x-axis"),
                     },
                 ]);
@@ -1169,7 +1169,7 @@ tutorial: function() {
                         do: () => tutorial_assignment.find(".tick-button").click(),
                     },
                     {
-                        wait: 2000,
+                        wait: 2500,
                         do: () => utils.ui.overlayAround({
                             element: null,
                             duration: 1250,
