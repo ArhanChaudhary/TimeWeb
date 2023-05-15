@@ -180,12 +180,13 @@ class Priority {
 
         const dom_title_link_anchor = dom_assignment.find(".title-link-anchor");
         if (sa.external_link) {
+            dom_title_link_anchor.show();
             dom_title_link_anchor.attr("href", sa.external_link);
             if (dom_title_link_anchor.prop("href").startsWith(location.origin)) {
                 dom_title_link_anchor.attr("href", "//" + sa.external_link);
             }
         } else {
-            dom_title_link_anchor.remove();
+            dom_title_link_anchor.hide();
         }
 
         const dom_description = dom_assignment.find(".description");
@@ -205,12 +206,13 @@ class Priority {
         dom_assignment.find(".title-text").text(sa.name);
         const dom_title_link_anchor = dom_assignment.find(".title-link-anchor");
         if (sa.external_link) {
+            dom_title_link_anchor.show();
             dom_title_link_anchor.attr("href", sa.external_link);
             if (dom_title_link_anchor.prop("href").startsWith(location.origin)) {
                 dom_title_link_anchor.attr("href", "//" + sa.external_link);
             }
         } else {
-            dom_title_link_anchor.remove();
+            dom_title_link_anchor.hide();
         }
         const dom_description = dom_assignment.find(".description");
         dom_description.empty();
