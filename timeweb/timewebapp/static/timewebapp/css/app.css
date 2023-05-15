@@ -1398,7 +1398,8 @@ main:not(.background-image-exists) #extra-navs {
         --widget-padding: 67px;
     }
     .hide-on-mobile {
-        display: none;
+        /* !important for estimated-completion-time */
+        display: none !important;
     }
     .show-on-mobile {
         display: initial;
