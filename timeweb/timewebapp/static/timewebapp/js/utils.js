@@ -939,7 +939,11 @@ overlayAround: function({element: $element, duration=1000, margin=15 } = {}) {
     $(window).trigger("resize.tutorial-overlay");
 },
 tutorial: function() {
-    // ignore work inputs
+    const tutorial_assignment = $(".assignment").filter(function() {
+        const dom_assignment = $(this);
+        const sa = utils.loadAssignmentData(dom_assignment);
+        return sa.name === EXAMPLE_ASSIGNMENT_NAME;
+    });
     const tutorial_alerts = [
         {
             buttons: {
@@ -948,8 +952,8 @@ tutorial: function() {
                         while (tutorial_alerts.length > 0) {
                             tutorial_alerts.pop();
                         }
-                        const assignment_container = $(".animate-in");
-                        const dom_assignment = assignment_container.children(".assignment");
+                        const dom_assignment = tutorial_assignment;
+                        const assignment_container = dom_assignment.parent();
                         const sa = utils.loadAssignmentData(dom_assignment);
 
                         $.ajax({
@@ -989,7 +993,7 @@ tutorial: function() {
                     {
                         wait: 1500,
                         do: () => utils.ui.overlayAround({
-                            element: $(".animate-in > .assignment"),
+                            element: tutorial_assignment,
                         }),
                     },
                     {
@@ -1005,9 +1009,9 @@ tutorial: function() {
                     {
                         wait: 300,
                         do: () => {
-                            $(".animate-in > .assignment").focus().click();
+                            tutorial_assignment.focus().click();
                             utils.ui.overlayAround({
-                                element: $(".animate-in > .assignment"),
+                                element: tutorial_assignment,
                                 margin: 10,
                                 duration: 800,
                             });
@@ -1016,7 +1020,7 @@ tutorial: function() {
                     {
                         wait: 2250,
                         do: () => utils.ui.overlayAround({
-                            element: $(".animate-in .graph"),
+                            element: tutorial_assignment.find(".graph"),
                             margin: 5,
                         }),
                     },
@@ -1034,7 +1038,7 @@ tutorial: function() {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
                             element: () => {
-                                const rect = $(".animate-in .graph")[0].getBoundingClientRect();
+                                const rect = tutorial_assignment.find(".graph")[0].getBoundingClientRect();
                                 return {
                                     top: rect.top + rect.height - 55,
                                     left: rect.left,
@@ -1060,7 +1064,7 @@ tutorial: function() {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
                             element: () => {
-                                const rect = $(".animate-in .graph")[0].getBoundingClientRect();
+                                const rect = tutorial_assignment.find(".graph")[0].getBoundingClientRect();
                                 return {
                                     top: rect.top,
                                     left: rect.left,
@@ -1085,10 +1089,10 @@ tutorial: function() {
                         wait: 300,
                         do: () => {
                             utils.ui.overlayAround({
-                                element: $(".animate-in .graph"),
+                                element: tutorial_assignment.find(".graph"),
                                 margin: 5,
                             });
-                            $(".animate-in .fixed-graph").addClass("blur");
+                            tutorial_assignment.find(".fixed-graph").addClass("blur");
                         }
                     },
                     {
@@ -1106,7 +1110,7 @@ tutorial: function() {
                         do: () => {
                             utils.ui.overlayAround({
                                 element: () => {
-                                    const rect = $(".animate-in .graph")[0].getBoundingClientRect();
+                                    const rect = tutorial_assignment.find(".graph")[0].getBoundingClientRect();
                                     return {
                                         top: rect.top + rect.height - 51,
                                         left: rect.left + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 9,
@@ -1117,7 +1121,7 @@ tutorial: function() {
                                 duration: 1250,
                                 margin: 20,
                             });
-                            $(".animate-in .fixed-graph").removeClass("blur");
+                            tutorial_assignment.find(".fixed-graph").removeClass("blur");
                         }
                     },
                     {
@@ -1133,7 +1137,7 @@ tutorial: function() {
                     {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
-                            element: $(".animate-in .tick-button").parent(),
+                            element: tutorial_assignment.find(".tick-button").parent(),
                             margin: 0,
                             duration: 1500,
                         }),
@@ -1151,14 +1155,14 @@ tutorial: function() {
                     {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
-                            element: $(".animate-in > .assignment"),
+                            element: tutorial_assignment,
                             margin: 10,
                             duration: 900,
                         }),
                     },
                     {
                         wait: 1500,
-                        do: () => $(".animate-in .tick-button").click(),
+                        do: () => tutorial_assignment.find(".tick-button").click(),
                     },
                     {
                         wait: 2000,
@@ -1715,6 +1719,8 @@ document.addEventListener("DOMContentLoaded", function() {
         utils.ui.addTagHandlers();
         utils.ui.setAnimationSpeed();
         utils.ui.setAssignmentsContainerScaleUtils();
+        if (SETTINGS.enable_tutorial)
+            utils.ui.tutorial();
     }, 0);
     utils.ui.saveAndLoadStates();
     utils.ui.navClickHandlers();

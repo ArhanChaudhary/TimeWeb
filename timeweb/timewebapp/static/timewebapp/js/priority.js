@@ -1229,8 +1229,6 @@ class Priority {
         if (!first_available_tutorial_assignment) {
             first_available_tutorial_assignment = first_available_tutorial_assignment_fallback;
         }
-        if (SETTINGS.enable_tutorial && that.params.first_sort)
-            utils.ui.tutorial(first_available_tutorial_assignment);
 
         let tops = new Array(that.assignments_to_sort.length);
         tops.fill(undefined);
@@ -1442,7 +1440,7 @@ class Priority {
                 if (bottom_element_is_below || no_bottom)
                     return bottom_assignment_container_to_scroll_to;
             }
-            function finished_scrolling() {
+            function finished_scrolling(finished_resolver) {
                 animate_in_assignments.each(function(i) {
                     const assignment_container = $(this);
                     const dom_title = assignment_container.find(".title");
@@ -1486,6 +1484,7 @@ class Priority {
 
                                 $("main").removeClass("disable-scrolling");
                                 $("#extra-navs").show();
+                                finished_resolver?.();
                             }
                         },
                     );
@@ -1566,7 +1565,13 @@ class Priority {
                     // without this else, the new step is never ran because it skips the now < end_time + finish_wait animation frame
                     window.requestAnimationFrame(Priority.scrollIntoViewSmoothlyStep);
                 }
-                finished_scrolling();
+                if (!SETTINGS.enable_tutorial) {
+                    finished_scrolling();
+                    return;
+                }
+                $(window).one('animate-example-assignment', function(e, finished_resolver) {
+                    finished_scrolling(finished_resolver);
+                });
             }
             if (!Priority.scrollIntoViewSmoothlyStep) {
                 window.requestAnimationFrame(step);
