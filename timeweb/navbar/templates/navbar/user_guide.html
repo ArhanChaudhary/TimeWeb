@@ -24,7 +24,7 @@ the span groups the major and minor categories together for user_guide.js
         About TimeWeb
     </div>
     <div id="written-on">
-        April 19, 2023 &#8226;
+        May 14, 2023 &#8226;
         <a href="https://github.com/ArhanChaudhary/TimeWeb/commits/master/timeweb/navbar/templates/navbar/user_guide.html" target="_blank">
             View Changes
         </a>
@@ -33,10 +33,10 @@ the span groups the major and minor categories together for user_guide.js
         Introduction
     </div>
     <p>
-        TimeWeb's user guide intends to elaborate on its many features so you can more efficiently use and configure its user interface. Self-explanatory features that do not add to the user guide such as the settings are skipped. It's recommended to first create an assignment and take a look at its graph before reading this guide.
+        TimeWeb's user guide elaborates on its features so you can efficiently use and configure its user interface. Self-explanatory features such as the settings are ommitted. It's recommended to first create an assignment and take a look at the assignment graph before reading this guide.
     </p>
     <p>
-        You can still use TimeWeb without reading this guide. You are free to use the Table of Contents to refer to specific sections or read the FAQs at the bottom.
+        You don't have to fully read this guide to still be able to use TimeWeb. At any time, you can use the Table of Contents to refer to specific sections of the user guide or read the FAQs right beneath it.
     </p>
     <div class="minor-category" id="what-is-timeweb">
         What is TimeWeb?
@@ -542,10 +542,9 @@ the span groups the major and minor categories together for user_guide.js
 		If a Google Classroom assignment meets the following criteria, it will momentarily be added to the assignments page after viewing:
     </p>
     <ul>
-        <li>Its due date must be after today</li>
-        <li>If it doesn't have a due date, its assignment date must be thirty days maximum before today</li>
-        <li>Its assignment date must be before its due date</li>
-        <li>Its class must not be archived</li>
+        <li>If it does have a due date, its due date must be after the current time</li>
+        <li>If it doesn't have a due date, its assignment date must be thirty days at most before today</li>
+        <li>Its class must not have been archived by the teacher</li>
     </ul>
     <p>
         Note that assignments on TimeWeb and Google Classroom are independent of each other. That is, modifications made to assignments on TimeWeb are not reflected on Google Classroom and vice versa.
@@ -740,7 +739,7 @@ the span groups the major and minor categories together for user_guide.js
 		Still need help?
 	</span>
     <p>
-		We encourage to <a href="{% url 'contact_form' %}">contact us</a> for any reason.
+		We encourage you to <a href="{% url 'contact_form' %}">contact us</a> for any reason.
     </p>
     <p>
         Whether you want to clarify a feature, report a bug, or ask how our day went, we are eager to hear and respond to your thoughts and comments. Perhaps your ideas can even become a part of TimeWeb in the future.
