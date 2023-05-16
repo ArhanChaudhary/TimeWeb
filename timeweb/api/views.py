@@ -336,6 +336,10 @@ def submit_assignment(request):
             sm.works = [str(first_work)]
         else:
             assert edited_assignment
+            # this isn't at all how to adjust dynamic start since it's not a simple offset as other work inputs,
+            # the other field inputs, and capped_at_x_num logic makes this hard
+            # so, only focus on adjusting dynamic_start when the assignment date changes and lay that logic on refreshDynamicMode
+            # in the front end
             sm.dynamic_start += utils.days_between_two_dates(old_data.assignment_date, sm.assignment_date)
             if sm.dynamic_start < 0:
                 sm.dynamic_start = 0
