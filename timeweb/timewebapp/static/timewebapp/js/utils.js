@@ -225,7 +225,7 @@ setClickHandlers: {
         });
     },
     assignmentsHeaderUI: function() {
-        $("#current-date").text(`Currently: ${date_now.toLocaleDateString([], {month: 'long', day: 'numeric', weekday: 'long'})}`);
+        $("#current-date").text(date_now.toLocaleDateString([], {month: 'long', day: 'numeric'}));
         
         // Hide and show estimated completion time
         $("#hide-button").click(function() {
@@ -253,7 +253,7 @@ setClickHandlers: {
                     position: "absolute",
                     top: -9999,
                 });
-                $("#current-date").text("Simulated date: " + date_now.toLocaleDateString([], {month: 'long', day: 'numeric', weekday: 'long'}));
+                $("#current-date").text(date_now.toLocaleDateString([], {month: 'long', day: 'numeric'}));
                 new Priority().sort();
             }
 
