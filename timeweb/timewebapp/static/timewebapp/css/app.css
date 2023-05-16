@@ -586,8 +586,8 @@ do this because midde-of-header is hidden in the delete assignments view */
     vertical-align: top;
     display: inline-block;
     top: 0;
-    width: 19.7px;
-    height: 19.7px;
+    width: 19px;
+    height: 19px;
     border-radius: 10px;
     --background-color: hsl(0, 0%, 91%);
     background-color: var(--background-color);
