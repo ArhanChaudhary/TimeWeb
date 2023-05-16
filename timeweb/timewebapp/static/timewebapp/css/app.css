@@ -416,7 +416,7 @@ main.background-image-exists {
     line-height: 0;
 }
 .left-side-of-header .title .title-link-icon {
-    margin-bottom: 1px;
+    margin-bottom: 0px;
     margin-left: 3px;
 }
 /* Add to truncate warning if the below style is changed */
