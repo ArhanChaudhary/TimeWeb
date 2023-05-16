@@ -325,7 +325,8 @@ class Crud {
 
         setTimeout(function() {
             $("#form-wrapper form input:visible").first().focus();
-            $("#id_description").trigger("input");
+            // so it is compatible with javascript in base.js 
+            $("#id_description").prop("dispatchEvent")(new Event("input"));
         // have a timeout so the edit button flashes when you click it
         }, 75);
     }
