@@ -278,8 +278,8 @@ class Priority {
             }
 
             sa.setParabolaValues();
-            if (sa.sa.refesh_dynamic_mode) {
-                delete sa.sa.refesh_dynamic_mode;
+            if (sa.sa.refresh_dynamic_mode) {
+                delete sa.sa.refresh_dynamic_mode;
                 if (!sa.sa.needs_more_info && !sa.sa.fixed_mode) {
                     // Fix dynamic start if y or anything else was changed
                     // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
