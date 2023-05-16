@@ -1710,7 +1710,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     const sa = sas[i];
                     sa.makeGCAnchorVisible();
                 });
-            }, 250);
+            }, mathUtils.clamp(0, (dat.length - 15) / 0.06, 250));
         });
         utils.ui.addTagHandlers();
         utils.ui.setAnimationSpeed();
