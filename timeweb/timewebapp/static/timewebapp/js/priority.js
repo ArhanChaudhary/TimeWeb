@@ -191,9 +191,15 @@ class Priority {
 
         const dom_description = dom_assignment.find(".description");
         if (sa.description) {
+            let first = true;
             for (const line of sa.description.split("\n")) {
+                if (!first) {
+                    // note that for some reason <br> isn't colored correctly if it's the break in the text line clamp
+                    // possible chromium bug?
+                    dom_description.append("<br>");
+                }
                 dom_description.append(document.createTextNode(line));
-                dom_description.append("<br>");
+                first = false;
             }
         }
 
