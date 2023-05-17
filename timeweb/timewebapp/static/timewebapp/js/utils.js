@@ -160,6 +160,15 @@ tickClock: function() {
         // this messes up current_translate_value *= 0.9
         !utils.in_simulation
     ) {
+        const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+        if (midnight.valueOf() !== date_now.valueOf()) {
+            // Don't reload in the next day to preserve changes made in the simulation
+            // Don't reload in the example account because date_now set in the example account causes an infinite reload loop  
+            if (utils.in_simulation || isExampleAccount) return;
+            date_now.setDate(date_now.getDate() + 1);
+            $("#current-date").text(date_now.toLocaleDateString([], {month: 'long', day: 'numeric'}));
+            new Priority().sort();
+        }
         // We can't simply define a setTimeout until every assignment's due date. Here's why:
         // 1) Due dates can be changed if an assignment is soft, outdating the setTimeout
         // 2) setTimeouts may not run if a device is on sleep or powered off, considering there is only one opportunity for it to run
