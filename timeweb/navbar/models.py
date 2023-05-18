@@ -206,7 +206,7 @@ class SettingsModel(models.Model):
         max_length=MAX_ASSIGNMENT_SORTINGS_LENGTH,
         choices=ASSIGNMENT_SORTINGS,
         default=_("Most Priority First"),
-        verbose_name=_('Assignment Sorting: '),
+        verbose_name=_('Sorting: '),
     )
     # Custom field validation in views: hardcoded enable or disable in change_setting
     oauth_token = models.JSONField(
