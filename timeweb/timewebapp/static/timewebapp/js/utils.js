@@ -1023,15 +1023,15 @@ tutorial: function() {
                         },
                     },
                     {
-                        wait: 2250,
+                        wait: 2500,
                         do: () => utils.ui.overlayAround({
                             element: tutorial_assignment.find(".graph"),
                             margin: 5,
-                            duration: 1000,
+                            duration: 1500,
                         }),
                     },
                     {
-                        wait: 1250,
+                        wait: 1750,
                         do: () => finished_resolver("graph-intro"),
                     }
                 ]);
@@ -1057,7 +1057,7 @@ tutorial: function() {
                         }),
                     },
                     {
-                        wait: 1500,
+                        wait: 1150,
                         do: () => finished_resolver("x-axis"),
                     },
                 ]);
