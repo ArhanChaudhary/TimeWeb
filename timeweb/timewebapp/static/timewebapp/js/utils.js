@@ -965,6 +965,8 @@ tutorial: function() {
                             url: "/api/delete-assignment",
                             data: {assignments: JSON.stringify([sa.id]), actually_delete: true},
                             success: () => {
+                                $(window).trigger("animate-example-assignment");
+                                assignment_container.stop(false, true);
                                 assignment_container.remove();
                                 // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)
                                 dom_assignment.removeClass("assignment-is-closing open-assignment");
