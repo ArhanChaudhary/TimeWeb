@@ -921,19 +921,23 @@ overlayAround: function({element: $element, duration, margin=15 } = {}) {
         });
     } else {
         $(window).on("resize.tutorial-overlay", function() {
-            let rect;
-            if (typeof $element === "function") {
-                rect = $element();
-            } else {
-                rect = $element[0].getBoundingClientRect();
-            }
-            $("#tutorial-overlay").css({
-                "--x": `${rect.left - margin}px`,
-                "--y": `${rect.top - margin}px`,
-                "--width": `${rect.width + margin * 2}px`,
-                "--height": `${rect.height + margin * 2}px`,
-                "--duration": `${duration}ms`,
-            });
+            // setTimeout in case this function is called too early before other
+            // positioning functions (like positionTags and makeGCAnchorVisible)
+            setTimeout(() => {
+                let rect;
+                if (typeof $element === "function") {
+                    rect = $element();
+                } else {
+                    rect = $element[0].getBoundingClientRect();
+                }
+                $("#tutorial-overlay").css({
+                    "--x": `${rect.left - margin}px`,
+                    "--y": `${rect.top - margin}px`,
+                    "--width": `${rect.width + margin * 2}px`,
+                    "--height": `${rect.height + margin * 2}px`,
+                    "--duration": `${duration}ms`,
+                });
+            }, 0);
         });
     }
     $(window).trigger("resize.tutorial-overlay");
