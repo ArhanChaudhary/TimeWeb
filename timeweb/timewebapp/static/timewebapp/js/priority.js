@@ -1109,6 +1109,9 @@ class Priority {
 
         // Updates open graphs' today line and other graph text
         $(window).trigger("redrawGraphs");
+        if (SETTINGS.enable_tutorial) {
+            $(window).trigger("resize.tutorial-overlay");
+        }
 
         const old_setting = SETTINGS.assignment_sorting;
         SETTINGS.assignment_sorting = "Most Priority First";
