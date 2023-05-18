@@ -825,7 +825,6 @@ class Crud {
                 url: "/api/submit-assignment/",
                 type: "POST",
                 data: serialized + "&" + $.param({
-                    utc_offset: Intl.DateTimeFormat().resolvedOptions().timeZone,
                     id: that.sa_id,
                 }),
                 success: function(response) {

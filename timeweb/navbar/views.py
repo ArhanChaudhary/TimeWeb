@@ -7,14 +7,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
 from django.forms.models import model_to_dict
 from django.contrib import messages
-from django.forms import ValidationError
 from django.utils.translation import gettext as _
 from ratelimit.decorators import ratelimit
 from ratelimit.core import is_ratelimited
 
 import common.utils as utils
 from common.views import CHANGELOGS, logger, TimewebGenericView
-from timewebapp.views import EXAMPLE_ASSIGNMENT, create_example_assignment
 from .forms import SettingsForm
 from .models import SettingsModel
 
@@ -74,11 +72,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     
     def valid_form(self, request):
         if not request.isExampleAccount:
-            if (
-                self.form.cleaned_data.get("enable_tutorial") and
-                request.user.timewebmodel_set.filter(hidden=False, name=EXAMPLE_ASSIGNMENT['name']).count() == 0
-            ):
-                create_example_assignment(request.user)
             if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in request.user.settingsmodel.oauth_token:
                 integrations.gc_auth_disable(request, save=False)
             self.form.save()

@@ -70,22 +70,11 @@ INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT = (
 
 assert len(INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT) + len(EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) == len(TimewebModel._meta.fields), "update this list"
 
-def create_example_assignment(instance):
-    date_now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    TimewebModel.objects.create(**EXAMPLE_ASSIGNMENT | {
-        "assignment_date": date_now,
-        "x": date_now + datetime.timedelta(EXAMPLE_ASSIGNMENT["x"]),
-        "user": instance,
-    })
-
 @receiver(post_save, sender=User)
-def create_settings_model_and_example(sender, instance, created, **kwargs):
-    if not created: return
-    # ensure this is UTC for assignment_date and x
-    # The front end adjusts the assignment and due date, so we don't need to worry about this being accurate
-    create_example_assignment(instance)
+def create_user_settings_model(sender, instance, created, **kwargs):
+    if not created:
+        return
     SettingsModel.objects.create(user=instance)
-    logger.info(f'Created settings model for user "{instance.username}"')
 
 def append_default_context(request):
     context = {
@@ -144,6 +133,15 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 timewebmodels = timewebmodels[:DELETED_ASSIGNMENTS_PER_PAGE]
         else:
             timewebmodels = list(request.user.timewebmodel_set.filter(hidden=False))
+            if request.user.settingsmodel.enable_tutorial and all(i.name != EXAMPLE_ASSIGNMENT['name'] for i in timewebmodels):
+                date_now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+                example_assignment = TimewebModel(**EXAMPLE_ASSIGNMENT | {
+                    "assignment_date": date_now,
+                    "x": date_now + datetime.timedelta(EXAMPLE_ASSIGNMENT["x"]),
+                    "user": request.user,
+                })
+                example_assignment.save()
+                timewebmodels.append(example_assignment)
         self.context['assignment_models'] = timewebmodels
         self.context['assignment_models_as_json'] = [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in timewebmodels]
 
