@@ -177,13 +177,14 @@ main.background-image-exists {
 #todo-wrapper .generic-button {
     /* is 1px too tall and messes up the height */
     margin-bottom: -1px;
+    margin-left: 2px;
 }
 #current-date-container {
     position: relative;
     order: 1;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
 }
 #go-to-next-day {
     cursor: pointer;
@@ -192,7 +193,7 @@ main.background-image-exists {
     display: flex;
     align-items: center;
     order: 1;
-    gap: 3px;
+    gap: 6px;
     margin-left: auto;
     padding-left: 35px;
 }
