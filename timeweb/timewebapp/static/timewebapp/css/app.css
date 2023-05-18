@@ -151,8 +151,11 @@ main.background-image-exists {
 .tutorial-content {
     color: hsl(0, 0%, 75%);
 }
-.tutorial-content-styled:not(#dummy) {
+.tutorial-content-styled .jconfirm-content:not(#dummy) {
     opacity: 1 !important;
+}
+.tutorial-content-styled .jconfirm-bg {
+    opacity: 0 !important;
 }
 #assignments-header {
     position: relative;

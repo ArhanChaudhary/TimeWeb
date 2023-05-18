@@ -986,6 +986,7 @@ tutorial: function() {
                     }
                 ]);
             },
+            center: true,
         },
         {
             transition: function(finished_resolver) {
@@ -1231,7 +1232,7 @@ tutorial: function() {
             alertparam.buttons = {};
         alertparam.buttons[alertparams.length ? "next" : "finish tutorial"] = {};
         alertparam.backgroundDismiss = false;
-        alertparam.draggable = true;
+        alertparam.offsetTop = 5;
         alertparam.onDestroy = function() {
             recurseAlert(alertparams);
         }
@@ -1246,8 +1247,13 @@ tutorial: function() {
             alertparam.content = alert_template.filter(".tutorial-content").prop("outerHTML");
             const a = $.alert(alertparam);
             setTimeout(function() {
-                a.$content.addClass("tutorial-content-styled");
-                a.$jconfirmBg.css("opacity", "0");
+                if (!alertparam.center) {
+                    a.$el.find(".jconfirm-cell").css("vertical-align", "top");
+                }
+                if (!alertparam.content) {
+                    a.$contentPane.hide();
+                }
+                a.$el.addClass("tutorial-content-styled");
             }, 0);
         });
     }
