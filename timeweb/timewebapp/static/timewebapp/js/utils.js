@@ -943,6 +943,7 @@ overlayAround: function({element: $element, duration, margin=15 } = {}) {
     $(window).trigger("resize.tutorial-overlay");
 },
 tutorial: function() {
+    $("#tutorial-overlay").show();
     const tutorial_assignment = $(".assignment").filter(function() {
         const dom_assignment = $(this);
         const sa = utils.loadAssignmentData(dom_assignment);
@@ -1044,7 +1045,7 @@ tutorial: function() {
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
-                        wait: 300,
+                        wait: 400,
                         do: () => utils.ui.overlayAround({
                             element: () => {
                                 const rect = tutorial_assignment.find(".graph")[0].getBoundingClientRect();
@@ -1056,11 +1057,11 @@ tutorial: function() {
                                 }
                             },
                             margin: 5,
-                            duration: 800,
+                            duration: 1000,
                         }),
                     },
                     {
-                        wait: 1150,
+                        wait: 1350,
                         do: () => finished_resolver("x-axis"),
                     },
                 ]);
@@ -1211,13 +1212,7 @@ tutorial: function() {
 
     function finishRecurseAlert() {
         $(window).off("resize.tutorial-overlay");
-        $("#tutorial-overlay").css({
-            "--x": "0px",
-            "--y": "0px",
-            "--width": "100%",
-            "--height": "100%",
-            "--duration": "1500ms",
-        });
+        $("#tutorial-overlay").hide();
         $("#site").css("pointer-events", "");
         SETTINGS.enable_tutorial = false;
         ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});

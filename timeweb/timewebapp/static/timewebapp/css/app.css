@@ -116,6 +116,10 @@ main.background-image-exists {
     padding: 0 10px;
 }
 #tutorial-overlay {
+    /* safari doesn't allow clicking in clip-path elements for some reason */
+    /* make displaying this element have an opt-in usage */
+    display: none;
+
     overflow: auto;
     background-color: hsla(0, 0%, 0%, 0.5);
     position: fixed;
