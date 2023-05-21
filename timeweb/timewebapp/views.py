@@ -121,29 +121,25 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 timewebmodels = timewebmodels[:DELETED_ASSIGNMENTS_PER_PAGE]
         else:
             timewebmodels = list(request.user.timewebmodel_set.filter(hidden=False))
-            existing_example_assignment = next((i for i in timewebmodels if i == request.user.settingsmodel.example_assignment), None)
             if request.user.settingsmodel.enable_tutorial:
-                if existing_example_assignment:
-                    example_assignment = existing_example_assignment
-                else:
-                    date_now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-                    example_assignment = TimewebModel(
-                        name="Read a Book",
-                        assignment_date=date_now,
-                        x=date_now + datetime.timedelta(20),
-                        unit="Chapter",
-                        y=25,
-                        blue_line_start=0,
-                        skew_ratio=1,
-                        time_per_unit=20,
-                        funct_round=1,
-                        min_work_time=2,
-                        break_days=[],
-                        dynamic_start=0,
-                        user=request.user,
-                    )
-                    example_assignment.save()
-                    timewebmodels.append(example_assignment)
+                date_now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+                example_assignment = TimewebModel(
+                    name="Read a Book",
+                    assignment_date=date_now,
+                    x=date_now + datetime.timedelta(20),
+                    unit="Chapter",
+                    y=25,
+                    blue_line_start=0,
+                    skew_ratio=1,
+                    time_per_unit=20,
+                    funct_round=1,
+                    min_work_time=2,
+                    break_days=[],
+                    dynamic_start=0,
+                    user=request.user,
+                )
+                example_assignment.save()
+                timewebmodels.append(example_assignment)
                 if request.user.settingsmodel.example_assignment != example_assignment:
                     request.user.settingsmodel.example_assignment = example_assignment
                     request.user.settingsmodel.save()
