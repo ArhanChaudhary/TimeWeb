@@ -965,7 +965,8 @@ tutorial: function() {
                             type: "POST",
                             url: "/api/delete-assignment",
                             data: {assignments: JSON.stringify([sa.id]), actually_delete: true},
-                            success: () => {
+                            // no error, fail silently
+                            complete: () => {
                                 $(window).trigger("animate-example-assignment");
                                 assignment_container.stop(false, true);
                                 assignment_container.remove();
@@ -976,7 +977,6 @@ tutorial: function() {
                                 new Priority().sort();
                             },
                             fakeSuccessArguments: [],
-                            // no error, fail silently
                         });
                     }
                 },
