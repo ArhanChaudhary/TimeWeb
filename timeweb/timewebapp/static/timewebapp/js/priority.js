@@ -608,14 +608,15 @@ class Priority {
             const priority_data = {
                 status_value,
                 status_priority,
+                todays_work,
+                today_minus_assignment_date,
                 first_real_tag,
                 has_important_tag,
                 has_not_important_tag,
                 due_date_minus_today,
                 name: sa.sa.name.toLowerCase(),
                 index,
-                todays_work,
-                today_minus_assignment_date,
+                id: sa.sa.id,
             }
             that.priority_data_list.push(priority_data);
 
@@ -899,9 +900,9 @@ class Priority {
         if (a.name > b.name) return 1;
 
         // If everything is the same, sort them by their index, which will always be different from each other
-        // Sort from min to max otherwise they will infinitly swap with each other every time they are resorted
-        if (a.index < b.index) return -1;
-        if (a.index > b.index) return 1;
+        // sort from max to min so tutorial assignment is at the very top in view after finishing the tutorial
+        if (a.id < b.id) return 1;
+        if (a.id > b.id) return -1;
     }
     priorityDataToPriorityPercentage(priority_data) {
         const that = this;
