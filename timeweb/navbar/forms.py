@@ -26,6 +26,7 @@ class SettingsForm(forms.ModelForm):
             "gc_courses_cache",
             "device_uuid",
             "device_uuid_api_timestamp",
+            "example_assignment",
         )
         extra_fields = {
             "enable_gc_integration": {

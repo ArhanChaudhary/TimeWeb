@@ -162,8 +162,7 @@ class Priority {
         }
         dom_assignment.attr("data-assignment-id", sa.id);
 
-        // use is_example when implemented
-        if (SETTINGS.enable_tutorial && sa.name === EXAMPLE_ASSIGNMENT_NAME) {
+        if (SETTINGS.enable_tutorial && !sa.hidden && sa.id === SETTINGS.example_assignment) {
             sa.just_created = true;
         }
 
@@ -246,7 +245,7 @@ class Priority {
             that.existing_ids[sa.id] = assignment_container;
         });
         for (const sa of dat) {
-            if (SETTINGS.enable_tutorial && sa.name !== EXAMPLE_ASSIGNMENT_NAME) {
+            if (SETTINGS.enable_tutorial && sa.id !== SETTINGS.example_assignment) {
                 continue;
             }
             let assignment_container;

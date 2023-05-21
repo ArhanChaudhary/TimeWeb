@@ -947,7 +947,7 @@ tutorial: function() {
     const tutorial_assignment = $(".assignment").filter(function() {
         const dom_assignment = $(this);
         const sa = utils.loadAssignmentData(dom_assignment);
-        return sa.name === EXAMPLE_ASSIGNMENT_NAME;
+        return sa.id === SETTINGS.example_assignment;
     });
     const tutorial_alerts = [
         {
@@ -1546,7 +1546,7 @@ initSA: function(sa) {
         if (sa.due_time && (sa.due_time.hour || sa.due_time.minute)) {
             sa.x++;
         }
-        if (sa.name === EXAMPLE_ASSIGNMENT_NAME) {
+        if (sa.id === SETTINGS.example_assignment) {
             sa.assignment_date = new Date(date_now.valueOf());
             sa.fake_assignment_date = false;
         }

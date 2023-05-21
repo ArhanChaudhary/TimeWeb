@@ -2,6 +2,7 @@ from django import forms
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from .views import MAX_NUMBER_OF_TAGS, MAX_TAG_LENGTH
 from .models import TimewebModel
 import common.utils as utils
 
@@ -95,6 +96,7 @@ class TimewebForm(forms.ModelForm):
                 data['x'] = data['x'].split(" ", 1)[0]
 
         self.request = kwargs.pop('request')
+        self.id = kwargs.pop('id', None)
         super().__init__(data, *args, **kwargs)
         assert not self.is_bound or data is not None, 'pls specify the data kwarg for readibility'
         for field_name in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
@@ -235,7 +237,7 @@ class TimewebForm(forms.ModelForm):
                     })
                 )
                 self.add_error("assignment_date", forms.ValidationError(""))
-        if name == EXAMPLE_ASSIGNMENT["name"] and utils.utc_to_local(self.request, timezone.now()).replace(hour=0, minute=0, second=0, microsecond=0) != assignment_date:
+        if self.id and self.request.user.example_assignment and self.id == self.request.user.example_assignment.id and utils.utc_to_local(self.request, timezone.now()).replace(hour=0, minute=0, second=0, microsecond=0) != assignment_date:
             self.add_error("assignment_date", forms.ValidationError(_("You cannot change this field of the example assignment")))
         if unit is None:
             # NOTE: do not do this from the backend!
@@ -250,6 +252,3 @@ class TimewebForm(forms.ModelForm):
             else:
                 cleaned_data['unit'] = "Minute"
         return cleaned_data
-
-# Put at the bottom due to circular imports
-from .views import MAX_NUMBER_OF_TAGS, MAX_TAG_LENGTH, EXAMPLE_ASSIGNMENT

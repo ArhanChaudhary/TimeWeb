@@ -493,7 +493,7 @@ def save_assignment(request):
             
             # see api.change_setting for why 64baf5 doesn't work here
             valid_model_fields_to_change = [i.name for i in TimewebModel._meta.get_fields()
-                 if not (i.unique or i.many_to_one or i.one_to_one or i.name in TimewebForm.Meta.exclude)]
+                 if not (i.one_to_one or i.unique or i.many_to_one or i.name in TimewebForm.Meta.exclude)]
             assignment = {field: value for field, value in assignment.items() if field in valid_model_fields_to_change}
 
             validation_model_data = {i: getattr(sm, i) for i in valid_model_fields_to_change}

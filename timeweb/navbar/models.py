@@ -13,6 +13,7 @@ from timewebapp.models import (
     empty_dict,
     create_image_path,
     WEEKDAYS,
+    TimewebModel
 )
 
 from decimal import Decimal
@@ -246,6 +247,11 @@ class SettingsModel(models.Model):
         # allow change setting form validation without a user
         null=True,
         blank=True,
+    )
+    example_assignment = models.OneToOneField(
+        TimewebModel,
+        on_delete=models.SET_NULL,
+        null=True,
     )
     device_uuid = models.CharField(
         max_length=8,

@@ -22,23 +22,11 @@ import datetime
 
 MAX_TAG_LENGTH = 100
 MAX_NUMBER_OF_TAGS = 5
-EXAMPLE_ASSIGNMENT = {
-    "name": "Read a Book",
-    "x": 20, # Not the db value of x, in this case is just the number of days in the assignment
-    "unit": "Chapter",
-    "y": 25,
-    "blue_line_start": 0,
-    "skew_ratio": 1,
-    "time_per_unit": 20,
-    "funct_round": 1,
-    "min_work_time": 2,
-    "break_days": [],
-    "dynamic_start": 0,
-}
+DELETED_ASSIGNMENTS_PER_PAGE = 50
+
 # needs to be down here due to circular imports
 from .forms import TimewebForm
 from navbar.forms import SettingsForm
-DELETED_ASSIGNMENTS_PER_PAGE = 50
 
 INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT = (
     'immediately_delete_completely_finished_assignments', 'def_min_work_time', 'def_break_days',
@@ -47,6 +35,7 @@ INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT = (
     'assignment_sorting', 'default_dropdown_tags', 'display_working_days_left',
     'horizontal_tag_position', 'vertical_tag_position', 'animation_speed',  'enable_tutorial',
     'sorting_animation_threshold', 'seen_latest_changelog', 'should_alert_due_date_incremented',
+    'example_assignment',
 )
 EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT = (
     "oauth_token", "added_gc_assignment_ids", "user", "background_image", "id", "nudge_calendar",
@@ -79,7 +68,6 @@ def create_user_settings_model(sender, instance, created, **kwargs):
 def append_default_context(request):
     context = {
         "EXAMPLE_ACCOUNT_EMAIL": settings.EXAMPLE_ACCOUNT_EMAIL,
-        "EXAMPLE_ASSIGNMENT_NAME": EXAMPLE_ASSIGNMENT["name"],
         "MAX_NUMBER_OF_TAGS": MAX_NUMBER_OF_TAGS,
         "EDITING_EXAMPLE_ACCOUNT": settings.EDITING_EXAMPLE_ACCOUNT,
         "DEBUG": settings.DEBUG,
@@ -133,15 +121,32 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 timewebmodels = timewebmodels[:DELETED_ASSIGNMENTS_PER_PAGE]
         else:
             timewebmodels = list(request.user.timewebmodel_set.filter(hidden=False))
-            if request.user.settingsmodel.enable_tutorial and all(i.name != EXAMPLE_ASSIGNMENT['name'] for i in timewebmodels):
-                date_now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-                example_assignment = TimewebModel(**EXAMPLE_ASSIGNMENT | {
-                    "assignment_date": date_now,
-                    "x": date_now + datetime.timedelta(EXAMPLE_ASSIGNMENT["x"]),
-                    "user": request.user,
-                })
-                example_assignment.save()
-                timewebmodels.append(example_assignment)
+            existing_example_assignment = next((i for i in timewebmodels if i == request.user.settingsmodel.example_assignment), None)
+            if request.user.settingsmodel.enable_tutorial:
+                if existing_example_assignment:
+                    example_assignment = existing_example_assignment
+                else:
+                    date_now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+                    example_assignment = TimewebModel(
+                        name="Read a Book",
+                        assignment_date=date_now,
+                        x=date_now + datetime.timedelta(20),
+                        unit="Chapter",
+                        y=25,
+                        blue_line_start=0,
+                        skew_ratio=1,
+                        time_per_unit=20,
+                        funct_round=1,
+                        min_work_time=2,
+                        break_days=[],
+                        dynamic_start=0,
+                        user=request.user,
+                    )
+                    example_assignment.save()
+                    timewebmodels.append(example_assignment)
+                if request.user.settingsmodel.example_assignment != example_assignment:
+                    request.user.settingsmodel.example_assignment = example_assignment
+                    request.user.settingsmodel.save()
         self.context['assignment_models'] = timewebmodels
         self.context['assignment_models_as_json'] = [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in timewebmodels]
 
