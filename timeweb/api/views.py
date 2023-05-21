@@ -44,10 +44,11 @@ assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RE
 @require_http_methods(["POST"])
 def submit_assignment(request):
     id_ = request.POST['id']
-    edited_assignment = bool(id_)
-    created_assignment = not edited_assignment
+    request.edited_assignment = bool(id_)
+    request.created_assignment = not request.edited_assignment
 
-    submitted_form = TimewebForm(data=request.POST, request=request)
+    # ideally use an instance kwarg or something but i am incompetent
+    submitted_form = TimewebForm(data=request.POST, request=request, id=int(id_))
 
     if not submitted_form.is_valid():
         logger.info(f"User \"{request.user}\" submitted an invalid form")
@@ -56,7 +57,7 @@ def submit_assignment(request):
             "errors": submitted_form.errors,
         })
 
-    if created_assignment:
+    if request.created_assignment:
         sm = submitted_form.save(commit=False)
         old_data = None
 
@@ -65,7 +66,7 @@ def submit_assignment(request):
         first_work = Decimal(sm.works[0])
         sm.user = request.user
     else:
-        assert edited_assignment
+        assert request.edited_assignment
         sm = request.user.timewebmodel_set.get(pk=id_)
         old_data = deepcopy(sm)
 
@@ -153,7 +154,7 @@ def submit_assignment(request):
         min_work_time_funct_round = ceil(sm.min_work_time / sm.funct_round) * sm.funct_round if sm.min_work_time else sm.funct_round
         # NOTE: (sm.x is None and sm.y is None) is impossible
         if sm.x is None:
-            if created_assignment or old_data.needs_more_info:
+            if request.created_assignment or old_data.needs_more_info:
                 adjusted_blue_line_partial = app_utils.adjust_blue_line(request,
                     old_data=old_data,
                     assignment_date=sm.assignment_date,
@@ -166,7 +167,7 @@ def submit_assignment(request):
                 )
                 new_first_work = first_work
             else:
-                assert edited_assignment
+                assert request.edited_assignment
                 adjusted_blue_line_partial = app_utils.adjust_blue_line(request,
                     old_data=old_data,
                     assignment_date=sm.assignment_date,
@@ -331,11 +332,11 @@ def submit_assignment(request):
                 # new_min_work_time_funct_round = ceil(sm.min_work_time / new_funct_round) * new_funct_round if sm.min_work_time else new_funct_round
                 # new_min_work_time_funct_round_minutes = new_min_work_time_funct_round * new_time_per_unit
                 
-        if created_assignment or old_data.needs_more_info or adjusted_blue_line['capped_at_x_num']:
+        if request.created_assignment or old_data.needs_more_info or adjusted_blue_line['capped_at_x_num']:
             sm.dynamic_start = sm.blue_line_start
             sm.works = [str(first_work)]
         else:
-            assert edited_assignment
+            assert request.edited_assignment
             # this isn't at all how to adjust dynamic start since it's not a simple offset as other work inputs,
             # the other field inputs, and capped_at_x_num logic makes this hard
             # so, only focus on adjusting dynamic_start when the assignment date changes and lay that logic on refreshDynamicMode
@@ -415,7 +416,7 @@ def submit_assignment(request):
         if all(not url.endswith("." + ending) for ending in banned_endings)
     ), None)
     description_has_link = description_link is not None
-    description_has_changed = created_assignment or sm.description != old_data.description
+    description_has_changed = request.created_assignment or sm.description != old_data.description
     
     if is_user_assignment and description_has_link and description_has_changed:
         sm.description = sm.description.replace(description_link, '')
@@ -423,7 +424,7 @@ def submit_assignment(request):
         sm.external_link = description_link
 
     sm.save()
-    if created_assignment:
+    if request.created_assignment:
         logger.info(f'User \"{request.user}\" created assignment "{sm.name}"')
         refresh_dynamic_mode = None
     else:
@@ -437,7 +438,7 @@ def submit_assignment(request):
                 break
     return JsonResponse({
         'valid': True,
-        'edited_assignment': edited_assignment,
+        'edited_assignment': request.edited_assignment,
         'refresh_dynamic_mode': refresh_dynamic_mode,
         'assignments': [model_to_dict(sm, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT)],
     })
@@ -496,7 +497,7 @@ def save_assignment(request):
             
             # see api.change_setting for why 64baf5 doesn't work here
             valid_model_fields_to_change = [i.name for i in TimewebModel._meta.get_fields()
-                 if not (i.unique or i.many_to_one or i.one_to_one or i.name in TimewebForm.Meta.exclude)]
+                 if not (i.one_to_one or i.unique or i.many_to_one or i.name in TimewebForm.Meta.exclude)]
             assignment = {field: value for field, value in assignment.items() if field in valid_model_fields_to_change}
 
             validation_model_data = {i: getattr(sm, i) for i in valid_model_fields_to_change}

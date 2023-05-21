@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
         assert(!("success" in options) || "fakeSuccessArguments" in options);
         if (ajaxUtils?.disable_ajax) {
             options.success?.(...options.fakeSuccessArguments);
+            options.complete?.();
             jqXHR.abort();
             return;
         }

@@ -162,8 +162,7 @@ class Priority {
         }
         dom_assignment.attr("data-assignment-id", sa.id);
 
-        // use is_example when implemented
-        if (SETTINGS.enable_tutorial && sa.name === EXAMPLE_ASSIGNMENT_NAME) {
+        if (SETTINGS.enable_tutorial && !sa.hidden && sa.id === SETTINGS.example_assignment) {
             sa.just_created = true;
         }
 
@@ -254,7 +253,7 @@ class Priority {
             that.existing_ids[sa.id] = assignment_container;
         });
         for (const sa of dat) {
-            if (SETTINGS.enable_tutorial && sa.name !== EXAMPLE_ASSIGNMENT_NAME) {
+            if (SETTINGS.enable_tutorial && sa.id !== SETTINGS.example_assignment) {
                 continue;
             }
             let assignment_container;
@@ -617,14 +616,15 @@ class Priority {
             const priority_data = {
                 status_value,
                 status_priority,
+                todays_work,
+                today_minus_assignment_date,
                 first_real_tag,
                 has_important_tag,
                 has_not_important_tag,
                 due_date_minus_today,
                 name: sa.sa.name.toLowerCase(),
                 index,
-                todays_work,
-                today_minus_assignment_date,
+                id: sa.sa.id,
             }
             that.priority_data_list.push(priority_data);
 
@@ -908,9 +908,9 @@ class Priority {
         if (a.name > b.name) return 1;
 
         // If everything is the same, sort them by their index, which will always be different from each other
-        // Sort from min to max otherwise they will infinitly swap with each other every time they are resorted
-        if (a.index < b.index) return -1;
-        if (a.index > b.index) return 1;
+        // sort from max to min so tutorial assignment is at the very top in view after finishing the tutorial
+        if (a.id < b.id) return 1;
+        if (a.id > b.id) return -1;
     }
     priorityDataToPriorityPercentage(priority_data) {
         const that = this;
@@ -1117,6 +1117,9 @@ class Priority {
 
         // Updates open graphs' today line and other graph text
         $(window).trigger("redrawGraphs");
+        if (SETTINGS.enable_tutorial) {
+            $(window).trigger("resize.tutorial-overlay");
+        }
 
         const old_setting = SETTINGS.assignment_sorting;
         SETTINGS.assignment_sorting = "Most Priority First";
@@ -1237,8 +1240,6 @@ class Priority {
         if (!first_available_tutorial_assignment) {
             first_available_tutorial_assignment = first_available_tutorial_assignment_fallback;
         }
-        if (SETTINGS.enable_tutorial && that.params.first_sort)
-            utils.ui.tutorial(first_available_tutorial_assignment);
 
         let tops = new Array(that.assignments_to_sort.length);
         tops.fill(undefined);
@@ -1450,7 +1451,7 @@ class Priority {
                 if (bottom_element_is_below || no_bottom && !ignore_no_top_bottom)
                     return bottom_assignment_container_to_scroll_to;
             }
-            function finished_scrolling() {
+            function finished_scrolling(finished_resolver) {
                 animate_in_assignments.each(function(i) {
                     const assignment_container = $(this);
                     const dom_title = assignment_container.find(".title");
@@ -1494,6 +1495,7 @@ class Priority {
 
                                 $("main").removeClass("disable-scrolling");
                                 $("#extra-navs").show();
+                                finished_resolver?.();
                             }
                         },
                     );
@@ -1574,7 +1576,13 @@ class Priority {
                     // without this else, the new step is never ran because it skips the now < end_time + finish_wait animation frame
                     window.requestAnimationFrame(Priority.scrollIntoViewSmoothlyStep);
                 }
-                finished_scrolling();
+                if (!SETTINGS.enable_tutorial) {
+                    finished_scrolling();
+                    return;
+                }
+                $(window).one('animate-example-assignment', function(e, finished_resolver) {
+                    finished_scrolling(finished_resolver);
+                });
             }
             if (!Priority.scrollIntoViewSmoothlyStep) {
                 window.requestAnimationFrame(step);

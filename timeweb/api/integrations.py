@@ -273,7 +273,7 @@ def create_gc_assignments(request, order=None):
             # I am still going to assume this is possible with my validation logic and also check for "scheduledTime"
             # for forward compatibility and to be safe
             complete_assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
-            complete_assignment_date = utils.utc_to_local(request, datetime.datetime.fromisoformat(complete_assignment_date.replace('Z', '+00:00')))
+            complete_assignment_date = utils.utc_to_local(request, datetime.datetime.fromisoformat(complete_assignment_date))
             assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
             if 'dueDate' in assignment:
                 # From https://developers.google.com/classroom/reference/rest/v1/courses.courseWork#CourseWork.FIELDS.due_time

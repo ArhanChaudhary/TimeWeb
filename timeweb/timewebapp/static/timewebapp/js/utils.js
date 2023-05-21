@@ -918,7 +918,7 @@ setAssignmentScaleUtils: function(dom_assignment) {
 setAnimationSpeed: function() {
     $("main").css('--animation-speed', SETTINGS.animation_speed);
 },
-overlayAround: function({element: $element, duration=1000, margin=15 } = {}) {
+overlayAround: function({element: $element, duration, margin=15 } = {}) {
     $(window).off("resize.tutorial-overlay");
     if ($element === null) {
         $("#tutorial-overlay").css({
@@ -930,25 +930,34 @@ overlayAround: function({element: $element, duration=1000, margin=15 } = {}) {
         });
     } else {
         $(window).on("resize.tutorial-overlay", function() {
-            let rect;
-            if (typeof $element === "function") {
-                rect = $element();
-            } else {
-                rect = $element[0].getBoundingClientRect();
-            }
-            $("#tutorial-overlay").css({
-                "--x": `${rect.left - margin}px`,
-                "--y": `${rect.top - margin}px`,
-                "--width": `${rect.width + margin * 2}px`,
-                "--height": `${rect.height + margin * 2}px`,
-                "--duration": `${duration}ms`,
-            });
+            // setTimeout in case this function is called too early before other
+            // positioning functions (like positionTags and makeGCAnchorVisible)
+            setTimeout(() => {
+                let rect;
+                if (typeof $element === "function") {
+                    rect = $element();
+                } else {
+                    rect = $element[0].getBoundingClientRect();
+                }
+                $("#tutorial-overlay").css({
+                    "--x": `${rect.left - margin}px`,
+                    "--y": `${rect.top - margin}px`,
+                    "--width": `${rect.width + margin * 2}px`,
+                    "--height": `${rect.height + margin * 2}px`,
+                    "--duration": `${duration}ms`,
+                });
+            }, 0);
         });
     }
     $(window).trigger("resize.tutorial-overlay");
 },
 tutorial: function() {
-    // ignore work inputs
+    $("#tutorial-overlay").show();
+    const tutorial_assignment = $(".assignment").filter(function() {
+        const dom_assignment = $(this);
+        const sa = utils.loadAssignmentData(dom_assignment);
+        return sa.id === SETTINGS.example_assignment;
+    });
     const tutorial_alerts = [
         {
             buttons: {
@@ -957,15 +966,18 @@ tutorial: function() {
                         while (tutorial_alerts.length > 0) {
                             tutorial_alerts.pop();
                         }
-                        const assignment_container = $(".animate-in");
-                        const dom_assignment = assignment_container.children(".assignment");
+                        const dom_assignment = tutorial_assignment;
+                        const assignment_container = dom_assignment.parent();
                         const sa = utils.loadAssignmentData(dom_assignment);
 
                         $.ajax({
                             type: "POST",
                             url: "/api/delete-assignment",
                             data: {assignments: JSON.stringify([sa.id]), actually_delete: true},
-                            success: () => {
+                            // no error, fail silently
+                            complete: () => {
+                                $(window).trigger("animate-example-assignment");
+                                assignment_container.stop(false, true);
                                 assignment_container.remove();
                                 // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)
                                 dom_assignment.removeClass("assignment-is-closing open-assignment");
@@ -974,7 +986,6 @@ tutorial: function() {
                                 new Priority().sort();
                             },
                             fakeSuccessArguments: [],
-                            // no error, fail silently
                         });
                     }
                 },
@@ -987,6 +998,7 @@ tutorial: function() {
                     }
                 ]);
             },
+            center: true,
         },
         {
             transition: function(finished_resolver) {
@@ -996,9 +1008,10 @@ tutorial: function() {
                         resolve: 'animate-example-assignment',
                     },
                     {
-                        wait: 1500,
+                        wait: 750,
                         do: () => utils.ui.overlayAround({
-                            element: $(".animate-in > .assignment"),
+                            element: tutorial_assignment,
+                            duration: 1000,
                         }),
                     },
                     {
@@ -1014,23 +1027,24 @@ tutorial: function() {
                     {
                         wait: 300,
                         do: () => {
-                            $(".animate-in > .assignment").focus().click();
+                            tutorial_assignment.focus().click();
                             utils.ui.overlayAround({
-                                element: $(".animate-in > .assignment"),
+                                element: tutorial_assignment,
                                 margin: 10,
                                 duration: 800,
                             });
                         },
                     },
                     {
-                        wait: 2250,
+                        wait: 2500,
                         do: () => utils.ui.overlayAround({
-                            element: $(".animate-in .graph"),
+                            element: tutorial_assignment.find(".graph"),
                             margin: 5,
+                            duration: 1500,
                         }),
                     },
                     {
-                        wait: 1250,
+                        wait: 1750,
                         do: () => finished_resolver("graph-intro"),
                     }
                 ]);
@@ -1040,10 +1054,10 @@ tutorial: function() {
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
-                        wait: 300,
+                        wait: 400,
                         do: () => utils.ui.overlayAround({
                             element: () => {
-                                const rect = $(".animate-in .graph")[0].getBoundingClientRect();
+                                const rect = tutorial_assignment.find(".graph")[0].getBoundingClientRect();
                                 return {
                                     top: rect.top + rect.height - 55,
                                     left: rect.left,
@@ -1052,11 +1066,11 @@ tutorial: function() {
                                 }
                             },
                             margin: 5,
-                            duration: 800,
+                            duration: 1000,
                         }),
                     },
                     {
-                        wait: 1050,
+                        wait: 1350,
                         do: () => finished_resolver("x-axis"),
                     },
                 ]);
@@ -1069,7 +1083,7 @@ tutorial: function() {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
                             element: () => {
-                                const rect = $(".animate-in .graph")[0].getBoundingClientRect();
+                                const rect = tutorial_assignment.find(".graph")[0].getBoundingClientRect();
                                 return {
                                     top: rect.top,
                                     left: rect.left,
@@ -1078,6 +1092,7 @@ tutorial: function() {
                                 }
                             },
                             margin: 5,
+                            duration: 1000,
                         }),
                     },
                     {
@@ -1094,10 +1109,11 @@ tutorial: function() {
                         wait: 300,
                         do: () => {
                             utils.ui.overlayAround({
-                                element: $(".animate-in .graph"),
+                                element: tutorial_assignment.find(".graph"),
                                 margin: 5,
+                                duration: 1000,
                             });
-                            $(".animate-in .fixed-graph").addClass("blur");
+                            tutorial_assignment.find(".fixed-graph").addClass("blur");
                         }
                     },
                     {
@@ -1115,7 +1131,7 @@ tutorial: function() {
                         do: () => {
                             utils.ui.overlayAround({
                                 element: () => {
-                                    const rect = $(".animate-in .graph")[0].getBoundingClientRect();
+                                    const rect = tutorial_assignment.find(".graph")[0].getBoundingClientRect();
                                     return {
                                         top: rect.top + rect.height - 51,
                                         left: rect.left + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 9,
@@ -1126,7 +1142,7 @@ tutorial: function() {
                                 duration: 1250,
                                 margin: 20,
                             });
-                            $(".animate-in .fixed-graph").removeClass("blur");
+                            tutorial_assignment.find(".fixed-graph").removeClass("blur");
                         }
                     },
                     {
@@ -1142,7 +1158,7 @@ tutorial: function() {
                     {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
-                            element: $(".animate-in .tick-button").parent(),
+                            element: tutorial_assignment.find(".tick-button").parent(),
                             margin: 0,
                             duration: 1500,
                         }),
@@ -1160,24 +1176,24 @@ tutorial: function() {
                     {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
-                            element: $(".animate-in > .assignment"),
+                            element: tutorial_assignment,
                             margin: 10,
                             duration: 900,
                         }),
                     },
                     {
                         wait: 1500,
-                        do: () => $(".animate-in .tick-button").click(),
+                        do: () => tutorial_assignment.find(".tick-button").click(),
                     },
                     {
-                        wait: 1750,
+                        wait: 2500,
                         do: () => utils.ui.overlayAround({
                             element: null,
                             duration: 1250,
                         }),
                     },
                     {
-                        wait: 2250,
+                        wait: 2000,
                         do: () => finished_resolver("wrap-up"),
                     }
                 ]);
@@ -1185,6 +1201,8 @@ tutorial: function() {
         }
     ]
 
+    // I probably should have used an async await function for this
+    // but i do not care
     function recurseTimeout(timeoutparams) {
         if (!timeoutparams.length) return;
 
@@ -1205,13 +1223,7 @@ tutorial: function() {
 
     function finishRecurseAlert() {
         $(window).off("resize.tutorial-overlay");
-        $("#tutorial-overlay").css({
-            "--x": "0px",
-            "--y": "0px",
-            "--width": "100%",
-            "--height": "100%",
-            "--duration": "1500ms",
-        });
+        $("#tutorial-overlay").hide();
         $("#site").css("pointer-events", "");
         SETTINGS.enable_tutorial = false;
         ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
@@ -1228,7 +1240,7 @@ tutorial: function() {
             alertparam.buttons = {};
         alertparam.buttons[alertparams.length ? "next" : "finish tutorial"] = {};
         alertparam.backgroundDismiss = false;
-        alertparam.draggable = true;
+        alertparam.offsetTop = 5;
         alertparam.onDestroy = function() {
             recurseAlert(alertparams);
         }
@@ -1243,8 +1255,13 @@ tutorial: function() {
             alertparam.content = alert_template.filter(".tutorial-content").prop("outerHTML");
             const a = $.alert(alertparam);
             setTimeout(function() {
-                a.$content.addClass("tutorial-content-styled");
-                a.$jconfirmBg.css("opacity", "0");
+                if (!alertparam.center) {
+                    a.$el.find(".jconfirm-cell").css("vertical-align", "top");
+                }
+                if (!alertparam.content) {
+                    a.$contentPane.hide();
+                }
+                a.$el.addClass("tutorial-content-styled");
             }, 0);
         });
     }
@@ -1538,7 +1555,7 @@ initSA: function(sa) {
         if (sa.due_time && (sa.due_time.hour || sa.due_time.minute)) {
             sa.x++;
         }
-        if (sa.name === EXAMPLE_ASSIGNMENT_NAME) {
+        if (sa.id === SETTINGS.example_assignment) {
             sa.assignment_date = new Date(date_now.valueOf());
             sa.fake_assignment_date = false;
         }
@@ -1724,6 +1741,8 @@ document.addEventListener("DOMContentLoaded", function() {
         utils.ui.addTagHandlers();
         utils.ui.setAnimationSpeed();
         utils.ui.setAssignmentsContainerScaleUtils();
+        if (SETTINGS.enable_tutorial)
+            utils.ui.tutorial();
     }, 0);
     utils.ui.saveAndLoadStates();
     utils.ui.navClickHandlers();

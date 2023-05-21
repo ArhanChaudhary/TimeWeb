@@ -19,7 +19,15 @@ class CustomImageFieldWidget(ClearableFileInput):
 class SettingsForm(forms.ModelForm):
     class Meta:
         model = SettingsModel
-        exclude = ("oauth_token", "added_gc_assignment_ids", "user", "gc_courses_cache", "device_uuid", "device_uuid_api_timestamp")
+        exclude = (
+            "oauth_token",
+            "added_gc_assignment_ids",
+            "user",
+            "gc_courses_cache",
+            "device_uuid",
+            "device_uuid_api_timestamp",
+            "example_assignment",
+        )
         extra_fields = {
             "enable_gc_integration": {
                 "field": forms.BooleanField(
@@ -186,9 +194,6 @@ class SettingsForm(forms.ModelForm):
             raise forms.ValidationError(_('This file is too big (>%(amount)d megabytes)') % {'amount': settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE/1048576})
         return background_image
 
-# needs to be down here due to circular imports
-from timewebapp.views import MAX_TAG_LENGTH
-
 class ContactForm(BaseContactForm):
     body = forms.CharField(widget=forms.Textarea, label=_("Ask me anything"))
 
@@ -201,3 +206,6 @@ class ContactForm(BaseContactForm):
         if message:
             messages.success(self.request, message)
         super().save(*args, **kwargs)
+
+# needs to be down here due to circular imports
+from timewebapp.views import MAX_TAG_LENGTH
