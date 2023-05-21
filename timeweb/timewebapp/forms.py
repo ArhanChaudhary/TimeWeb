@@ -237,7 +237,11 @@ class TimewebForm(forms.ModelForm):
                     })
                 )
                 self.add_error("assignment_date", forms.ValidationError(""))
-        if self.id and self.request.user.example_assignment and self.id == self.request.user.example_assignment.id and utils.utc_to_local(self.request, timezone.now()).replace(hour=0, minute=0, second=0, microsecond=0) != assignment_date:
+        if (
+            self.id and self.request.user.settingsmodel.example_assignment and
+            self.id == self.request.user.settingsmodel.example_assignment.id and
+            utils.utc_to_local(self.request, timezone.now()).replace(hour=0, minute=0, second=0, microsecond=0) != assignment_date
+        ):
             self.add_error("assignment_date", forms.ValidationError(_("You cannot change this field of the example assignment")))
         if unit is None:
             # NOTE: do not do this from the backend!
