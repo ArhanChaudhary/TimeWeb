@@ -46,7 +46,9 @@ class APIValidationMiddleware:
             return res
         request.user.settingsmodel.device_uuid = device_uuid
         request.user.settingsmodel.device_uuid_api_timestamp = timezone.now()
-        request.user.settingsmodel.refresh_from_db() # update SET_NULL from example_assignment
+        # update SET_NULL from example_assignment
+        # don't refresh any other field or else device_uuid and device_uuid_api_timestamp will be reset
+        request.user.settingsmodel.refresh_from_db(fields=('example_assignment', ))
         request.user.settingsmodel.save()
         return res
 
