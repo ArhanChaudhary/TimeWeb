@@ -1192,6 +1192,8 @@ tutorial: function() {
         }
     ]
 
+    // I probably should have used an async await function for this
+    // but i do not care
     function recurseTimeout(timeoutparams) {
         if (!timeoutparams.length) return;
 

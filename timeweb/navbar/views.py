@@ -32,13 +32,15 @@ EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS = (
 )
 # NOTE: this does not take into account SettingsForm.Meta.exlude, so don't worry if
 # you see fields like gc_courses_cache here
-DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS = ('immediately_delete_completely_finished_assignments', 'def_min_work_time',
+DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS = (
+    'immediately_delete_completely_finished_assignments', 'def_min_work_time',
     'def_break_days', 'def_skew_ratio', 'one_graph_at_a_time', 'close_graph_after_work_input', 'show_priority', 'highest_priority_color',
     'lowest_priority_color', 'default_dropdown_tags', 'horizontal_tag_position', 'vertical_tag_position', 'appearance', 'animation_speed',
     'enable_tutorial', 'sorting_animation_threshold', 'oauth_token', 'added_gc_assignment_ids', 'seen_latest_changelog', 
     'nudge_calendar', 'nudge_notifications', 'nudge_canvas', 'user', 'gc_courses_cache', 'device_uuid', 'device_uuid_api_timestamp',
     'display_working_days_left', 'background_image_text_shadow_width', 'gc_assignments_always_midnight', 'loosely_enforce_minimum_work_times', 
-    'priority_color_borders', 'font', 'should_alert_due_date_incremented', )
+    'priority_color_borders', 'font', 'should_alert_due_date_incremented',
+)
 
 assert len(EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS) + len(DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS) == len(SettingsModel._meta.fields), "update this list"
 @method_decorator(ratelimit(key=utils.get_client_ip, rate='1/s', method="POST", block=True), name='post')

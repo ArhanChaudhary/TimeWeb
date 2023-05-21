@@ -8,7 +8,12 @@ from colorfield.fields import ColorField
 from multiselectfield import MultiSelectField
 from multiselectfield.utils import get_max_length
 
-from timewebapp.models import empty_list, empty_dict, create_image_path, WEEKDAYS
+from timewebapp.models import (
+    empty_list,
+    empty_dict,
+    create_image_path,
+    WEEKDAYS,
+)
 
 from decimal import Decimal
 
