@@ -122,7 +122,6 @@ MIDDLEWARE = [
     'common.middleware.LogoutExampleAccount',
     'common.middleware.DefineIsExampleAccount',
     'common.middleware.DefineUTCOffset',
-    *('request_logging.middleware.LoggingMiddleware' for i in range(1) if not DEBUG),
     'common.middleware.CommonRatelimit',
     'api.middleware.APIValidationMiddleware',
     # CatchRequestDataTooBig must be a global middleware so it can be ordered before PopulatePost
@@ -363,13 +362,7 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'level': DJANGO_LOG_LEVEL,
-            'propagate': False,
-        },
-        'django.request': {
-            'handlers': ['console'],
-            'level': DJANGO_LOG_LEVEL,
-            'propagate': False,
-        },
+        }
     },
     'formatters': {
         'verbose': {

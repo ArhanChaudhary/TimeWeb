@@ -18,7 +18,6 @@ django-minify-html==1.4.0
 django-multiselectfield==0.1.12
 django-pwa @ git+https://github.com/ArhanChaudhary/django-pwa.git@060de0e83e9798d1001f75087a693c4d7dd1dda8
 django-ratelimit==3.0.1
-django-request-logging==0.7.5
 django-storages==1.12.3
 django-timezone-field==4.2.1
 filelock==3.10.7
