@@ -17,8 +17,8 @@ KEEP_EXAMPLE_ACCOUNT_LOGGED_IN_VIEWS = ("home", "example", "settings", "deleted_
 from . import views
 
 urlpatterns = [
+    # Root urlpattern is handled in home_page app
     # if I add any views make sure to change RELOAD_VIEWS
-    path('', views.TimewebView.as_view(),name='home'),
     path('deleted-assignments/', views.TimewebView.as_view(), name='deleted_assignments'),
     path('example/', views.ExampleAccountView.as_view(), name='example'),
 ]

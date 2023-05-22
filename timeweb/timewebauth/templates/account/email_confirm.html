@@ -24,6 +24,6 @@
     {% else %}
         {% url 'account_email' as email_url %}
 
-        <p>This e-mail verification link is expired or invalid. Please <a href="{% url 'home' %}">log in</a> to request a new e-mail verification link.</p>
+        <p>This e-mail verification link is expired or invalid. Please <a href="{% url 'account_login' %}">log in</a> to request a new e-mail verification link.</p>
     {% endif %}
 {% endblock %}

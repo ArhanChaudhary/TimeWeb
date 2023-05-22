@@ -48,3 +48,9 @@ window.addEventListener("load", function() {
         });
     }, 0);
 });
+if (ACCOUNT_EMAIL === '') {
+    // Reset storages from saveAndLoadStates from utils.js
+    sessionStorage.removeItem("open_assignments");
+    sessionStorage.removeItem("scroll");
+    localStorage.removeItem("last_visit");
+}

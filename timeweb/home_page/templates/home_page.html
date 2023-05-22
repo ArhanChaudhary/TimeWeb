@@ -1,0 +1,69 @@
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block base_head_css %}
+    <link rel="stylesheet" href="{% static 'home_page/css/home_page.css' %}">
+{% endblock %}
+
+{% block base_head_js %}
+<script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"></script>
+    <script src="{% static 'home_page/js/home_page.js' %}"></script>
+{% endblock %}
+
+{% block base_head_body %}
+<main>
+    <header id="header">
+        <img id="logo-icon" src="{% static 'misc/icons/icon_512x512.webp' %}" draggable="false"/>
+        <a href="{% url 'account_signup' %}">Sign up</a>
+        <a href="{% url 'account_login' %}">Log in</a>
+        <a href="{% url 'example' %}">Example Account</a>
+    </header>
+    <div class="section-block" id="first">
+        <span class="section-max-width-wrapper">
+            <span class="left-section-side">
+                <img src="{% static 'home_page/images/timeweb_scaled.webp' %}" draggable="false" id="main-logo"/>
+                The new way to manage your time
+                {% comment %} <a href="{% url 'account_login' %}">Login</a> {% endcomment %}
+            </span>
+            <span class="right-section-side">
+                <span id="first-section-initial-scroller-transition">
+                    {% for i in "xxx" %}
+                        {% for scroller in random_scrollers %}
+                            <span class="assignment-scroller-image-extender">
+                                <img alt class="assignment-scroller-image" draggable="false" src="{% static 'home_page/images/scrollers/scroller'|add:scroller|add:'_light.webp' %}">
+                            </span>
+                        {% endfor %}
+                    {% endfor %}
+                </span>
+            </span>
+        </span>
+    </div>
+    <div class="section-block" id="second">
+        <span class="section-max-width-wrapper">
+            <span class="left-section-side">
+                <img id="graph-image" alt src="{% static 'home_page/images/light_narrow_graph.webp' %}">
+            </span>
+            <span class="right-section-side">
+                Take complete control over your work
+                <p class="header-description">
+                    An easy and highly customizable interface for your assignments' work schedules.
+                </p>
+            </span>
+        </span>
+    </div>
+    <div class="section-block" id="third">
+    </div>
+    <div class="section-block" id="fourth">
+        {% comment %} Know what to do, when to do it, and for how long. {% endcomment %}
+    </div>
+    <div class="section-block" id="fifth">
+        <span class="section-max-width-wrapper">
+            {% include "favicon_animated.svg" %}
+            <span class="right-section-side">
+                No ads. No paywalls. Just you and your assignments — uninterrupted.
+                <a id="bottom-signup-button" href="{% url 'account_signup' %}">Sign up</a>
+            </span>
+        </span>
+    </div>
+</main>
+{% endblock %}

@@ -90,6 +90,7 @@ INSTALLED_APPS = [
     'timewebapp',
     'navbar',
     'misc',
+    'home_page',
     'multiselectfield',
     'django.contrib.admin', # admin needs to be after 'timewebapp' for some reason I forgot but it needs to be here
     'pwa',
@@ -142,7 +143,8 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             BASE_DIR / 'common' / 'templates',
-            BASE_DIR / 'timewebapp' / 'static' / 'timewebapp' / 'svg'
+            BASE_DIR / 'timewebapp' / 'static' / 'timewebapp' / 'svg',
+            BASE_DIR / 'home_page' / 'static' / 'home_page' / 'images',
         ],
         'APP_DIRS': True,
         'OPTIONS': {

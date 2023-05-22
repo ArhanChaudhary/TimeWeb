@@ -27,6 +27,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('contact/', include('navbar.contact_form_urls')),
     path('contact/', include('contact_form.urls')),
+    path('', include('home_page.urls')),
     path('', include('timewebapp.urls')),
     path('api/', include('api.urls')),
     path('', include('navbar.urls')),
