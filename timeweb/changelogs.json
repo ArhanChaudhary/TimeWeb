@@ -1,5 +1,32 @@
 [
   {
+    "date": "5/22/2023",
+    "version": "v1.9.1-beta",
+    "updates": [
+      "Significantly improved page loading times",
+      "Major performance optimizations",
+      "More assignment animations",
+      "Completely rewrote user guide",
+      "Implemented tutorial",
+      "Improved priority algorithm",
+      "Defaulted color scheme to dark mode",
+      "Overdue assignments are no longer marked as completely finished",
+      "Limited maximum number of completely finished assignments",
+      "Cleanly extract links in assignment descriptions",
+      "Implemented \"Priority Color Borders\" setting",
+      "Implemented \"Font\" setting",
+      "Minor bug fixes"
+    ],
+    "bugfixes": [
+      "Fixed assignments with due times sometimes not saving their work inputs",
+      "Fixed tick button sometimes not finishing assignment for today",
+      "Fixed crashing after submitting decimal inputs in the assignment form",
+      "Fixed crashing after creating assignment tags",
+      "Fixed small viewport heights not properly scrolling the assignment form",
+      "Fixed invisible header on the user guide"
+    ]
+  },
+  {
     "date": "2/12/2023",
     "version": "v1.9.0-beta",
     "updates": [
