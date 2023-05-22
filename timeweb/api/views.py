@@ -48,7 +48,7 @@ def submit_assignment(request):
     request.created_assignment = not request.edited_assignment
 
     # ideally use an instance kwarg or something but i am incompetent
-    submitted_form = TimewebForm(data=request.POST, request=request, id=int(id_))
+    submitted_form = TimewebForm(data=request.POST, request=request, id=int(id_) if request.edited_assignment else None)
 
     if not submitted_form.is_valid():
         logger.info(f"User \"{request.user}\" submitted an invalid form")
