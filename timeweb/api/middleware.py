@@ -44,11 +44,12 @@ class APIValidationMiddleware:
             resolved.url_name in CONDITIONALLY_EXCLUDE_FROM_STATE_EVALUATION and not json.loads(res.content.decode('utf-8')).get('update_state')
         ):
             return res
+        # update SET_NULL from example_assignment and added_gc_assignment_ids and etc
+        # https://www.youtube.com/watch?v=RY_2gElt3SA <-- what's happening
+        # refresh everything for forward compatibility
+        request.user.settingsmodel.refresh_from_db()
         request.user.settingsmodel.device_uuid = device_uuid
         request.user.settingsmodel.device_uuid_api_timestamp = timezone.now()
-        # update SET_NULL from example_assignment
-        # don't refresh any other field or else device_uuid and device_uuid_api_timestamp will be reset
-        request.user.settingsmodel.refresh_from_db(fields=('example_assignment', ))
         request.user.settingsmodel.save()
         return res
 

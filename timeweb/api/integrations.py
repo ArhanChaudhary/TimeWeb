@@ -198,7 +198,7 @@ def update_gc_courses(request):
         # this makes it so that we don't need to use a similar caching system to the one used in create_gc_assignments
         # as broken pipes no longer won't reload the user
         request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
-        request.user.settingsmodel.save()
+        request.user.settingsmodel.save(update_fields=("gc_courses_cache", ))
         # If old contains every element in new, then we don't need to create_gc_assignments again
         # As if all the elements of new are in old, then there are new classes to import assignment from.
 
@@ -248,7 +248,7 @@ def create_gc_assignments(request, order=None):
             return JsonResponse({"next": "continue"})
         else:
             request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
-            request.user.settingsmodel.save()
+            request.user.settingsmodel.save(update_fields=("oauth_token", ))
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
 
     def add_gc_assignments_from_response(response_id, course_coursework, exception):
@@ -474,7 +474,7 @@ def create_gc_assignments(request, order=None):
         # y is missing
         "y": None,
     }
-    request.user.settingsmodel.save()
+    request.user.settingsmodel.save(update_fields=("added_gc_assignment_ids", ))
     created = [TimewebModel(**assignment | static_gc_model_fields) for assignment in gc_model_data]
     TimewebModel.objects.bulk_create(created)
     return JsonResponse({
@@ -587,7 +587,7 @@ def gc_auth_callback(request):
     request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
     # Use .update() (dict method) instead of = so the refresh token isnt overwritten
     request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
-    request.user.settingsmodel.save()
+    request.user.settingsmodel.save(update_fields=("gc_courses_cache", "oauth_token"))
     logger.info(f"User {request.user} enabled google classroom API")
     del request.session["gc-callback-current-url"]
     return redirect(request.session.pop("gc-callback-next-url"))
