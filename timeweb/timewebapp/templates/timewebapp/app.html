@@ -439,49 +439,47 @@
         <div id="tutorial-welcome">Welcome to TimeWeb!</div>
       </span>
       <span class="tutorial-content">
-        TimeWeb is a time management application that visualizes, quantifies, and prioritizes your daily school or work assignments. Here's a demonstration of how it works.
+        TimeWeb is a time management application that visualizes, quantifies, and prioritizes your daily school or work assignments. Here's a tutorial of how it works.
       </span>
     </template>
     <template id="tutorial-header-template">
       <span class="tutorial-title">
-        The assignment header summarizes the status of the assignment for today. So, you know exactly what to complete for today to be on track to complete both your short and long term assignments.
+        The assignment header summarizes the current status for every assignment. Know what to do for today at a glance.
       </span>
     </template>
     <template id="tutorial-graph-intro-template">
       <span class="tutorial-title">
-        Click a complete assignment to open the assignment graph, a visualization of its entire work schedule.
+        Click an assignment to open the assignment graph, a visualization of its entire work schedule.
       </span>
     </template>
     <template id="tutorial-x-axis-template">
       <span class="tutorial-title">
-        The x-axis of the assignment graph represents days. The starting point at day zero corresponds to the assignment's assignment date, and the ending point corresponds to the assignment's due date.
+        The x-axis represents days. The starting point at day zero corresponds to the assignment date, and the ending point corresponds to the due date.
       </span>
     </template>
     <template id="tutorial-y-axis-template">
       <span class="tutorial-title">
-        The y-axis of the assignment graph represents units of work, or how the assignment's work is split and divided up. As you progress through the assignment, you will gradually complete more and more units of work until the entire assignment is completely finished.
+        The y-axis represents units of work, or how the assignment's work is split up. In this case, the unit of work is Chapter as books are divided into Chapters.
       </span>
     </template>
     <template id="tutorial-work-schedule-template">
       <span class="tutorial-title">
-        The assignment's work schedule is formed by connecting the red points on the assignment graph, each of which corresponds to an increasing cumulative amount of work to complete every day until the assignment is due.
+        Your work schedule is formed by the red points on the assignment graph. You'll gradually complete more units of work until completely finished.
       </span>
     </template>
     <template id="tutorial-work-inputs-template">
       <span class="tutorial-title">
-        Every day, you must input how much work you actually complete so the assignment can be prioritized accordingly. These will be plotted and connected in blue to form your assignment's work inputs.
+        Every day, you must input how much work you actually complete. These will be graphed in blue to form the assignment's work inputs.
       </span>
     </template>
     <template id="tutorial-tick-button-template">
       <span class="tutorial-title">
-        {% comment %} Why are assignments marked as finished for today after inputting no work done?
-        faq {% endcomment %}
         If you're finished with the assignment's work for today, click the tick button on the assignment header to input all work done for today.
       </span>
     </template>
     <template id="tutorial-wrap-up-template">
       <span class="tutorial-title">
-        It is highly recommended to read the graph's section on TimeWeb's <a href="/user-guide#what-is-the-assignment-graph" target="_blank">user guide</a> to understand how to use it. Check out your example assignment or the <a href=\"/example\">example account</a> to see how TimeWeb handles longer and more complicated assignments.
+        That's it! Check out TimeWeb's <a href="{% url 'user_guide' %}" target="_blank">user guide</a> for advanced usage and FAQs. Thanks for using TimeWeb!
       </span>
     </template>
   {% endif %}
