@@ -900,7 +900,8 @@ setAssignmentsContainerScaleUtils: function() {
     if (SETTINGS.animation_speed === 0) {
         $("#assignments-container").css('--scale-percent-x', '1');
     } else {
-        $("#assignments-container").css('--scale-percent-x', `${1 + 10 / $("#assignments-header").width()}`);
+        // deleted assignments view
+        $("#assignments-container").css('--scale-percent-x', `${1 + 10 / ($("#assignments-header").width() || $(".assignment-container:first").width())}`);
     }
 },
 setAssignmentScaleUtils: function(dom_assignment) {
@@ -1736,6 +1737,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     const sa = sas[i];
                     sa.makeGCAnchorVisible();
                 });
+                utils.ui.setAssignmentsContainerScaleUtils();
             }, mathUtils.clamp(0, (dat.length - 15) / 0.06, 250));
         });
         utils.ui.addTagHandlers();
