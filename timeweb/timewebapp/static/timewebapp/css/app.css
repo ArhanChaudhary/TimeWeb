@@ -237,7 +237,7 @@ main.background-image-exists {
     padding-bottom: 40px;
 }
 .assignment {
-    --box-shadow-assignment-spread: -9px;
+    --box-shadow-assignment-spread: -8px;
     --box-shadow-assignment: 0 0 12px var(--box-shadow-assignment-spread) black;
     --box-shadow-priority: 0 0 0 0 transparent;
     --box-shadow: var(--box-shadow-assignment), var(--box-shadow-priority);
@@ -1349,7 +1349,7 @@ main:not(.background-image-exists) #extra-navs {
 }
 @media screen and (max-width: 750px) {
     .assignment {
-        --box-shadow-assignment-spread: -8px;
+        --box-shadow-assignment-spread: -7px;
     }
     #assignments-container {
         --outer-assignment-horizontal-padding: 13px;
