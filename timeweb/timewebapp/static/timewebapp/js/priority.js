@@ -514,7 +514,10 @@ class Priority {
                     }).css({marginLeft: -1, marginRight: -1});
                     if (hard_due_date_passed) {
                         todo = sa.sa.y - last_work_input;
-                        var todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
+                        // dont do Number.isFinite(todo) as null - 0 = 0
+                        if (Number.isFinite(sa.sa.y) && Number.isFinite(last_work_input) && Number.isFinite(sa.sa.time_per_unit)) {
+                            var todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
+                        }
                         // NOTE: in case I add other status groups, it's important that I don't forget to manually add
                         // conditions to replicate as if the assignment has other status groups. This is because the
                         // condition !hard_due_date_passed manually skips over status groups that are used for checking
