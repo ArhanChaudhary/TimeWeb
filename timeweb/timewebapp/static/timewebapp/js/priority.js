@@ -517,6 +517,7 @@ class Priority {
                         // dont do Number.isFinite(todo) as null - 0 = 0
                         if (Number.isFinite(sa.sa.y) && Number.isFinite(last_work_input) && Number.isFinite(sa.sa.time_per_unit)) {
                             var todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
+                            that.total_completion_time += todo_minutes;
                         }
                         // NOTE: in case I add other status groups, it's important that I don't forget to manually add
                         // conditions to replicate as if the assignment has other status groups. This is because the
