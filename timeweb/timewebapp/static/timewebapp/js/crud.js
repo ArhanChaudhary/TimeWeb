@@ -326,7 +326,10 @@ class Crud {
         setTimeout(function() {
             $("#form-wrapper form input:visible").first().focus();
             // so it is compatible with javascript in base.js
-            document.getElementById("id_description").dispatchEvent(new Event("input"))
+            document.getElementById("id_description").dispatchEvent(new Event("input"));
+            if ($("#form-wrapper #second-field-group .invalid").length) {
+                Crud.GO_TO_FIELD_GROUP({advanced: true});
+            }
         // have a timeout so the edit button flashes when you click it
         }, 75);
     }
