@@ -597,20 +597,18 @@ class Priority {
 
             let status_priority; // Don't use NaN because NaN === NaN is false for calculations used later
             let todays_work;
-            switch (status_value) {
-                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY:
-                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW:
-                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW:
-                case Priority.UNFINISHED_FOR_TODAY:
-                case Priority.DUE_DATE_PASSED:
+            if (Number.isFinite(todo_minutes) || [
+                Priority.INCOMPLETE_WORKS,
+                Priority.NO_WORKING_DAYS,
+                Priority.FINISHED_FOR_TODAY,
+            ].includes(status_value)) {
+                if (Number.isFinite(todo_minutes)) {
+                    // no safeConversion to be accurate
                     todays_work = sa.sa.time_per_unit * todo;
-                case Priority.INCOMPLETE_WORKS:
-                case Priority.NO_WORKING_DAYS:
-                case Priority.FINISHED_FOR_TODAY:
-                    // If due times are enabled, it's possible for (sa.sa.complete_x - (sa.sa.blue_line_start - len_works)) to become negative
-                    // However this doesn't happen because the assignment will have been marked have completed in this scenario
-                    status_priority = Priority.todoScalingFunction(sa.sa.time_per_unit * todo) / Priority.dueDateScalingFunction(sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
-                    break;
+                }
+                // If due times are enabled, it's possible for (sa.sa.complete_x - (sa.sa.blue_line_start - len_works)) to become negative
+                // However this doesn't happen because the assignment will have been marked have completed in this scenario
+                status_priority = Priority.todoScalingFunction(sa.sa.time_per_unit * todo) / Priority.dueDateScalingFunction(sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
             }
 
             // due_date_minus_today can be NaN sometimes and break the logic in assignmentSortingComparator
@@ -646,20 +644,10 @@ class Priority {
 
             // !! is needed because toggleClass only works with booleans
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
-            switch (status_value) {
-                case Priority.DUE_DATE_PASSED:
-                    if (!Number.isFinite(sa.sa.y) || !Number.isFinite(last_work_input)) {
-                        dom_completion_time.text("");
-                        break;
-                    }
-                case Priority.UNFINISHED_FOR_TODAY:
-                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY:
-                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW:
-                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW:
-                    dom_completion_time.text(utils.formatting.formatMinutes(todo_minutes));
-                    break;
-                default:
-                    dom_completion_time.text("");
+            if (Number.isFinite(todo_minutes)) {
+                dom_completion_time.text(utils.formatting.formatMinutes(todo_minutes));
+            } else {
+                dom_completion_time.text("");
             }
             // If the status message is "finish this assignment", display the completion time on mobile
             dom_completion_time.toggleClass("hide-on-mobile", !!sa.unit_is_of_time && todo + last_work_input !== sa.sa.y);
