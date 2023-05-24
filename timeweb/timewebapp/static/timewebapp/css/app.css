@@ -121,7 +121,7 @@ main.background-image-exists {
     display: none;
 
     overflow: auto;
-    background-color: hsla(0, 0%, 0%, 0.45);
+    background-color: hsla(0, 0%, 0%, 0.3);
     position: fixed;
     top: 0;
     left: 0;
@@ -155,16 +155,20 @@ main.background-image-exists {
     text-align: center;
 }
 .tutorial-content {
-    color: hsl(0, 0%, 85%);
+    color: hsl(0, 0%, 25%);
 }
-.tutorial-content-styled {
-    color: white;
+.jconfirm.tutorial-content-styled {
+    color: black;
 }
-.tutorial-content-styled .jconfirm-content:not(#dummy) {
+.jconfirm.tutorial-content-styled .jconfirm-content:not(#dummy) {
     opacity: 1 !important;
 }
-.tutorial-content-styled .jconfirm-bg {
+.jconfirm.tutorial-content-styled .jconfirm-bg {
     opacity: 0 !important;
+}
+.jconfirm.tutorial-content-styled .jconfirm-box {
+    box-shadow: none !important;
+    border: 1px solid hsl(0, 0%, 48%);
 }
 #assignments-header {
     position: relative;
