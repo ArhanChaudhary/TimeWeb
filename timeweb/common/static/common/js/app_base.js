@@ -20,11 +20,13 @@ document.addEventListener("DOMContentLoaded", function() {
         // so we must instread derive it from options
 
         // do not use decodeURIComponent, it will break the url with ampersands in it
-        options.data = $.param($.extend(Object.fromEntries(new URLSearchParams(options.data === undefined ? "" : options.data)), {
+        // we cannot use Object.fromEntries(new UrlSearchParams(options.data)) because
+        // break_days may be a duplicate key which isnt allowed in an object
+        options.data += '&' + $.param({
             device_uuid: window.DEVICE_UUID,
             tab_creation_time: window.TAB_CREATION_TIME,
             utc_offset: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        }));
+        });
         options.url += options.url.endsWith("/") ? "" : "/";
     });
 });
