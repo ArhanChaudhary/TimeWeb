@@ -121,6 +121,15 @@ select {
 .graph-container > table {
     --background-color: hsl(0, 0%, 12%);
 }
+#tutorial-overlay {
+    background-color: hsla(0, 0%, 0%, 0.45);
+}
+.tutorial-content {
+    color: hsl(0, 0%, 85%);
+}
+.jconfirm.tutorial-content-styled {
+    color: white;
+}
 
 
 /* vendor prefixed pseudo styles are mega sus

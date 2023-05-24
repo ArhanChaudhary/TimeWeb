@@ -121,7 +121,7 @@ main.background-image-exists {
     display: none;
 
     overflow: auto;
-    background-color: hsla(0, 0%, 0%, 0.5);
+    background-color: hsla(0, 0%, 0%, 0.3);
     position: fixed;
     top: 0;
     left: 0;
@@ -155,13 +155,20 @@ main.background-image-exists {
     text-align: center;
 }
 .tutorial-content {
-    color: hsl(0, 0%, 75%);
+    color: hsl(0, 0%, 25%);
 }
-.tutorial-content-styled .jconfirm-content:not(#dummy) {
+.jconfirm.tutorial-content-styled {
+    color: black;
+}
+.jconfirm.tutorial-content-styled .jconfirm-content:not(#dummy) {
     opacity: 1 !important;
 }
-.tutorial-content-styled .jconfirm-bg {
+.jconfirm.tutorial-content-styled .jconfirm-bg {
     opacity: 0 !important;
+}
+.jconfirm.tutorial-content-styled .jconfirm-box {
+    box-shadow: none !important;
+    border: 1px solid hsl(0, 0%, 48%);
 }
 #assignments-header {
     position: relative;
@@ -237,7 +244,7 @@ main.background-image-exists {
     padding-bottom: 40px;
 }
 .assignment {
-    --box-shadow-assignment-spread: -9px;
+    --box-shadow-assignment-spread: -8px;
     --box-shadow-assignment: 0 0 12px var(--box-shadow-assignment-spread) black;
     --box-shadow-priority: 0 0 0 0 transparent;
     --box-shadow: var(--box-shadow-assignment), var(--box-shadow-priority);
@@ -1349,7 +1356,7 @@ main:not(.background-image-exists) #extra-navs {
 }
 @media screen and (max-width: 750px) {
     .assignment {
-        --box-shadow-assignment-spread: -8px;
+        --box-shadow-assignment-spread: -7px;
     }
     #assignments-container {
         --outer-assignment-horizontal-padding: 13px;
