@@ -174,7 +174,11 @@ def update_gc_courses(request):
         # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
         courses = service.courses().list(courseStates=["ACTIVE"]).execute()
     except RefreshError:
-        return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
+        return JsonResponse({
+            'invalid_credentials': True,
+            'reauthorization_url': gc_auth_enable(request, next_url="home", current_url="home"),
+            'next': 'stop',
+        })
     # If connection to the server randomly dies (could happen locally when wifi is off)
     except (ServerNotFoundError, TimeoutError):
         return JsonResponse({"next": "continue"})
@@ -242,7 +246,11 @@ def create_gc_assignments(request, order=None):
             credentials.refresh(Request())
         except RefreshError:
             # In case users manually revoke access to their oauth scopes after authorizing
-            return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
+            return JsonResponse({
+                'invalid_credentials': True,
+                'reauthorization_url': gc_auth_enable(request, next_url="home", current_url="home"),
+                'next': 'stop',
+            })
         # If connection to the server randomly dies (could happen locally when wifi is off)
         except TransportError:
             return JsonResponse({"next": "continue"})
@@ -445,7 +453,11 @@ def create_gc_assignments(request, order=None):
     try:
         batch.execute()
     except RefreshError:
-        return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
+        return JsonResponse({
+            'invalid_credentials': True,
+            'reauthorization_url': gc_auth_enable(request, next_url="home", current_url="home"),
+            'next': 'stop',
+        })
     # If connection to the server randomly dies (could happen locally when wifi is off)
     except (ServerNotFoundError, TimeoutError):
         pass
