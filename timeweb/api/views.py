@@ -523,7 +523,10 @@ def change_setting(request):
 
     if setting == "oauth_token":
         if value:
-            return HttpResponse(integrations.gc_auth_enable(request, next_url="home", current_url="settings"), status=302)
+            return JsonResponse({
+                'should_redirect': True,
+                'redirect_url': integrations.gc_auth_enable(request, next_url="home", current_url="settings"),
+            })
         else:
             integrations.gc_auth_disable(request, save=True)
             return HttpResponse(status=204)

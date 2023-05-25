@@ -204,40 +204,14 @@ changeSetting: function(kwargs={}) {
             setting: kwargs.setting,
             value: JSON.stringify(kwargs.value),
         },
-        error: function(jqXHR) {
-            switch (jqXHR.status) {
-                case 302:
-                    var reauthorization_url = jqXHR.responseText;
-                    reloadWhenAppropriate({ href: reauthorization_url });
-                    break;
-
-                default:
-                    ajaxUtils.error.bind(this)(...arguments);
+        success: function(response) {
+            if (response?.should_redirect) {
+                const reauthorization_url = response.redirect_url
+                reloadWhenAppropriate({ href: reauthorization_url });
             }
         },
-    });
-},
-GCIntegrationError: function(jqXHR) {
-    if (jqXHR.status !== 302) return;
-    const reauthorization_url = jqXHR.responseText;
-    $.alert({
-        title: "Invalid credentials.",
-        content: "Your Google Classroom integration credentials are invalid. Please reauthenticate or disable the integration.",
-        buttons: {
-            ok: {
-
-            },
-            "disable integration": {
-                action: function() {
-                    ajaxUtils.changeSetting({setting: "oauth_token", value: false});
-                }
-            },
-            reauthenticate: {
-                action: function() {
-                    reloadWhenAppropriate({href: reauthorization_url});
-                }
-            },
-        }
+        fakeSuccessArguments: [],
+        error: ajaxUtils.error,
     });
 },
 createGCAssignments: function() {
@@ -248,12 +222,34 @@ createGCAssignments: function() {
         {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
     ];
     let ajaxCallback = function(response) {
+        if (response.invalid_credentials) {
+            $.alert({
+                title: "Invalid credentials.",
+                content: "Your Google Classroom integration credentials are invalid. Please reauthenticate or disable the integration.",
+                buttons: {
+                    ok: {
+
+                    },
+                    "disable integration": {
+                        action: function() {
+                            ajaxUtils.changeSetting({setting: "oauth_token", value: false});
+                        }
+                    },
+                    reauthenticate: {
+                        action: function() {
+                            reloadWhenAppropriate({href: response.reauthorization_url});
+                        }
+                    },
+                }
+            });
+        }
         // indicates: this ajax means we have to terminate everything and
         // restart the later queue from the beginning
 
         // raised if:
         // concurrent requests are made
         // update-gc-courses doesn't add any new courses (saves last ajax)
+        // credentials are invalid
         if (response.next === "stop") return;
 
         // indicates: this ajax means google classroom assignments were
@@ -277,9 +273,9 @@ createGCAssignments: function() {
                 type: ajax.type,
                 url: ajax.url,
                 data: ajax.data,
-                error: ajaxUtils.GCIntegrationError,
                 success: ajaxCallback,
                 fakeSuccessArguments: [{next: "stop"}],
+                // no error, fail silently
             });
         }
     }
