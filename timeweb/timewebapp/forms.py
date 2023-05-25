@@ -26,7 +26,7 @@ class TimewebForm(forms.ModelForm):
         # time_per_unit should be first because of logic in views.py
         ADD_CHECKBOX_WIDGET_FIELDS = ["time_per_unit", "y", "x", "min_work_time","works", "funct_round"]
         widgets = {
-            'name': forms.TextInput(attrs={"placeholder": "Ex. Book reading, Math homework, Study for test"}),
+            'name': forms.TextInput(attrs={"placeholder": "Read a Book, Math homework, Study for test"}),
             'due_time': forms.HiddenInput(),
             'soft': forms.HiddenInput(),
             'blue_line_start': forms.HiddenInput(),
