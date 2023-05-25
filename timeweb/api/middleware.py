@@ -42,6 +42,7 @@ class APIValidationMiddleware:
         if (
             resolved.url_name in EXCLUDE_FROM_UPDATING_STATE or
             resolved.url_name in CONDITIONALLY_EXCLUDE_FROM_STATE_EVALUATION and not json.loads(res.content.decode('utf-8') or '{}').get('update_state')
+            
         ):
             return res
         # update SET_NULL from example_assignment and added_gc_assignment_ids and etc
