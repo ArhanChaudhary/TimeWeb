@@ -161,7 +161,7 @@ class MemoryCache(Cache):
     def set(self, url, content):
         MemoryCache._CACHE[url] = content
 
-@require_http_methods(["GET"])
+@require_http_methods(["POST"])
 def update_gc_courses(request):
     # NOTE: we cannot simply run this in create_gc_assignments after the response is sent because
     # we want to be able to alert the user if their credentials for listing courses is invalid
@@ -229,7 +229,7 @@ def simplify_courses(courses, include_name=True):
                 "name": simplify_course_name(course["name"]) if include_name else None,
             } for course in courses]
 
-@require_http_methods(["GET"])
+@require_http_methods(["POST"])
 def create_gc_assignments(request, order=None):
     if 'token' not in request.user.settingsmodel.oauth_token: return HttpResponse(status=401)
     # The file token.json stores the user's access and refresh tokens, and is
