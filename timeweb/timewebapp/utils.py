@@ -155,7 +155,6 @@ def adjust_blue_line(request, *, old_data, assignment_date, x_num):
             blue_line_start = old_blue_line_start + utils.days_between_two_dates(old_data.assignment_date, assignment_date)
     if blue_line_start < 0:
         blue_line_start = 0
-    # TODO: do I need to account for when x_num is None?
     if x_num is None:
         capped_at_x_num = None
     elif capped_at_x_num := blue_line_start >= x_num:
@@ -169,7 +168,6 @@ def adjust_blue_line(request, *, old_data, assignment_date, x_num):
         actual_len_works = removed_works_end + 1 - removed_works_start
         len_works = actual_len_works - 1
         # If the edited due date cuts off some of the work inputs
-        # TODO: do I need to account for when x_num is None?
         if x_num is not None and len_works + blue_line_start > x_num:
             # (removed_works_end + 1 - removed_works_start) - 1 + self.sm.blue_line_start > x_num
             # removed_works_end - removed_works_start + self.sm.blue_line_start > x_num

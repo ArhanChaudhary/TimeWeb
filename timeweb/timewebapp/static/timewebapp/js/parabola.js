@@ -193,7 +193,7 @@ Assignment.prototype.setParabolaValues = function () {
         // their inputted minimum work time. Another reason to use this is because the last day of an assignment doesn't really care about the step size)
         // If it does, simply decrement the cutoff (another way to think of this is by forcing the ignore ends setting to be off for the last day if it has a due time)
 
-        // TODO: Another possible way of going about this issue is to do a similar sort of check before return_y_cutoff is set
+        // Another possible way of going about this issue is to do a similar sort of check before return_y_cutoff is set
         // This check, if activated, would simulate a work schedule without a due time to ensure work isnt assigned to the last day with the due time
         // However, this would be much harder to code. I may implement this in the future as this could possibly be more accurate, but see no reason to as my current implementation is accurate enough
         this.return_0_cutoff = NaN; // ensure funct never returns early for this cutoff
