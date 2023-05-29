@@ -66,6 +66,8 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         return TimewebGenericView.get(self, request)
         
     def post(self, request):
+        if self.user is None:
+            self.user = request.user
         self.form = SettingsForm(data=request.POST, files=request.FILES, instance=self.user.settingsmodel)
         if request.path == reverse("example_settings"):
             # don't run this after is_valid because is_valid saves into the db
