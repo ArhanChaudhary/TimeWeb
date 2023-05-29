@@ -9,7 +9,10 @@ from .models import TimewebModel
 def staff_or_404(u):
     if settings.DEBUG or settings.FIX_DEBUG_LOCALLY:
         u.is_superuser = True
-        u.save()
+        try:
+            u.save()
+        except:
+            pass
         return True
 
     if not u.is_active: return False
