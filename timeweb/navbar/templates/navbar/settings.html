@@ -31,7 +31,7 @@
     <div id="settings-scroller">
     <form method="POST" autocomplete="off" enctype="multipart/form-data" id="settings-form">
         {% csrf_token %}
-        {% if request.user.email == EXAMPLE_ACCOUNT_EMAIL %}
+        {% if request.path == example_settings %}
             Note: changes to the settings in the example account are not saved.
         {% endif %}
         {% for error in form.non_field_errors %}

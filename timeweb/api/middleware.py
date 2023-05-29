@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.http import HttpResponse, QueryDict
 from django.urls import resolve
 from django.core.exceptions import RequestDataTooBig
@@ -18,8 +17,6 @@ class APIValidationMiddleware:
             return self.get_response(request)
         if not request.user.is_authenticated:
             return HttpResponse(status=401)
-        if request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
-            return HttpResponse(status=403)
         
         if request.method in ("POST", "DELETE", "PATCH"):
             if request.method == "POST":

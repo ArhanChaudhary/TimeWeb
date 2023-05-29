@@ -8,6 +8,7 @@ app_static = utils.app_static_factory(__package__)
 
 urlpatterns = [
     path('settings/', views.SettingsView.as_view(), name='settings'),
+    path('example/settings/', views.ExampleAccountSettingsView.as_view(), name='example_settings'),
     # path('blog/', views.BlogView.as_view(), name='blog'),
     path('user-guide/', views.UserguideView.as_view(), name='user_guide'),
     path('changelog/', views.ChangelogView.as_view(), name='changelog'),

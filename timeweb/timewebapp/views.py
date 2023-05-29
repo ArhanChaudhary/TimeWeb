@@ -4,7 +4,6 @@ from django.shortcuts import reverse
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.models import model_to_dict
-from django.contrib.auth import logout, login
 from django.utils.decorators import method_decorator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -23,6 +22,10 @@ import datetime
 MAX_TAG_LENGTH = 100
 MAX_NUMBER_OF_TAGS = 5
 DELETED_ASSIGNMENTS_PER_PAGE = 50
+try:
+    EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)
+except:
+    EXAMPLE_ACCOUNT_MODEL = None
 
 # needs to be down here due to circular imports
 from .forms import TimewebForm
@@ -85,10 +88,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
     def add_user_models_to_context(self, request, *, view_hidden):
         # kinda cursed but saves an entire sql query
-        # we have to force request.user.timewebmodel_set.all() to non lazily evaluate or else it executes once to seralize it
+        # we have to force user.timewebmodel_set.all() to non lazily evaluate or else it executes once to seralize it
         # and another in the html
         if view_hidden:
-            timewebmodels = list(request.user.timewebmodel_set.filter(hidden=True).order_by("-deletion_time"))
+            timewebmodels = list(self.user.timewebmodel_set.filter(hidden=True).order_by("-deletion_time"))
             if "everything_before" in request.GET:
                 everything_before = float(request.GET["everything_before"])
                 everything_after = None
@@ -120,8 +123,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
                 timewebmodels = timewebmodels[:DELETED_ASSIGNMENTS_PER_PAGE]
         else:
-            timewebmodels = list(request.user.timewebmodel_set.filter(hidden=False))
-            if request.user.settingsmodel.enable_tutorial:
+            timewebmodels = list(self.user.timewebmodel_set.filter(hidden=False))
+            if self.user.settingsmodel.enable_tutorial:
                 date_now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
                 example_assignment = TimewebModel(
                     name="Read a Book",
@@ -136,50 +139,46 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     min_work_time=2,
                     break_days=[],
                     dynamic_start=0,
-                    user=request.user,
+                    user=self.user,
                 )
                 example_assignment.save()
                 timewebmodels.append(example_assignment)
-                if request.user.settingsmodel.example_assignment != example_assignment:
-                    request.user.settingsmodel.example_assignment = example_assignment
-                    request.user.settingsmodel.save()
+                if self.user.settingsmodel.example_assignment != example_assignment:
+                    self.user.settingsmodel.example_assignment = example_assignment
+                    self.user.settingsmodel.save()
         self.context['assignment_models'] = timewebmodels
         self.context['assignment_models_as_json'] = [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in timewebmodels]
 
-        self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel, exclude=EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT)
-        self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in request.user.settingsmodel.oauth_token
+        self.context['settings_model_as_json'] = model_to_dict(self.user.settingsmodel, exclude=EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT)
+        self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in self.user.settingsmodel.oauth_token
 
-        if not request.user.settingsmodel.seen_latest_changelog:
+        if not self.user.settingsmodel.seen_latest_changelog:
             self.context['latest_changelog'] = CHANGELOGS[0]
 
     def get(self, request):
-        if request.path == reverse("deleted_assignments"):
+        if self.user is None:
+            self.user = request.user
+        if request.path in (reverse("deleted_assignments"), reverse("example_deleted_assignments")):
             self.add_user_models_to_context(request, view_hidden=True)
             self.context["VIEWING_DELETED_ASSIGNMENTS"] = True
         else:
             self.add_user_models_to_context(request, view_hidden=False)
             self.context['settings_form'] = SettingsForm(initial={ # unbound form
-                'assignment_sorting': request.user.settingsmodel.assignment_sorting,
+                'assignment_sorting': self.user.settingsmodel.assignment_sorting,
             })
         self.context['form'] = TimewebForm(request=request)
-        logger.info(f'User \"{request.user}\" is now viewing the home page')
+        logger.info(f'User \"{self.user}\" is now viewing the home page')
         return super().get(request)
 
-try:
-    EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)
-except:
-    EXAMPLE_ACCOUNT_MODEL = None
 class ExampleAccountView(TimewebView):
     # Ignore LoginRequiredMixin
+    def __init__(self):
+        super(ExampleAccountView, self).__init__()
+        self.user = EXAMPLE_ACCOUNT_MODEL
+        self.context['user'] = self.user
+
     def dispatch(self, *args, **kwargs):
         return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
-
-    def get(self, request):
-        if EXAMPLE_ACCOUNT_MODEL is not None:
-            if request.user.is_authenticated:
-                logout(request)
-            login(request, EXAMPLE_ACCOUNT_MODEL, 'allauth.account.auth_backends.AuthenticationBackend')
-        return super(ExampleAccountView, self).get(request)
 
 # needs to be down here due to circular imports
 from .urls import RELOAD_VIEWS

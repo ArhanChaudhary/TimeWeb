@@ -101,15 +101,11 @@ class LabeledAddEmailForm(AddEmailForm):
                 "This e-mail address is already associated with another account"
             ),
             "max_email_addresses": _("You cannot add more than %d e-mail addresses"),
-            "example_account": _("You cannot modify the example account")
         }
         users = filter_users_by_email(value)
         on_this_account = [u for u in users if u.pk == self.user.pk]
         on_diff_account = [u for u in users if u.pk != self.user.pk]
-        on_example_account = self.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
 
-        if on_example_account:
-            raise forms.ValidationError(errors["example_account"])
         if on_this_account:
             raise forms.ValidationError(errors["this_account"])
         if on_diff_account and app_settings.UNIQUE_EMAIL:
@@ -129,8 +125,6 @@ class LabeledChangePasswordForm(ChangePasswordForm):
         self.label_suffix = ""
 
     def clean(self, *args, **kwargs):
-        if self.user.email == settings.EXAMPLE_ACCOUNT_EMAIL:
-            raise forms.ValidationError(_("You cannot modify the example account"))
         return LabeledTwoPasswordForm.clean(self)
 
 class LabeledTwoPasswordForm(ResetPasswordKeyForm):
@@ -213,8 +207,3 @@ class UsernameResetForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['username'].label = "New username"
         self.label_suffix = ""
-    
-    def clean_username(self):
-        if self.request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL:
-            raise forms.ValidationError("You cannot modify the example account")
-        return self.cleaned_data["username"]

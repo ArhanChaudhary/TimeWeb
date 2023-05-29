@@ -7,29 +7,12 @@ from ratelimit.exceptions import Ratelimited
 from ratelimit.decorators import ratelimit
 from ratelimit.core import is_ratelimited
 
-from timewebapp.urls import KEEP_EXAMPLE_ACCOUNT_LOGGED_IN_VIEWS
 from django_minify_html.middleware import MinifyHtmlMiddleware as _MinifyHtmlMiddleware
 
 import sys
 from . import utils
 
 DEFAULT_GLOBAL_RATELIMIT = "5/s"
-class LogoutExampleAccount:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        if resolve(request.path_info).url_name not in KEEP_EXAMPLE_ACCOUNT_LOGGED_IN_VIEWS and request.user.is_authenticated and request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL:
-            logout(request)
-        return self.get_response(request)
-
-class DefineIsExampleAccount:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        request.isExampleAccount = request.user.is_authenticated and request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
-        return self.get_response(request)
 
 class DefineUTCOffset:
     def __init__(self, get_response):

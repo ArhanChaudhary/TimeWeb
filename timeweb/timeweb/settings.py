@@ -119,8 +119,6 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
     'api.middleware.CatchRequestDataTooBig',
 
-    'common.middleware.LogoutExampleAccount',
-    'common.middleware.DefineIsExampleAccount',
     'common.middleware.DefineUTCOffset',
     'common.middleware.CommonRatelimit',
     'api.middleware.APIValidationMiddleware',
@@ -307,7 +305,6 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
-SOCIALACCOUNT_ADAPTER = 'timewebauth.adapter.ExampleAccountSocialLoginAdapter'
 ACCOUNT_ADAPTER = 'timewebauth.adapter.NonUniqueUsernameAccountAdapter'
 
 ACCOUNT_FORMS = {

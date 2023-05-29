@@ -1,7 +1,7 @@
 # In the future I should probably switch all my view classes to FormView
 
 from django.conf import settings
-from django.shortcuts import redirect
+from django.shortcuts import redirect, reverse
 from django.urls import reverse_lazy, resolve
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
@@ -13,13 +13,13 @@ from ratelimit.core import is_ratelimited
 
 import common.utils as utils
 from common.views import CHANGELOGS, logger, TimewebGenericView
+from timewebapp.views import ExampleAccountView
 from .forms import SettingsForm
 from .models import SettingsModel
 
 import api.integrations as integrations
 from contact_form.views import ContactFormView
 
-from copy import deepcopy
 from requests import get as requests_get
 
 EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS = (
@@ -51,37 +51,41 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     template_name = "navbar/settings.html"
 
     def get(self, request):
+        if self.user is None:
+            self.user = request.user
         if "form" not in self.context:
             initial = {
-                'enable_gc_integration': 'token' in request.user.settingsmodel.oauth_token,
+                'enable_gc_integration': 'token' in self.user.settingsmodel.oauth_token,
             }
-            self.context['form'] = SettingsForm(initial=initial, instance=request.user.settingsmodel)
+            self.context['form'] = SettingsForm(initial=initial, instance=self.user.settingsmodel)
         self.context['default_settings'] = model_to_dict(SettingsForm().save(commit=False),
                             exclude=[*SettingsForm.Meta.exclude, # SettingsForm already excludes these fields but saving the field to a model adds them back
                             *EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS])
 
-        logger.info(f'User \"{request.user}\" is now viewing the settings page')
-        return super().get(request)
+        logger.info(f'User \"{self.user}\" is now viewing the settings page')
+        return TimewebGenericView.get(self, request)
         
     def post(self, request):
-        self.old_data = deepcopy(request.user.settingsmodel)
-        self.form = SettingsForm(data=request.POST, files=request.FILES, instance=request.user.settingsmodel)
-
+        self.form = SettingsForm(data=request.POST, files=request.FILES, instance=self.user.settingsmodel)
+        if request.path == reverse("example_settings"):
+            # don't run this after is_valid because is_valid saves into the db
+            if self.form.data.get("view_deleted_assignments"):
+                return redirect("example_deleted_assignments")
+            else:
+                return redirect("example")
         if self.form.is_valid():
             return self.valid_form(request)
         else:
             return self.invalid_form(request)
-            
     
     def valid_form(self, request):
-        if not request.isExampleAccount:
-            if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in request.user.settingsmodel.oauth_token:
-                integrations.gc_auth_disable(request, save=False)
-            self.form.save()
-            logger.info(f'User \"{request.user}\" updated the settings page')
+        if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in self.user.settingsmodel.oauth_token:
+            integrations.gc_auth_disable(request, save=False)
+        self.form.save()
+        logger.info(f'User \"{self.user}\" updated the settings page')
 
-            if self.form.cleaned_data.get("enable_gc_integration") and not 'token' in request.user.settingsmodel.oauth_token:
-                return redirect(integrations.gc_auth_enable(request, next_url="home", current_url="settings"))
+        if self.form.cleaned_data.get("enable_gc_integration") and not 'token' in self.user.settingsmodel.oauth_token:
+            return redirect(integrations.gc_auth_enable(request, next_url="home", current_url="settings"))
         if self.form.cleaned_data.get("view_deleted_assignments"):
             return redirect("deleted_assignments")
         else:
@@ -92,6 +96,10 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         logger.info(self.form.errors)
         # It's ok to return a 2xx from invalid form, because there is no danger of the user resubmitting because its invalid
         return self.get(request)
+
+# the class order matters so settingsview can override exampleaccountview
+class ExampleAccountSettingsView(SettingsView, ExampleAccountView):
+    pass
 
 class SecuredFormView(ContactFormView):
     success_url = reverse_lazy("secured_contact_form")
