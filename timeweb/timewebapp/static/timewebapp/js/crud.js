@@ -509,6 +509,8 @@ class Crud {
         }
         const dom_errors = $("<div>").addClass("assignment-form-error-note");
         for (const error of error_list) {
+            if (error === '')
+                continue
             if (is_potato) {
                 dom_errors.append(error);
             } else {
