@@ -70,7 +70,8 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             self.user = request.user
         self.form = SettingsForm(data=request.POST, files=request.FILES, instance=self.user.settingsmodel)
         if request.path == reverse("example_settings"):
-            # don't run this after is_valid because is_valid saves into the db
+            # don't run this after is_valid because is_valid updates self.user.settingsmodel which then is later
+            # saved into the db by later .save calls in other views
             if self.form.data.get("view_deleted_assignments"):
                 return redirect("example_deleted_assignments")
             else:
