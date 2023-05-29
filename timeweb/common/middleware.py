@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.urls import resolve
 from django.http import QueryDict
-from django.contrib.auth import logout
 
 from ratelimit.exceptions import Ratelimited
 from ratelimit.decorators import ratelimit

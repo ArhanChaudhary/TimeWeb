@@ -8,9 +8,10 @@ window.addEventListener("pageshow", function(e) {
     if (e.persisted || window.performance?.getEntriesByType("navigation")[0].type === "back_forward") {
         // We have to reload at account login in case a user goes back from the account page to the login page
         // This will mess up the csrf token, so we reload the page to get a new one
-        let exclude_login_route = RELOAD_VIEWS.slice(0, -1);
-        let login_route = RELOAD_VIEWS[RELOAD_VIEWS.length - 1];
-        if (exclude_login_route.includes(window.location.pathname) || login_route === window.location.pathname && sessionStorage.getItem("login_email")) {
+        let exclude_login_email_routes = RELOAD_VIEWS.slice(0, -2);
+        let login_email_routes = RELOAD_VIEWS.slice(-2);
+        if (exclude_login_email_routes.includes(window.location.pathname) || login_email_routes.includes(window.location.pathname) && sessionStorage.getItem("login_email")) {
+            sessionStorage.removeItem("login_email");
             window.ignore_reload_alert = true;
             window.location.reload();
         } else {
