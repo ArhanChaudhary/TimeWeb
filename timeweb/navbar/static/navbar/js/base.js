@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     $(window).on("resize", responsiveVideoLayout);
     responsiveVideoLayout();
-    const default_settings = JSON.parse(document.getElementById("default-settings").textContent);
+    const default_settings = JSON.parse(document.getElementById("default-settings")?.textContent || null);
     $("[data-default-setting]").each(function() {
         const setting_name = $(this).attr("data-default-setting");
         const default_value = default_settings[setting_name];
