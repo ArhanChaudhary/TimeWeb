@@ -1355,10 +1355,10 @@ class VisualAssignment extends Assignment {
             let not_applicable_message_title;
             let not_applicable_message_description;
             if (!work_input_textbox.val()) {
-                not_applicable_message_title = "Enter a Value.";
-                not_applicable_message_description = "Please enter a number or keyword (which can be found in the <a href=\"/user-guide#standard-assignment-graph-controls\" target=\"_blank\">user guide</a>) into the textbox to submit a work input."
+                not_applicable_message_title = "Enter a number.";
+                not_applicable_message_description = "Please enter a number into the \"Enter Units Done\" textbox to submit your next work input."
             } else if (last_work_input >= this.sa.y) {
-                not_applicable_message_title = "Already Finished.";
+                not_applicable_message_title = "Already finished.";
                 not_applicable_message_description = "You've already finished this assignment, so you can't enter any more work inputs.";
             }
             let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
