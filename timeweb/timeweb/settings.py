@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     'pwa',
     'colorfield',
     'django_cleanup.apps.CleanupConfig',
+    'encrypted_json_fields',
 
     'allauth',
     'allauth.account',
@@ -273,6 +274,11 @@ else:
     GC_REDIRECT_URI = "https://timeweb.io/api/gc-auth-callback/"
 # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+
+try:
+    EJF_ENCRYPTION_KEYS = os.environ['EJF_ENCRYPTION_KEYS'].encode("utf-8")
+except KeyError:
+    raise Exception("You must set EJF_ENCRYPTION_KEYS in your environment variables; Generate one with `from encrypted_json_fields import helpers;helpers.generate_random_encryption_key()`")
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',

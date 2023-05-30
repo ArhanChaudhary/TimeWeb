@@ -13,6 +13,7 @@ django-cleanup==5.2.0
 django-colorfield==0.4.3
 django-contact-form==1.9
 django-csp==3.7
+django-encrypted-json-fields==1.0.4
 django-livereload-server==0.4
 django-minify-html==1.4.0
 django-multiselectfield==0.1.12

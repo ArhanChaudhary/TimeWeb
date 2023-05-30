@@ -7,6 +7,7 @@ from django.core.validators import MinValueValidator
 from colorfield.fields import ColorField
 from multiselectfield import MultiSelectField
 from multiselectfield.utils import get_max_length
+from encrypted_json_fields.fields import EncryptedJSONField
 
 from timewebapp.models import (
     empty_list,
@@ -215,7 +216,11 @@ class SettingsModel(models.Model):
         verbose_name=_('Sorting: '),
     )
     # Custom field validation in views: hardcoded enable or disable in change_setting
-    oauth_token = models.JSONField(
+    # note that existing unencryped fields before this json field was changed to encrypted
+    # will be compatible with the new encrypted field; that is decrypt_values on an
+    # unencrypted data type will simply just return the same value courtesy of the author
+    # of django-encrypted-json-fields :)
+    oauth_token = EncryptedJSONField(
         default=empty_dict,
         blank=True,
     )
