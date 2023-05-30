@@ -30,6 +30,10 @@ from oauthlib.oauth2.rfc6749.errors import (
     MissingCodeError
 )
 
+# Canvas API
+from canvasapi import Canvas
+from canvasapi.exceptions import InvalidAccessToken, RateLimitExceeded
+
 # Misc
 import re
 import os
@@ -603,3 +607,11 @@ def gc_auth_callback(request):
     logger.info(f"User {request.user} enabled google classroom API")
     del request.session["gc-callback-current-url"]
     return redirect(request.session.pop("gc-callback-next-url"))
+
+@require_http_methods(["POST"])
+def create_canvas_assignments(request):
+    canvas = Canvas(url, token)
+
+    for course in canvas.get_current_user().get_courses(enrollment_state='active'):
+        for assignment in course.get_assignments():
+            print(assignment)
