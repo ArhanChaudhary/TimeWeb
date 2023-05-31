@@ -257,6 +257,7 @@ class SettingsModel(models.Model):
         TimewebModel,
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
     )
     device_uuid = models.CharField(
         max_length=8,
