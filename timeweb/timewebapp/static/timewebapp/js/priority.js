@@ -35,7 +35,6 @@ class Priority {
         const a = Priority.dayZeroScaleOutput;
         const b = Priority.dueDateTransitionValue;
         const c = Priority.piecewiseCutoff;
-        assert(x > 0);
         if (x <= c)
             return x / (a - a * x * x / (c * c) + x * x / (c * c - b * c));
         return x - b;
@@ -606,9 +605,16 @@ class Priority {
                     // no safeConversion to be accurate
                     todays_work = sa.sa.time_per_unit * todo;
                 }
-                // If due times are enabled, it's possible for (sa.sa.complete_x - (sa.sa.blue_line_start - len_works)) to become negative
-                // However this doesn't happen because the assignment will have been marked have completed in this scenario
-                status_priority = Priority.todoScalingFunction(sa.sa.time_per_unit * todo) / Priority.dueDateScalingFunction(sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
+                if (sa.sa.complete_x - (sa.sa.blue_line_start + len_works) > 0) {
+                    // If due times are enabled or if the due date has passed (todo_minutes will be defined in this case),
+                    // it's possible for (sa.sa.complete_x - (sa.sa.blue_line_start - len_works)) to become negative
+                    // it doesn't matter in these cases because the assignment will either be marked as finished or
+                    // due date passed and priority percentage won't matter
+                    status_priority = Priority.todoScalingFunction(sa.sa.time_per_unit * todo) / Priority.dueDateScalingFunction(sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
+                } else {
+                    // assignment should be completed or seemingly completed (works should reach x here)
+                    status_priority = -Infinity;
+                }
             }
 
             // due_date_minus_today can be NaN sometimes and break the logic in assignmentSortingComparator

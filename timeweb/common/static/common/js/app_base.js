@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // do not use decodeURIComponent, it will break the url with ampersands in it
         // we cannot use Object.fromEntries(new UrlSearchParams(options.data)) because
         // break_days may be a duplicate key which isnt allowed in an object
-        options.data += '&' + $.param({
+        options.data = (options.data ? '&' : '') + $.param({
             device_uuid: window.DEVICE_UUID,
             tab_creation_time: window.TAB_CREATION_TIME,
             utc_offset: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -216,10 +216,8 @@ changeSetting: function(kwargs={}) {
 },
 createGCAssignments: function() {
     const ajaxs = [
-        {type: "POST", url: '/api/create-gc-assignments', data: {order: "descending"}},
-        {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
-        {type: "POST", url: '/api/update-gc-courses'},
-        {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
+        {type: "GET", url: '/api/create-gc-assignments'},
+        {type: "GET", url: '/api/update-gc-courses'},
     ];
     let ajaxCallback = function(response) {
         if (response.invalid_credentials) {
@@ -272,7 +270,6 @@ createGCAssignments: function() {
             $.ajax({
                 type: ajax.type,
                 url: ajax.url,
-                data: ajax.data,
                 success: ajaxCallback,
                 fakeSuccessArguments: [{next: "stop"}],
                 // no error, fail silently
