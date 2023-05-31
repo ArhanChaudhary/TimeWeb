@@ -18,7 +18,9 @@ class DefineUTCOffset:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.method == "POST":
+        if request.method == "GET":
+            request.utc_offset = request.GET.get("utc_offset")
+        elif request.method == "POST":
             request.utc_offset = request.POST.get("utc_offset")
         elif request.method in ("DELETE", "PATCH"):
             request.utc_offset = QueryDict(request.body).get("utc_offset")

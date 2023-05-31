@@ -216,8 +216,8 @@ changeSetting: function(kwargs={}) {
 },
 createGCAssignments: function() {
     const ajaxs = [
-        {type: "POST", url: '/api/create-gc-assignments'},
-        {type: "POST", url: '/api/update-gc-courses'},
+        {type: "GET", url: '/api/create-gc-assignments'},
+        {type: "GET", url: '/api/update-gc-courses'},
     ];
     let ajaxCallback = function(response) {
         if (response.invalid_credentials) {
@@ -270,7 +270,6 @@ createGCAssignments: function() {
             $.ajax({
                 type: ajax.type,
                 url: ajax.url,
-                data: ajax.data,
                 success: ajaxCallback,
                 fakeSuccessArguments: [{next: "stop"}],
                 // no error, fail silently

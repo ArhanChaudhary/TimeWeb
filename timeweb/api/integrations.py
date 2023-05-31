@@ -163,7 +163,7 @@ class MemoryCache(Cache):
     def set(self, url, content):
         MemoryCache._CACHE[url] = content
 
-@require_http_methods(["POST"])
+@require_http_methods(["GET"])
 def update_gc_courses(request):
     # NOTE: we cannot simply run this in create_gc_assignments after the response is sent because
     # we want to be able to alert the user if their credentials for listing courses is invalid
@@ -233,7 +233,7 @@ def simplify_courses(courses, include_name=True):
 
 # https://stackoverflow.com/a/65428098/12230735
 @sync_to_async
-@require_http_methods(["POST"])
+@require_http_methods(["GET"])
 @async_to_sync
 async def create_gc_assignments(request):
     await sync_to_async(lambda: request.user.settingsmodel)()
