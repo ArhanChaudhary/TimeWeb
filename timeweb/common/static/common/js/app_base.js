@@ -216,10 +216,8 @@ changeSetting: function(kwargs={}) {
 },
 createGCAssignments: function() {
     const ajaxs = [
-        {type: "POST", url: '/api/create-gc-assignments', data: {order: "descending"}},
-        {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
+        {type: "POST", url: '/api/create-gc-assignments'},
         {type: "POST", url: '/api/update-gc-courses'},
-        {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
     ];
     let ajaxCallback = function(response) {
         if (response.invalid_credentials) {

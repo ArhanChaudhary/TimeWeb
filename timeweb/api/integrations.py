@@ -15,6 +15,8 @@ from timewebapp.models import TimewebModel
 from timewebapp.views import EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT
 
 # Google API
+import asyncio
+from asgiref.sync import sync_to_async, async_to_sync
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import Flow
@@ -220,7 +222,7 @@ def update_gc_courses(request):
         # new_courses = [1,2,5] (you leave two classes and join a new one)
         # In this case, create_gc_assignments again
         if not set(course['id'] for course in new_courses).issubset(set(course['id'] for course in old_courses)):
-            return create_gc_assignments(request, "descending")
+            return async_to_sync(create_gc_assignments)(request)
     return JsonResponse({"next": "stop"})
 
 def simplify_courses(courses, include_name=True):
@@ -229,9 +231,14 @@ def simplify_courses(courses, include_name=True):
                 "name": simplify_course_name(course["name"]) if include_name else None,
             } for course in courses]
 
+# https://stackoverflow.com/a/65428098/12230735
+@sync_to_async
 @require_http_methods(["POST"])
-def create_gc_assignments(request, order=None):
-    if 'token' not in request.user.settingsmodel.oauth_token: return HttpResponse(status=401)
+@async_to_sync
+async def create_gc_assignments(request):
+    await sync_to_async(lambda: request.user.settingsmodel)()
+    if 'token' not in request.user.settingsmodel.oauth_token:
+        return HttpResponse(status=401)
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
@@ -256,10 +263,10 @@ def create_gc_assignments(request, order=None):
             return JsonResponse({"next": "continue"})
         else:
             request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
-            request.user.settingsmodel.save(update_fields=("oauth_token", ))
+            await sync_to_async(request.user.settingsmodel.save)(update_fields=("oauth_token", ))
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
 
-    def add_gc_assignments_from_response(response_id, course_coursework, exception):
+    def add_gc_assignments_from_response(course_coursework, order, exception):
         # it is possible for this function to process courses that are in the cache but archived
         # this does not matter
         if exception is not None:
@@ -432,26 +439,26 @@ def create_gc_assignments(request, order=None):
     # Ordering by due date descending puts assignments without due dates at the very bottom, so if we limit the number
     # of assignments its possible for them to get overlooked
     # So, we are forced to make a second request this time in ascending order to add assignments without due dates
-    order = request.POST.get('order', order)
-    if order == "descending":
-        order = "desc"
-        page_size = MAX_DESCENDING_COURSEWORK_PAGE_SIZE
-    elif order == "ascending":
-        order = "asc"
-        page_size = MAX_ASCENDING_COURSEWORK_PAGE_SIZE
+    async def fetch_coursework(*, order, page_size):
+        batch = service.new_batch_http_request(
+            callback=lambda response_id, course_coursework, exception: add_gc_assignments_from_response(course_coursework, order, exception)
+        )
+        for course in request.user.settingsmodel.gc_courses_cache:
+            # NOTE: we don't need to set courseWorkStates because
+            # from https://developers.google.com/classroom/reference/rest/v1/courses.courseWork/list#description
+            # "Course students may only view PUBLISHED course work. Course teachers and domain administrators may view all course work."
+            batch.add(coursework_lazy.list(courseId=course["id"], orderBy=f"dueDate {order}", pageSize=page_size))
+        await sync_to_async(batch.execute)()
     coursework_lazy = service.courses().courseWork()
-    batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
-    for course in request.user.settingsmodel.gc_courses_cache:
-        # NOTE: we don't need to set courseWorkStates because
-        # from https://developers.google.com/classroom/reference/rest/v1/courses.courseWork/list#description
-        # "Course students may only view PUBLISHED course work. Course teachers and domain administrators may view all course work."
-        batch.add(coursework_lazy.list(courseId=course["id"], orderBy=f"dueDate {order}", pageSize=page_size))
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
     cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
     gc_model_data = []
     try:
-        batch.execute()
+        await asyncio.gather(
+            fetch_coursework(order="asc", page_size=MAX_ASCENDING_COURSEWORK_PAGE_SIZE),
+            fetch_coursework(order="desc", page_size=MAX_DESCENDING_COURSEWORK_PAGE_SIZE),
+        )
     except RefreshError:
         return JsonResponse({
             'invalid_credentials': True,
@@ -486,9 +493,9 @@ def create_gc_assignments(request, order=None):
         # y is missing
         "y": None,
     }
-    request.user.settingsmodel.save(update_fields=("added_gc_assignment_ids", ))
+    await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_gc_assignment_ids", ))
     created = [TimewebModel(**assignment | static_gc_model_fields) for assignment in gc_model_data]
-    TimewebModel.objects.bulk_create(created)
+    await sync_to_async(TimewebModel.objects.bulk_create)(created)
     return JsonResponse({
         "assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created],
         "update_state": True,
