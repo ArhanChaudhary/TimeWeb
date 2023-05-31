@@ -7,7 +7,7 @@ from django.core.validators import MinValueValidator
 from colorfield.fields import ColorField
 from multiselectfield import MultiSelectField
 from multiselectfield.utils import get_max_length
-from encrypted_json_fields.fields import EncryptedJSONField
+from encrypted_json_fields.fields import EncryptedJSONField, EncryptedCharField
 
 from timewebapp.models import (
     empty_list,
@@ -72,6 +72,8 @@ FONTS = (
 )
 
 MAX_FONTS_LENGTH = len(max([i[0] for i in FONTS], key=len))
+
+MAX_CANVAS_TOKEN_LENGTH = 69
 
 class SettingsModel(models.Model):
     # Group "Assignment Deletion"
@@ -232,6 +234,11 @@ class SettingsModel(models.Model):
     # Custom field validation in views: excluded in SettingsForm.Meta.exclude in change_setting
     gc_courses_cache = models.JSONField(
         default=empty_list,
+        blank=True,
+    )
+    canvas_token = EncryptedCharField(
+        max_length=MAX_CANVAS_TOKEN_LENGTH,
+        null=True,
         blank=True,
     )
     seen_latest_changelog = models.BooleanField(
