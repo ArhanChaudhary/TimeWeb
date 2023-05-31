@@ -18,22 +18,25 @@ class APIValidationMiddleware:
         if not request.user.is_authenticated:
             return HttpResponse(status=401)
         
-        if request.method in ("POST", "DELETE", "PATCH"):
-            if request.method == "POST":
+        if request.method in ("GET", "POST", "DELETE", "PATCH"):
+            if request.method == "GET":
+                body = request.GET
+            elif request.method == "POST":
                 body = request.POST
             else:
                 body = QueryDict(request.body)
-            device_uuid = body['device_uuid']
-            tab_creation_time = body['tab_creation_time']
-            same_device = device_uuid == request.user.settingsmodel.device_uuid
-            created_tab_after_last_api_call = int(tab_creation_time)/1000 > request.user.settingsmodel.device_uuid_api_timestamp.timestamp()
-            should_reload = not same_device and not created_tab_after_last_api_call
-            if should_reload:
-                # don't update device_uuid and device_uuid_api_timestamp
-                # this would mean we are communicating to the database that
-                # this invalid and outdated request was a valid api call
-                # that servers as the most recent api call
-                return HttpResponse(status=409)
+            device_uuid = body.get('device_uuid')
+            tab_creation_time = body.get('tab_creation_time')
+            if device_uuid and tab_creation_time:
+                same_device = device_uuid == request.user.settingsmodel.device_uuid
+                created_tab_after_last_api_call = int(tab_creation_time)/1000 > request.user.settingsmodel.device_uuid_api_timestamp.timestamp()
+                should_reload = not same_device and not created_tab_after_last_api_call
+                if should_reload:
+                    # don't update device_uuid and device_uuid_api_timestamp
+                    # this would mean we are communicating to the database that
+                    # this invalid and outdated request was a valid api call
+                    # that servers as the most recent api call
+                    return HttpResponse(status=409)
 
         res = self.get_response(request)
         if (
