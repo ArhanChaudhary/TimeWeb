@@ -270,6 +270,7 @@ async def create_gc_assignments(request):
             await sync_to_async(request.user.settingsmodel.save)(update_fields=("oauth_token", ))
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
 
+    gc_model_data = []
     def add_gc_assignments_from_response(course_coursework, order, exception):
         # it is possible for this function to process courses that are in the cache but archived
         # this does not matter
@@ -443,6 +444,8 @@ async def create_gc_assignments(request):
     # Ordering by due date descending puts assignments without due dates at the very bottom, so if we limit the number
     # of assignments its possible for them to get overlooked
     # So, we are forced to make a second request this time in ascending order to add assignments without due dates
+    loop = asyncio.get_event_loop()
+    coursework_lazy = service.courses().courseWork()
     async def fetch_coursework(*, order, page_size):
         batch = service.new_batch_http_request(
             callback=lambda response_id, course_coursework, exception: add_gc_assignments_from_response(course_coursework, order, exception)
@@ -452,12 +455,10 @@ async def create_gc_assignments(request):
             # from https://developers.google.com/classroom/reference/rest/v1/courses.courseWork/list#description
             # "Course students may only view PUBLISHED course work. Course teachers and domain administrators may view all course work."
             batch.add(coursework_lazy.list(courseId=course["id"], orderBy=f"dueDate {order}", pageSize=page_size))
-        await sync_to_async(batch.execute)()
-    coursework_lazy = service.courses().courseWork()
+        await loop.run_in_executor(None, batch.execute)
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
     cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
-    gc_model_data = []
     try:
         await asyncio.gather(
             fetch_coursework(order="asc", page_size=MAX_ASCENDING_COURSEWORK_PAGE_SIZE),
