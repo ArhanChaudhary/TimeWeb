@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // do not use decodeURIComponent, it will break the url with ampersands in it
         // we cannot use Object.fromEntries(new UrlSearchParams(options.data)) because
         // break_days may be a duplicate key which isnt allowed in an object
-        options.data += '&' + $.param({
+        options.data = (options.data ? `${options.data}&` : '') + $.param({
             device_uuid: window.DEVICE_UUID,
             tab_creation_time: window.TAB_CREATION_TIME,
             utc_offset: Intl.DateTimeFormat().resolvedOptions().timeZone,
