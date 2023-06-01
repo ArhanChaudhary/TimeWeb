@@ -43,6 +43,21 @@ from django.utils.text import Truncator
 MAX_DESCENDING_COURSEWORK_PAGE_SIZE = 15
 MAX_ASCENDING_COURSEWORK_PAGE_SIZE = 35
 
+COURSEWORK_API_FIELDS = (
+    "alternateLink",
+    "courseId",
+    "creationTime",
+    "description",
+    "dueDate",
+    "dueTime",
+    "id",
+    "title",
+)
+COURSE_API_FIELDS = (
+    "name",
+    "id",
+)
+
 def simplify_course_name(tag_name):
     abbreviations = [
         (r"(rec)ommendation", r"\1"),
@@ -174,7 +189,7 @@ def update_gc_courses(request):
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
     try:
         # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
-        courses = service.courses().list(courseStates=["ACTIVE"]).execute()
+        courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in COURSE_API_FIELDS)).execute()
     except RefreshError:
         return JsonResponse({
             'invalid_credentials': True,
@@ -450,7 +465,12 @@ async def create_gc_assignments(request):
             # NOTE: we don't need to set courseWorkStates because
             # from https://developers.google.com/classroom/reference/rest/v1/courses.courseWork/list#description
             # "Course students may only view PUBLISHED course work. Course teachers and domain administrators may view all course work."
-            batch.add(coursework_lazy.list(courseId=course["id"], orderBy=f"dueDate {order}", pageSize=page_size))
+            batch.add(coursework_lazy.list(
+                courseId=course["id"],
+                orderBy=f"dueDate {order}",
+                pageSize=page_size,
+                fields=",".join(f"courseWork/{i}" for i in COURSEWORK_API_FIELDS)
+            ))
         await loop.run_in_executor(None, batch.execute)
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
@@ -600,7 +620,7 @@ def gc_auth_callback(request):
     # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
     # I don't need to worry about Ratelimit errors either because such a situation would be very rare
     try:
-        courses = service.courses().list(courseStates=["ACTIVE"]).execute()
+        courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in COURSE_API_FIELDS)).execute()
     except TimeoutError:
         return callback_failed()
     courses = courses.get('courses', [])
