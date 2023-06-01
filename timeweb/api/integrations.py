@@ -620,6 +620,10 @@ def gc_auth_callback(request):
 def create_canvas_assignments(request):
     canvas = Canvas(url, token)
 
+    # clone and run locally: https://github.com/instructure/canvas-lms
+    # create developer key reference: https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-developer-keys-for-an-account/ta-p/249
+    # oauth spec reference: https://canvas.instructure.com/doc/api/file.oauth.html
+    # django implementation reference: https://django-oauth-toolkit.readthedocs.io/en/latest/rest-framework/getting_started.html
     for course in canvas.get_current_user().get_courses(enrollment_state='active'):
         for assignment in course.get_assignments():
             print(assignment)
