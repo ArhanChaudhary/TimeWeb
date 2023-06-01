@@ -236,9 +236,8 @@ class SettingsModel(models.Model):
         default=empty_list,
         blank=True,
     )
-    canvas_token = EncryptedCharField(
-        max_length=MAX_CANVAS_TOKEN_LENGTH,
-        null=True,
+    canvas_token = EncryptedJSONField(
+        default=empty_dict,
         blank=True,
     )
     seen_latest_changelog = models.BooleanField(
