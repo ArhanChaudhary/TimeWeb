@@ -644,8 +644,10 @@ def gc_auth_callback(request):
     del request.session["gc-callback-current-url"]
     return redirect(request.session.pop("gc-callback-next-url"))
 
+@sync_to_async
 @require_http_methods(["POST"])
-def create_canvas_assignments(request):
+@async_to_sync
+async def create_canvas_assignments(request):
     canvas = Canvas(url, token)
 
     # clone and run locally: https://github.com/instructure/canvas-lms
