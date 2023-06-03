@@ -47,6 +47,21 @@ from django.utils.text import Truncator
 MAX_DESCENDING_COURSEWORK_PAGE_SIZE = 15
 MAX_ASCENDING_COURSEWORK_PAGE_SIZE = 35
 
+COURSEWORK_API_FIELDS = (
+    "alternateLink",
+    "courseId",
+    "creationTime",
+    "description",
+    "dueDate",
+    "dueTime",
+    "id",
+    "title",
+)
+COURSE_API_FIELDS = (
+    "name",
+    "id",
+)
+
 def simplify_course_name(tag_name):
     abbreviations = [
         (r"(rec)ommendation", r"\1"),
@@ -178,7 +193,7 @@ def update_gc_courses(request):
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
     try:
         # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
-        courses = service.courses().list(courseStates=["ACTIVE"]).execute()
+        courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in COURSE_API_FIELDS)).execute()
     except RefreshError:
         return JsonResponse({
             'invalid_credentials': True,
@@ -270,8 +285,7 @@ async def create_gc_assignments(request):
             await sync_to_async(request.user.settingsmodel.save)(update_fields=("oauth_token", ))
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
 
-    gc_model_data = []
-    def add_gc_assignments_from_response(course_coursework, order, exception):
+    def add_gc_assignments_from_response(*, response_model_data, course_coursework, order, exception):
         # it is possible for this function to process courses that are in the cache but archived
         # this does not matter
         if exception is not None:
@@ -413,7 +427,7 @@ async def create_gc_assignments(request):
                 x = x.replace(tzinfo=timezone.utc)
             if assignment_date:
                 assignment_date = assignment_date.replace(tzinfo=timezone.utc)
-            gc_model_data.append({
+            response_model_data.append({
                 # from api, can change
                 "name": name,
                 "assignment_date": assignment_date,
@@ -447,23 +461,36 @@ async def create_gc_assignments(request):
     loop = asyncio.get_event_loop()
     coursework_lazy = service.courses().courseWork()
     async def fetch_coursework(*, order, page_size):
+        response_model_data = []
         batch = service.new_batch_http_request(
-            callback=lambda response_id, course_coursework, exception: add_gc_assignments_from_response(course_coursework, order, exception)
+            callback=lambda _, course_coursework, exception: 
+                add_gc_assignments_from_response(
+                    response_model_data=response_model_data,
+                    course_coursework=course_coursework,
+                    order=order,
+                    exception=exception,
+                )
         )
         for course in request.user.settingsmodel.gc_courses_cache:
             # NOTE: we don't need to set courseWorkStates because
             # from https://developers.google.com/classroom/reference/rest/v1/courses.courseWork/list#description
             # "Course students may only view PUBLISHED course work. Course teachers and domain administrators may view all course work."
-            batch.add(coursework_lazy.list(courseId=course["id"], orderBy=f"dueDate {order}", pageSize=page_size))
+            batch.add(coursework_lazy.list(
+                courseId=course["id"],
+                orderBy=f"dueDate {order}",
+                pageSize=page_size,
+                fields=",".join(f"courseWork/{i}" for i in COURSEWORK_API_FIELDS)
+            ))
         await loop.run_in_executor(None, batch.execute)
+        return response_model_data
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
     cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
     try:
-        await asyncio.gather(
+        response_model_data = [response_model for response_models in asyncio.as_completed([
             fetch_coursework(order="asc", page_size=MAX_ASCENDING_COURSEWORK_PAGE_SIZE),
             fetch_coursework(order="desc", page_size=MAX_DESCENDING_COURSEWORK_PAGE_SIZE),
-        )
+        ]) for response_model in await response_models]
     except RefreshError:
         return JsonResponse({
             'invalid_credentials': True,
@@ -481,7 +508,7 @@ async def create_gc_assignments(request):
         # refer to the explanation in create_gc_assignments for more context
         return JsonResponse({"next": "stop"})
     cache.delete(concurrent_request_key)
-    if not gc_model_data:
+    if not response_model_data:
         return JsonResponse({"next": "continue"})
     static_gc_model_fields = {
         # from app
@@ -499,7 +526,7 @@ async def create_gc_assignments(request):
         "y": None,
     }
     await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_gc_assignment_ids", ))
-    created = [TimewebModel(**assignment | static_gc_model_fields) for assignment in gc_model_data]
+    created = [TimewebModel(**assignment | static_gc_model_fields) for assignment in response_model_data]
     await sync_to_async(TimewebModel.objects.bulk_create)(created)
     return JsonResponse({
         "assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created],
@@ -604,7 +631,7 @@ def gc_auth_callback(request):
     # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
     # I don't need to worry about Ratelimit errors either because such a situation would be very rare
     try:
-        courses = service.courses().list(courseStates=["ACTIVE"]).execute()
+        courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in COURSE_API_FIELDS)).execute()
     except TimeoutError:
         return callback_failed()
     courses = courses.get('courses', [])
