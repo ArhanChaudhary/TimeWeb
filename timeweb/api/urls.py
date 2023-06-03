@@ -8,8 +8,8 @@ urlpatterns = [
     path("save-assignment/", views.save_assignment, name="save_assignment"),
     path("change-setting/", views.change_setting, name="change_setting"),
     path("evaluate-current-state/", views.evaluate_current_state, name="evaluate_changed_state"),
-    path("create-gc-assignments/", integrations.create_gc_assignments, name="create_gc_assignments"),
-    path("update-gc-courses/", integrations.update_gc_courses, name="update_gc_courses"),
+    path("create-integration-assignments/", integrations.create_integration_assignments, name="create_gc_assignments"),
+    path("update-integration-courses/", integrations.update_integration_courses, name="update_gc_courses"),
     path("gc-auth-callback/", integrations.gc_auth_callback, name="gc_auth_callback"),
 ]
 INCLUDE_IN_STATE_EVALUATION = ("submit_assignment", "delete_assignment",

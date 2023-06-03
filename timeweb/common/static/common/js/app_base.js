@@ -214,15 +214,16 @@ changeSetting: function(kwargs={}) {
         error: ajaxUtils.error,
     });
 },
-createGCAssignments: function() {
+createIntegrationAssignments: function() {
     const ajaxs = [
-        {type: "GET", url: '/api/create-gc-assignments'},
-        {type: "GET", url: '/api/update-gc-courses'},
+        {type: "GET", url: '/api/create-integration-assignments'},
+        {type: "GET", url: '/api/update-integration-courses'},
     ];
     let ajaxCallback = function(response) {
         if (response.invalid_credentials) {
             $.alert({
                 title: "Invalid credentials.",
+                // gc or canvas
                 content: "Your Google Classroom integration credentials are invalid. Please reauthenticate or disable the integration.",
                 buttons: {
                     ok: {
@@ -241,14 +242,6 @@ createGCAssignments: function() {
                 }
             });
         }
-        // indicates: this ajax means we have to terminate everything and
-        // restart the later queue from the beginning
-
-        // raised if:
-        // concurrent requests are made
-        // update-gc-courses doesn't add any new courses (saves last ajax)
-        // credentials are invalid
-        if (response.next === "stop") return;
 
         // indicates: this ajax means google classroom assignments were
         // created
@@ -261,9 +254,17 @@ createGCAssignments: function() {
             new Priority().sort();
         }
 
+        // indicates: this ajax means we have to terminate everything and
+        // restart the later queue from the beginning
+
+        // raised if:
+        // concurrent requests are made
+        // update-gc-courses doesn't add any new courses (saves last ajax)
+        // credentials are invalid
+        if (response.next === "stop") return;
         // indicates: this ajax didn't create any assignments, go to the next
         // ajax in ajaxs
-        if (response.next === "continue") {
+        else if (response.next === "continue") {
             let ajax = ajaxs.shift();
             if (!ajax) return;
 

@@ -190,29 +190,29 @@ def update_gc_courses(request):
     credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.oauth_token, settings.GC_SCOPES)
     if not credentials.valid:
         # rest this logic on create_gc_assignments, idrc if its invalid here
-        return JsonResponse({"next": "continue"})
+        return {"next": "continue"}
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
     try:
         # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
         courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in COURSE_API_FIELDS)).execute()
     except RefreshError:
-        return JsonResponse({
+        return {
             'invalid_credentials': True,
             'reauthorization_url': gc_auth_enable(request, next_url="home", current_url="home"),
             'next': 'stop',
-        })
+        }
     # If connection to the server randomly dies (could happen locally when wifi is off)
     except (ServerNotFoundError, TimeoutError):
-        return JsonResponse({"next": "continue"})
+        return {"next": "continue"}
     except HttpError as e:
         if e.status_code == 429:
             # Ratelimited, don't care
-            return JsonResponse({"next": "continue"})
+            return {"next": "continue"}
         if e.status_code >= 500:
             # this happened one time:
             # googleapiclient.errors.HttpError: <HttpError 503 when requesting https://classroom.googleapis.com/v1/courses?alt=json returned "The service is currently unavailable.". Details: "The service is currently unavailable.">
             logger.error(e)
-            return JsonResponse({"next": "continue"})
+            return {"next": "continue"}
         raise e
     courses = courses.get('courses', [])
     old_courses = request.user.settingsmodel.gc_courses_cache
@@ -243,7 +243,7 @@ def update_gc_courses(request):
         # In this case, create_gc_assignments again
         if not set(course['id'] for course in new_courses).issubset(set(course['id'] for course in old_courses)):
             return async_to_sync(create_gc_assignments)(request)
-    return JsonResponse({"next": "stop"})
+    return {"next": "stop"}
 
 def simplify_courses(courses, include_name=True):
     return [{
@@ -273,14 +273,14 @@ async def create_gc_assignments(request):
             credentials.refresh(Request())
         except RefreshError:
             # In case users manually revoke access to their oauth scopes after authorizing
-            return JsonResponse({
+            return {
                 'invalid_credentials': True,
                 'reauthorization_url': gc_auth_enable(request, next_url="home", current_url="home"),
                 'next': 'stop',
-            })
+            }
         # If connection to the server randomly dies (could happen locally when wifi is off)
         except TransportError:
-            return JsonResponse({"next": "continue"})
+            return {"next": "continue"}
         else:
             request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
             await sync_to_async(request.user.settingsmodel.save)(update_fields=("oauth_token", ))
@@ -493,11 +493,11 @@ async def create_gc_assignments(request):
             fetch_coursework(order="desc", page_size=MAX_DESCENDING_COURSEWORK_PAGE_SIZE),
         ]) for response_model in await response_models]
     except RefreshError:
-        return JsonResponse({
+        return {
             'invalid_credentials': True,
             'reauthorization_url': gc_auth_enable(request, next_url="home", current_url="home"),
             'next': 'stop',
-        })
+        }
     # If connection to the server randomly dies (could happen locally when wifi is off)
     except (ServerNotFoundError, TimeoutError):
         pass
@@ -507,10 +507,10 @@ async def create_gc_assignments(request):
         # request.user.settingsmodel.save() is thread-safe, bulk_create runs directly
         # through the ORM is not
         # refer to the explanation in create_gc_assignments for more context
-        return JsonResponse({"next": "stop"})
+        return {"next": "stop"}
     cache.delete(concurrent_request_key)
     if not response_model_data:
-        return JsonResponse({"next": "continue"})
+        return {"next": "continue"}
     static_gc_model_fields = {
         # from app
         "skew_ratio": request.user.settingsmodel.def_skew_ratio,
@@ -529,11 +529,11 @@ async def create_gc_assignments(request):
     await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_gc_assignment_ids", ))
     created = [TimewebModel(**assignment | static_gc_model_fields) for assignment in response_model_data]
     await sync_to_async(TimewebModel.objects.bulk_create)(created)
-    return JsonResponse({
+    return {
         "assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created],
         "update_state": True,
         "next": "continue",
-    })
+    }
 
 def generate_gc_authorization_url(request, *, next_url, current_url):
     flow = Flow.from_client_config(
@@ -645,7 +645,32 @@ def gc_auth_callback(request):
     return redirect(request.session.pop("gc-callback-next-url"))
 
 @sync_to_async
-@require_http_methods(["POST"])
+@require_http_methods(["GET"])
+@async_to_sync
+async def create_integration_assignments(request):
+    return JsonResponse({
+        key: value for response_json in asyncio.as_completed(
+            [
+                create_gc_assignments(request),
+                # create_canvas_assignments(request)
+            ]
+        ) for key, value in (await response_json).items()
+    })
+
+@sync_to_async
+@require_http_methods(["GET"])
+@async_to_sync
+async def update_integration_courses(request):
+    return JsonResponse({
+        key: value for response_json in asyncio.as_completed(
+            [
+                sync_to_async(update_gc_courses)(request),
+            ]
+        ) for key, value in (await response_json).items()
+    })
+
+@sync_to_async
+@require_http_methods(["GET"])
 @async_to_sync
 async def create_canvas_assignments(request):
     canvas = Canvas(settings.CANVAS_URL, settings.CANVAS_TOKEN)
