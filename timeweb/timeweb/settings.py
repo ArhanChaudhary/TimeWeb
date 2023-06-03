@@ -378,3 +378,8 @@ LOGGING = {
         },
     },
 }
+
+
+import os
+CANVAS_URL = os.environ.get("CANVAS_URL")
+CANVAS_TOKEN = os.environ.get("CANVAS_TOKEN")
