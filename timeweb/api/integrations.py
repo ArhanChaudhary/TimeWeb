@@ -281,8 +281,7 @@ async def create_gc_assignments(request):
             await sync_to_async(request.user.settingsmodel.save)(update_fields=("oauth_token", ))
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
 
-    gc_model_data = []
-    def add_gc_assignments_from_response(course_coursework, order, exception):
+    def add_gc_assignments_from_response(*, response_model_data, course_coursework, order, exception):
         # it is possible for this function to process courses that are in the cache but archived
         # this does not matter
         if exception is not None:
@@ -424,7 +423,7 @@ async def create_gc_assignments(request):
                 x = x.replace(tzinfo=timezone.utc)
             if assignment_date:
                 assignment_date = assignment_date.replace(tzinfo=timezone.utc)
-            gc_model_data.append({
+            response_model_data.append({
                 # from api, can change
                 "name": name,
                 "assignment_date": assignment_date,
@@ -458,8 +457,15 @@ async def create_gc_assignments(request):
     loop = asyncio.get_event_loop()
     coursework_lazy = service.courses().courseWork()
     async def fetch_coursework(*, order, page_size):
+        response_model_data = []
         batch = service.new_batch_http_request(
-            callback=lambda response_id, course_coursework, exception: add_gc_assignments_from_response(course_coursework, order, exception)
+            callback=lambda _, course_coursework, exception: 
+                add_gc_assignments_from_response(
+                    response_model_data=response_model_data,
+                    course_coursework=course_coursework,
+                    order=order,
+                    exception=exception,
+                )
         )
         for course in request.user.settingsmodel.gc_courses_cache:
             # NOTE: we don't need to set courseWorkStates because
@@ -472,14 +478,15 @@ async def create_gc_assignments(request):
                 fields=",".join(f"courseWork/{i}" for i in COURSEWORK_API_FIELDS)
             ))
         await loop.run_in_executor(None, batch.execute)
+        return response_model_data
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
     cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
     try:
-        await asyncio.gather(
+        response_model_data = [response_model for response_models in asyncio.as_completed([
             fetch_coursework(order="asc", page_size=MAX_ASCENDING_COURSEWORK_PAGE_SIZE),
             fetch_coursework(order="desc", page_size=MAX_DESCENDING_COURSEWORK_PAGE_SIZE),
-        )
+        ]) for response_model in await response_models]
     except RefreshError:
         return JsonResponse({
             'invalid_credentials': True,
@@ -497,7 +504,7 @@ async def create_gc_assignments(request):
         # refer to the explanation in create_gc_assignments for more context
         return JsonResponse({"next": "stop"})
     cache.delete(concurrent_request_key)
-    if not gc_model_data:
+    if not response_model_data:
         return JsonResponse({"next": "continue"})
     static_gc_model_fields = {
         # from app
@@ -515,7 +522,7 @@ async def create_gc_assignments(request):
         "y": None,
     }
     await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_gc_assignment_ids", ))
-    created = [TimewebModel(**assignment | static_gc_model_fields) for assignment in gc_model_data]
+    created = [TimewebModel(**assignment | static_gc_model_fields) for assignment in response_model_data]
     await sync_to_async(TimewebModel.objects.bulk_create)(created)
     return JsonResponse({
         "assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created],
