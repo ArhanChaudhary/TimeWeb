@@ -659,7 +659,7 @@ async def create_integration_assignments(request):
         key: value for response_json in asyncio.as_completed(
             [
                 create_gc_assignments(request),
-                # create_canvas_assignments(request)
+                create_canvas_assignments(request),
             ]
         ) for key, value in (await response_json).items()
     })
@@ -687,9 +687,16 @@ async def create_canvas_assignments(request):
     # create developer key reference: https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-developer-keys-for-an-account/ta-p/249
     # oauth spec reference: https://canvas.instructure.com/doc/api/file.oauth.html
     # django implementation reference: https://github.dev/Harvard-University-iCommons/django-canvas-oauth/tree/master/canvas_oauth
-    # for course in canvas.get_current_user().get_courses(enrollment_state='active'):
-    for assignment in Course(canvas._Canvas__requester, {'id': id_}).get_assignments():
-        print(assignment)
+    await sync_to_async(lambda: request.user.settingsmodel)()
+    loop = asyncio.get_event_loop()
+    async def get_coursework_model_data(course_id):
+        return await loop.run_in_executor(None, lambda: list(Course(canvas._Canvas__requester, {'id': course_id}).get_assignments(
+            # order_by='due_at', doesn't work because response order is from oldest to soonest and then no due date
+            # bucket=("undated", "upcoming", "future"), doesn't work because canvas api only supports one string parameter for bucket
+        )))
+    response_model_data = [response_model for response_models in asyncio.as_completed([
+        get_coursework_model_data(course_id['id']) for course_id in request.user.settingsmodel.canvas_courses_cache*10
+    ]) for response_model in await response_models]
 
 @require_http_methods(["GET"])
 def update_canvas_courses(request):
