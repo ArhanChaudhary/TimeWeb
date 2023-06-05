@@ -644,6 +644,12 @@ def gc_auth_callback(request):
     del request.session["gc-callback-current-url"]
     return redirect(request.session.pop("gc-callback-next-url"))
 
+def format_canvas_courses(courses, include_name=True):
+    return [{
+                "id": course.id,
+                "name": simplify_course_name(course.name) if include_name else None,
+            } for course in courses]
+
 @sync_to_async
 @require_http_methods(["GET"])
 @async_to_sync
@@ -665,6 +671,7 @@ async def update_integration_courses(request):
         key: value for response_json in asyncio.as_completed(
             [
                 sync_to_async(update_gc_courses)(request),
+                sync_to_async(update_canvas_courses)(request)
             ]
         ) for key, value in (await response_json).items()
     })
@@ -682,3 +689,18 @@ async def create_canvas_assignments(request):
     # for course in canvas.get_current_user().get_courses(enrollment_state='active'):
     for assignment in Course(canvas._Canvas__requester, {'id': id_}).get_assignments():
         print(assignment)
+
+@require_http_methods(["GET"])
+def update_canvas_courses(request):
+    canvas = Canvas(settings.CANVAS_URL, settings.CANVAS_TOKEN)
+
+    courses = list(canvas.get_courses(enrollment_state='active', state=['available']))
+
+    old_courses = request.user.settingsmodel.canvas_courses_cache
+    new_courses = format_canvas_courses(courses, include_name=False)
+    if len(old_courses) != len(new_courses) or any(old_course["id"] != new_course["id"] for old_course, new_course in zip(old_courses, new_courses)):
+        request.user.settingsmodel.canvas_courses_cache = format_canvas_courses(courses)
+        request.user.settingsmodel.save(update_fields=("canvas_courses_cache", ))
+        if not set(course['id'] for course in new_courses).issubset(set(course['id'] for course in old_courses)):
+            return async_to_sync(create_canvas_assignments)(request)
+    return {"next": "stop"}
