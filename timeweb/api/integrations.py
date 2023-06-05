@@ -268,10 +268,10 @@ def format_gc_courses(courses, include_name=True):
                 "name": simplify_course_name(course["name"]) if include_name else None,
             } for course in courses]
 
-# https://stackoverflow.com/a/65428098/12230735
-@sync_to_async
-@require_http_methods(["GET"])
-@async_to_sync
+# @sync_to_async
+# @require_http_methods(["GET"])
+# @async_to_sync
+# reminder: do not use this because thread_sensitive is True by default
 async def create_gc_assignments(request):
     await sync_to_async(lambda: request.user.settingsmodel)()
     if 'token' not in request.user.settingsmodel.oauth_token:
@@ -678,9 +678,10 @@ async def update_integration_courses(request):
         ) for key, value in (await response_json).items()
     })
 
-@sync_to_async
-@require_http_methods(["GET"])
-@async_to_sync
+# @sync_to_async
+# @require_http_methods(["GET"])
+# @async_to_sync
+# reminder: do not use this because thread_sensitive is True by default
 async def create_canvas_assignments(request):
     canvas = Canvas(settings.CANVAS_URL, settings.CANVAS_TOKEN)
 
