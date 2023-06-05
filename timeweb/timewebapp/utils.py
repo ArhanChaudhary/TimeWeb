@@ -83,7 +83,7 @@ def update_gc_courses_cache():
     This function is manually invoked to update every user's gc_courses_cache
     """
     from django.conf import settings
-    from api.integrations import MemoryCache, simplify_courses
+    from api.integrations import MemoryCache, format_gc_courses
     from navbar.models import SettingsModel
     from google.oauth2.credentials import Credentials
     from google.auth.exceptions import RefreshError
@@ -105,7 +105,7 @@ def update_gc_courses_cache():
                 logger.error("Error with token: %s", e)
                 continue
             courses = courses.get('courses', [])
-            s.gc_courses_cache = simplify_courses(courses)
+            s.gc_courses_cache = format_gc_courses(courses)
     print("Success\n")
     for s in SettingsModel.objects.exclude(gc_courses_cache=[]):
         print(f"{s.user.username}: {s.gc_courses_cache}\n")

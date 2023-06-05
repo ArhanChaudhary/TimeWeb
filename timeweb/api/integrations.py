@@ -216,14 +216,14 @@ def update_gc_courses(request):
         raise e
     courses = courses.get('courses', [])
     old_courses = request.user.settingsmodel.gc_courses_cache
-    new_courses = simplify_courses(courses, include_name=False)
+    new_courses = format_gc_courses(courses, include_name=False)
     if len(old_courses) != len(new_courses) or any(old_course["id"] != new_course["id"] for old_course, new_course in zip(old_courses, new_courses)):
         # NOTE: request.user.settingsmodel is thread-safe
         # i.e if one thread calls .save while another thread is still blocked in the api request call,
         # the value of gc_courses_cache won't be affected by the .save and will still retain the original old value
         # this makes it so that we don't need to use a similar caching system to the one used in create_gc_assignments
         # as broken pipes no longer won't reload the user
-        request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
+        request.user.settingsmodel.gc_courses_cache = format_gc_courses(courses)
         request.user.settingsmodel.save(update_fields=("gc_courses_cache", ))
         # If old contains every element in new, then we don't need to create_gc_assignments again
         # As if all the elements of new are in old, then there are new classes to import assignment from.
@@ -245,7 +245,7 @@ def update_gc_courses(request):
             return async_to_sync(create_gc_assignments)(request)
     return {"next": "stop"}
 
-def simplify_courses(courses, include_name=True):
+def format_gc_courses(courses, include_name=True):
     return [{
                 "id": course["id"],
                 "name": simplify_course_name(course["name"]) if include_name else None,
@@ -286,7 +286,7 @@ async def create_gc_assignments(request):
             await sync_to_async(request.user.settingsmodel.save)(update_fields=("oauth_token", ))
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
 
-    def add_gc_assignments_from_response(*, response_model_data, course_coursework, order, exception):
+    def populate_response_model_data(*, response_model_data, course_coursework, order, exception):
         # it is possible for this function to process courses that are in the cache but archived
         # this does not matter
         if exception is not None:
@@ -461,11 +461,11 @@ async def create_gc_assignments(request):
     # So, we are forced to make a second request this time in ascending order to add assignments without due dates
     loop = asyncio.get_event_loop()
     coursework_lazy = service.courses().courseWork()
-    async def fetch_coursework(*, order, page_size):
+    async def get_coursework_batch_model_data(*, order, page_size):
         response_model_data = []
         batch = service.new_batch_http_request(
             callback=lambda _, course_coursework, exception: 
-                add_gc_assignments_from_response(
+                populate_response_model_data(
                     response_model_data=response_model_data,
                     course_coursework=course_coursework,
                     order=order,
@@ -489,8 +489,8 @@ async def create_gc_assignments(request):
     cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
     try:
         response_model_data = [response_model for response_models in asyncio.as_completed([
-            fetch_coursework(order="asc", page_size=MAX_ASCENDING_COURSEWORK_PAGE_SIZE),
-            fetch_coursework(order="desc", page_size=MAX_DESCENDING_COURSEWORK_PAGE_SIZE),
+            get_coursework_batch_model_data(order="asc", page_size=MAX_ASCENDING_COURSEWORK_PAGE_SIZE),
+            get_coursework_batch_model_data(order="desc", page_size=MAX_DESCENDING_COURSEWORK_PAGE_SIZE),
         ]) for response_model in await response_models]
     except RefreshError:
         return {
@@ -636,7 +636,7 @@ def gc_auth_callback(request):
     except TimeoutError:
         return callback_failed()
     courses = courses.get('courses', [])
-    request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
+    request.user.settingsmodel.gc_courses_cache = format_gc_courses(courses)
     # Use .update() (dict method) instead of = so the refresh token isnt overwritten
     request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
     request.user.settingsmodel.save(update_fields=("gc_courses_cache", "oauth_token"))
