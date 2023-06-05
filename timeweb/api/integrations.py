@@ -39,6 +39,8 @@ from canvasapi.course import Course
 from canvasapi.exceptions import InvalidAccessToken, RateLimitExceeded
 
 # Misc
+if settings.DEBUG:
+    import time
 import re
 import os
 import datetime
@@ -500,18 +502,28 @@ async def create_gc_assignments(request):
                 pageSize=page_size,
                 fields=",".join(f"courseWork/{i}" for i in COURSEWORK_API_FIELDS)
             ))
+        if settings.DEBUG:
+            logger.info(f"started gc order {order}")
+            t = time.time()
         batch.execute()
+        if settings.DEBUG:
+            logger.info(f"finished gc order {order} in {time.time() - t}")
         return response_model_data
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
     cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
     try:
+        if settings.DEBUG:
+            logger.info("started gc requests")
+            t = time.time()
         response_model_data = [response_model for response_models in asyncio.as_completed([
             loop.run_in_executor(None, lambda: get_coursework_batch_model_data(order=order, page_size=page_size)) for order, page_size in (
                 ("desc", MAX_DESCENDING_COURSEWORK_PAGE_SIZE),
                 ("asc", MAX_ASCENDING_COURSEWORK_PAGE_SIZE),
             )
         ]) for response_model in await response_models]
+        if settings.DEBUG:
+            logger.info(f"finished gc requests in {time.time() - t}")
     except RefreshError:
         return {
             'invalid_credentials': True,
@@ -659,7 +671,10 @@ def format_canvas_courses(courses, include_name=True):
 @require_http_methods(["GET"])
 @async_to_sync
 async def create_integration_assignments(request):
-    return JsonResponse({
+    if settings.DEBUG:
+        t = time.time()
+        logger.info("started integration requests")
+    ret = JsonResponse({
         key: value for response_json in asyncio.as_completed(
             [
                 create_gc_assignments(request),
@@ -667,6 +682,9 @@ async def create_integration_assignments(request):
             ]
         ) for key, value in (await response_json).items()
     })
+    if settings.DEBUG:
+        logger.info(f"finished integration requests in {time.time() - t}")
+    return ret
 
 @sync_to_async
 @require_http_methods(["GET"])
@@ -696,16 +714,27 @@ async def create_canvas_assignments(request):
     loop = asyncio.get_event_loop()
     def get_coursework_model_data(course_id):
         try:
-            return list(Course(canvas._Canvas__requester, {'id': course_id}).get_assignments(
+            if settings.DEBUG:
+                t = time.time()
+                logger.info(f"started for canvas course_id {course_id}")
+            ret = list(Course(canvas._Canvas__requester, {'id': course_id}).get_assignments(
                 order_by='due_at',
                 # bucket=("undated", "upcoming", "future"), doesn't work because canvas api only supports one string parameter for bucket
             ))
+            if settings.DEBUG:
+                logger.info(f"finished for canvas course_id {course_id} in {time.time() - t}")
+            return ret
         except ConnectionError:
             return []
     try:
+        if settings.DEBUG:
+            logger.info("started canvas api requests")
+            t = time.time()
         response_model_data = [format_response_data(response_model) for response_models in asyncio.as_completed([
             loop.run_in_executor(None, get_coursework_model_data, course_id['id']) for course_id in request.user.settingsmodel.canvas_courses_cache
         ]) for response_model in await response_models]
+        if settings.DEBUG:
+            logger.info(f"finished all canvas requests in {time.time() - t}")
     except InvalidAccessToken:
         pass
 
