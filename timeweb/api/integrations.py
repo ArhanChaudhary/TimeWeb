@@ -478,7 +478,7 @@ async def create_gc_assignments(request):
     # So, we are forced to make a second request this time in ascending order to add assignments without due dates
     loop = asyncio.get_event_loop()
     coursework_lazy = service.courses().courseWork()
-    async def get_coursework_batch_model_data(*, order, page_size):
+    def get_coursework_batch_model_data(*, order, page_size):
         response_model_data = []
         batch = service.new_batch_http_request(
             callback=lambda _, course_coursework, exception: 
@@ -499,15 +499,17 @@ async def create_gc_assignments(request):
                 pageSize=page_size,
                 fields=",".join(f"courseWork/{i}" for i in COURSEWORK_API_FIELDS)
             ))
-        await loop.run_in_executor(None, batch.execute)
+        batch.execute()
         return response_model_data
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
     cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
     try:
         response_model_data = [response_model for response_models in asyncio.as_completed([
-            get_coursework_batch_model_data(order="asc", page_size=MAX_ASCENDING_COURSEWORK_PAGE_SIZE),
-            get_coursework_batch_model_data(order="desc", page_size=MAX_DESCENDING_COURSEWORK_PAGE_SIZE),
+            loop.run_in_executor(None, lambda: get_coursework_batch_model_data(order=order, page_size=page_size)) for order, page_size in (
+                ("desc", MAX_DESCENDING_COURSEWORK_PAGE_SIZE),
+                ("asc", MAX_ASCENDING_COURSEWORK_PAGE_SIZE),
+            )
         ]) for response_model in await response_models]
     except RefreshError:
         return {
