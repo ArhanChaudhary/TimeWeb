@@ -702,9 +702,12 @@ async def create_canvas_assignments(request):
             ))
         except ConnectionError:
             return []
-    response_model_data = [format_response_data(response_model) for response_models in asyncio.as_completed([
-        loop.run_in_executor(None, get_coursework_model_data, course_id['id']) for course_id in request.user.settingsmodel.canvas_courses_cache
-    ]) for response_model in await response_models]
+    try:
+        response_model_data = [format_response_data(response_model) for response_models in asyncio.as_completed([
+            loop.run_in_executor(None, get_coursework_model_data, course_id['id']) for course_id in request.user.settingsmodel.canvas_courses_cache
+        ]) for response_model in await response_models]
+    except InvalidAccessToken:
+        pass
 
 @require_http_methods(["GET"])
 def update_canvas_courses(request):
