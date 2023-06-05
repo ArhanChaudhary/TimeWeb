@@ -693,11 +693,11 @@ async def create_canvas_assignments(request):
     # django implementation reference: https://github.dev/Harvard-University-iCommons/django-canvas-oauth/tree/master/canvas_oauth
     await sync_to_async(lambda: request.user.settingsmodel)()
     loop = asyncio.get_event_loop()
-    response_model_data = [response_model for response_models in asyncio.as_completed([
-        format_response_data(await loop.run_in_executor(None, lambda: list(Course(canvas._Canvas__requester, {'id': course_id['id']}).get_assignments(
+    response_model_data = [format_response_data(response_model) for response_models in asyncio.as_completed([
+        loop.run_in_executor(None, lambda: list(Course(canvas._Canvas__requester, {'id': course_id['id']}).get_assignments(
             order_by='due_at',
             # bucket=("undated", "upcoming", "future"), doesn't work because canvas api only supports one string parameter for bucket
-        )))) for course_id in request.user.settingsmodel.canvas_courses_cache
+        ))) for course_id in request.user.settingsmodel.canvas_courses_cache
     ]) for response_model in await response_models]
 
 @require_http_methods(["GET"])
