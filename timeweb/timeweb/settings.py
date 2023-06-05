@@ -346,7 +346,7 @@ EXAMPLE_ACCOUNT_EMAIL = 'timeweb@example.com'
 EDITING_EXAMPLE_ACCOUNT = False
 
 # Django Logging config
-ROOT_LOG_LEVEL = 'DEBUG' if DEBUG else 'INFO'
+ROOT_LOG_LEVEL = 'INFO'
 DJANGO_LOG_LEVEL = 'INFO'
 LOGGING = {
     'version': 1,
