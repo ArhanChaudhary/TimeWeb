@@ -726,6 +726,24 @@ async def create_canvas_assignments(request):
             return ret
         except ConnectionError:
             return []
+    def filter_response_data_after_now(response_data):
+        complete_date_now = timezone.now()
+        now_search_left = 0
+        now_search_right = len(response_data)
+        while now_search_left < now_search_right:
+            mid = (now_search_left + now_search_right) // 2
+            assignment = response_data[mid]
+            try:
+                complete_x = assignment.due_at_date
+            except AttributeError:
+                due_before_today = False
+            else:
+                due_before_today = complete_x <= complete_date_now
+            if not due_before_today:
+                now_search_right = mid
+            else:
+                now_search_left = mid + 1
+        return response_data[now_search_left:]
     try:
         if settings.DEBUG:
             logger.info("started canvas api requests")
