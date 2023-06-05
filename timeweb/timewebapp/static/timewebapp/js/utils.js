@@ -612,8 +612,8 @@ addTagHandlers: function() {
 
         // There are too many conditions on whether to sort or not, so just sort every time
 
-        // GC class tags
-        // if (sa.is_google_classroom_assignment && sa.needs_more_info || tag_name_to_delete.includes("Important") || tag_name_to_delete.includes("Not Important")) {
+        // integration class tags
+        // if (sa.is_integration_assignment && sa.needs_more_info || tag_name_to_delete.includes("Important") || tag_name_to_delete.includes("Not Important")) {
             new Priority().sort();
         // }
 
@@ -678,8 +678,8 @@ makeAssignmentTagsSortable: function(dom_assignment) {
 
             // There are too many conditions on whether to sort or not, so just sort every time
 
-            // GC class tags
-            //sa.is_google_classroom_assignment && sa.needs_more_info && 
+            // integration class tags
+            //sa.is_integration_assignment && sa.needs_more_info && 
             new Priority().sort();
             ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
         }

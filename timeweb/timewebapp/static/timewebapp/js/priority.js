@@ -799,9 +799,9 @@ class Priority {
 
         let a_status_value = a.status_value;
         let b_status_value = b.status_value;
-        // +Ignore tags if its a google classroom assignment and it needs more info because important and not important can mess up some ordering
+        // +Ignore tags if its an integration assignment and it needs more info because important and not important can mess up some ordering
         // -Not needed anymore because of Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG
-        // if (!(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
+        // if (!(sa.sa.is_integration_assignment && sa.sa.needs_more_info)) {
         if (!initial_monotonic_sort) {
             if (a.has_important_tag) {
                 a_status_value += 0.25;

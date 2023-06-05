@@ -38,7 +38,7 @@ TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("assignment_date", "x", "due_time", "blue_l
                                         "works", "funct_round", "break_days", "skew_ratio", "fixed_mode", "dynamic_start", "hidden")
 DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("id", "name", "soft", "unit", "description", "tags", "is_google_classroom_assignment",
                                         "external_link", "alert_due_date_incremented", "dont_hide_again",
-                                        "deletion_time", "user", "needs_more_info")
+                                        "deletion_time", "user", "needs_more_info", "is_integration_assignment", )
 assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(TimewebModel._meta.fields), "update this list"
 
 @require_http_methods(["POST"])
@@ -410,7 +410,7 @@ def submit_assignment(request):
     # ap cs may have .java homework which are counted as links
     banned_endings = ("java", )
 
-    is_user_assignment = not sm.is_google_classroom_assignment
+    is_user_assignment = not sm.is_integration_assignment
     description_link = next((
         url for url in extractor.gen_urls(sm.description or '')
         if all(not url.endswith("." + ending) for ending in banned_endings)

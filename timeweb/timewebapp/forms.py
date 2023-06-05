@@ -18,6 +18,7 @@ class TimewebForm(forms.ModelForm):
         exclude = (
             "needs_more_info",
             "is_google_classroom_assignment",
+            "is_integration_assignment",
             "user",
             "external_link",
             "hidden",

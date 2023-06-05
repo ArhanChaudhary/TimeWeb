@@ -590,7 +590,7 @@ class Crud {
             }
             that.showForm();
             that.sa_id = sa.id;
-            if (!(sa.is_google_classroom_assignment && sa.needs_more_info))
+            if (!(sa.is_integration_assignment && sa.needs_more_info))
                 that.alerted_early_due_time = true; // dont display the early due time alert in edit
         });
         $(document).click(function(e) {

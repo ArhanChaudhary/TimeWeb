@@ -518,6 +518,7 @@ async def create_gc_assignments(request):
         "break_days": request.user.settingsmodel.def_break_days,
         "user": request.user,
         "needs_more_info": True,
+        "is_integration_assignment": True,
         "is_google_classroom_assignment": True,
         # assumptions
         "unit": "Minute",
