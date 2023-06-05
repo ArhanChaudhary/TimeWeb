@@ -33,6 +33,7 @@ from oauthlib.oauth2.rfc6749.errors import (
 )
 
 # Canvas API
+from requests.exceptions import ConnectionError
 from canvasapi import Canvas
 from canvasapi.course import Course
 from canvasapi.exceptions import InvalidAccessToken, RateLimitExceeded
@@ -693,11 +694,16 @@ async def create_canvas_assignments(request):
     # django implementation reference: https://github.dev/Harvard-University-iCommons/django-canvas-oauth/tree/master/canvas_oauth
     await sync_to_async(lambda: request.user.settingsmodel)()
     loop = asyncio.get_event_loop()
+    def get_coursework_model_data(course_id):
+        try:
+            return list(Course(canvas._Canvas__requester, {'id': course_id}).get_assignments(
+                order_by='due_at',
+                # bucket=("undated", "upcoming", "future"), doesn't work because canvas api only supports one string parameter for bucket
+            ))
+        except ConnectionError:
+            return []
     response_model_data = [format_response_data(response_model) for response_models in asyncio.as_completed([
-        loop.run_in_executor(None, lambda: list(Course(canvas._Canvas__requester, {'id': course_id['id']}).get_assignments(
-            order_by='due_at',
-            # bucket=("undated", "upcoming", "future"), doesn't work because canvas api only supports one string parameter for bucket
-        ))) for course_id in request.user.settingsmodel.canvas_courses_cache
+        loop.run_in_executor(None, get_coursework_model_data, course_id['id']) for course_id in request.user.settingsmodel.canvas_courses_cache
     ]) for response_model in await response_models]
 
 @require_http_methods(["GET"])
