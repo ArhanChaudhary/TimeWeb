@@ -27,6 +27,9 @@ class SettingsForm(forms.ModelForm):
             "device_uuid",
             "device_uuid_api_timestamp",
             "example_assignment",
+            "canvas_token",
+            "added_canvas_assignment_ids",
+            "canvas_courses_cache",
         )
         extra_fields = {
             "enable_gc_integration": {

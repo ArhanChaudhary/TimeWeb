@@ -39,8 +39,8 @@ DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS = (
     'enable_tutorial', 'sorting_animation_threshold', 'oauth_token', 'added_gc_assignment_ids', 'seen_latest_changelog', 
     'nudge_calendar', 'nudge_notifications', 'nudge_canvas', 'user', 'gc_courses_cache', 'device_uuid', 'device_uuid_api_timestamp',
     'display_working_days_left', 'background_image_text_shadow_width', 'gc_assignments_always_midnight', 'loosely_enforce_minimum_work_times', 
-    'priority_color_borders', 'font', 'should_alert_due_date_incremented',
-    'example_account', "oauth_token",
+    'priority_color_borders', 'font', 'should_alert_due_date_incremented', 'example_account', "oauth_token",
+    'added_canvas_assignment_ids', 'canvas_courses_cache',
 )
 
 assert len(EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS) + len(DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS) == len(SettingsModel._meta.fields), "update this list"

@@ -240,6 +240,14 @@ class SettingsModel(models.Model):
         default=empty_dict,
         blank=True,
     )
+    added_canvas_assignment_ids = models.JSONField(
+        default=empty_list,
+        blank=True,
+    )
+    canvas_courses_cache = models.JSONField(
+        default=empty_list,
+        blank=True,
+    )
     seen_latest_changelog = models.BooleanField(
         default=True,
     )
