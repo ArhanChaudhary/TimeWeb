@@ -306,7 +306,7 @@ async def create_gc_assignments(request):
             await sync_to_async(request.user.settingsmodel.save)(update_fields=("oauth_token", ))
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
 
-    def populate_response_model_data(*, response_model_data, course_coursework, order, exception):
+    def format_response_data(*, assignment_models, response_data, order, exception):
         # it is possible for this function to process courses that are in the cache but archived
         # this does not matter
         if exception is not None:
@@ -317,10 +317,10 @@ async def create_gc_assignments(request):
                 logger.warning(exception)
             else:
                 logger.error(exception)
-        if course_coursework in (None, {}):
+        if response_data in (None, {}):
             return
         # NOTE: there is no point trying to waste brain cells trying to return early if ascending order
-        # course_coursework repeats the same assignments as in the descending order response as the loop
+        # response_data repeats the same assignments as in the descending order response as the loop
         # continues if an assignment has already been added
         def parse_coursework_dates(assignment):
             # NOTE: scheduled assignments logically don't show up on the API
@@ -364,12 +364,12 @@ async def create_gc_assignments(request):
         # Note about timezones: use the local tz because date_now repesents the date at the user's location
         # This makes comparison logic work
         date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        course_coursework = course_coursework['courseWork']
+        response_data = response_data['courseWork']
         now_search_left = 0
-        now_search_right = len(course_coursework)
+        now_search_right = len(response_data)
         while now_search_left < now_search_right:
             mid = (now_search_left + now_search_right) // 2
-            assignment = course_coursework[mid]
+            assignment = response_data[mid]
             complete_assignment_date, complete_x = parse_coursework_dates(assignment)
             if complete_x:
                 due_before_today = complete_x <= complete_date_now
@@ -380,29 +380,29 @@ async def create_gc_assignments(request):
             else:
                 now_search_left = mid + 1
         none_search_left = 0
-        none_search_right = len(course_coursework)
+        none_search_right = len(response_data)
         while none_search_left < none_search_right:
             mid = (none_search_left + none_search_right) // 2
-            assignment = course_coursework[mid]
+            assignment = response_data[mid]
             complete_assignment_date, complete_x = parse_coursework_dates(assignment)
             if complete_x and order == "desc" or not complete_x and order == "asc":
                 none_search_left = mid + 1
             else:
                 none_search_right = mid
         # import pprint
-        # pprint.pprint([i.get('dueDate') for i in course_coursework])
+        # pprint.pprint([i.get('dueDate') for i in response_data])
         # if order == "desc":
-        #     pprint.pprint([i.get('dueDate') for i in course_coursework[:now_search_left]])
-        #     pprint.pprint([i.get('dueDate') for i in course_coursework[none_search_left:]])
+        #     pprint.pprint([i.get('dueDate') for i in response_data[:now_search_left]])
+        #     pprint.pprint([i.get('dueDate') for i in response_data[none_search_left:]])
         # elif order == "asc":
-        #     pprint.pprint([i.get('dueDate') for i in course_coursework[now_search_left:]])
-        #     pprint.pprint([i.get('dueDate') for i in course_coursework[:none_search_left]])
+        #     pprint.pprint([i.get('dueDate') for i in response_data[now_search_left:]])
+        #     pprint.pprint([i.get('dueDate') for i in response_data[:none_search_left]])
         # breakpoint()
         if order == "desc":
-            course_coursework = course_coursework[:now_search_left] + course_coursework[none_search_left:]
+            response_data = response_data[:now_search_left] + response_data[none_search_left:]
         elif order == "asc":
-            course_coursework = course_coursework[now_search_left:] + course_coursework[:none_search_left]
-        for assignment in course_coursework:
+            response_data = response_data[now_search_left:] + response_data[:none_search_left]
+        for assignment in response_data:
             assignment_id = int(assignment['id'], 10)
             if assignment_id in request.user.settingsmodel.added_gc_assignment_ids:
                 continue
@@ -448,7 +448,7 @@ async def create_gc_assignments(request):
                 x = x.replace(tzinfo=timezone.utc)
             if assignment_date:
                 assignment_date = assignment_date.replace(tzinfo=timezone.utc)
-            response_model_data.append({
+            assignment_models.append({
                 # from api, can change
                 "name": name,
                 "assignment_date": assignment_date,
@@ -481,13 +481,13 @@ async def create_gc_assignments(request):
     # So, we are forced to make a second request this time in ascending order to add assignments without due dates
     loop = asyncio.get_event_loop()
     coursework_lazy = service.courses().courseWork()
-    def get_coursework_batch_model_data(*, order, page_size):
-        response_model_data = []
+    def get_assignment_models_from_response(*, order, page_size):
+        assignment_models = []
         batch = service.new_batch_http_request(
-            callback=lambda _, course_coursework, exception: 
-                populate_response_model_data(
-                    response_model_data=response_model_data,
-                    course_coursework=course_coursework,
+            callback=lambda _, response_data, exception: 
+                format_response_data(
+                    assignment_models=assignment_models,
+                    response_data=response_data,
                     order=order,
                     exception=exception,
                 )
@@ -508,7 +508,7 @@ async def create_gc_assignments(request):
         batch.execute()
         if settings.DEBUG:
             logger.info(f"finished gc order {order} in {time.time() - t}")
-        return response_model_data
+        return assignment_models
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
     cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
@@ -516,12 +516,12 @@ async def create_gc_assignments(request):
         if settings.DEBUG:
             logger.info("started gc requests")
             t = time.time()
-        response_model_data = [response_model for response_models in asyncio.as_completed([
-            loop.run_in_executor(None, lambda: get_coursework_batch_model_data(order=order, page_size=page_size)) for order, page_size in (
+        assignment_model_data = [assignment_model for assignment_models in asyncio.as_completed([
+            loop.run_in_executor(None, lambda: get_assignment_models_from_response(order=order, page_size=page_size)) for order, page_size in (
                 ("desc", MAX_DESCENDING_COURSEWORK_PAGE_SIZE),
                 ("asc", MAX_ASCENDING_COURSEWORK_PAGE_SIZE),
             )
-        ]) for response_model in await response_models]
+        ]) for assignment_model in await assignment_models]
         if settings.DEBUG:
             logger.info(f"finished gc requests in {time.time() - t}")
     except RefreshError:
@@ -541,10 +541,10 @@ async def create_gc_assignments(request):
         # refer to the explanation in create_gc_assignments for more context
         return {"next": "stop"}
     cache.delete(concurrent_request_key)
-    if not response_model_data:
+    if not assignment_model_data:
         return {"next": "continue"}
     await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_gc_assignment_ids", ))
-    created = [TimewebModel(**assignment | generate_static_integration_fields(request.user) | { "is_google_classroom_assignment": True }) for assignment in response_model_data]
+    created = [TimewebModel(**assignment | generate_static_integration_fields(request.user) | { "is_google_classroom_assignment": True }) for assignment in assignment_model_data]
     await sync_to_async(TimewebModel.objects.bulk_create)(created)
     return {
         "assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created],
@@ -730,9 +730,9 @@ async def create_canvas_assignments(request):
         if settings.DEBUG:
             logger.info("started canvas api requests")
             t = time.time()
-        response_model_data = [format_response_data(response_model) for response_models in asyncio.as_completed([
+        assignment_model_data = [format_response_datum(response_datum) for response_data in asyncio.as_completed([
             loop.run_in_executor(None, get_coursework_model_data, course_id['id']) for course_id in request.user.settingsmodel.canvas_courses_cache
-        ]) for response_model in await response_models]
+        ]) for response_datum in filter_response_data_after_now(await response_data)]
         if settings.DEBUG:
             logger.info(f"finished all canvas requests in {time.time() - t}")
     except InvalidAccessToken:
