@@ -63,6 +63,22 @@ COURSE_API_FIELDS = (
     "id",
 )
 
+generate_static_integration_fields = lambda user: {
+    # from app
+    "skew_ratio": user.settingsmodel.def_skew_ratio,
+    "min_work_time": user.settingsmodel.def_min_work_time,
+    "break_days": user.settingsmodel.def_break_days,
+    "user": user,
+    "needs_more_info": True,
+    "is_integration_assignment": True,
+    # assumptions
+    "unit": "Minute",
+    "time_per_unit": 1,
+    "funct_round": 5,
+    # y is missing
+    "y": None,
+}
+
 def simplify_course_name(tag_name):
     abbreviations = [
         (r"(rec)ommendation", r"\1"),
@@ -512,24 +528,8 @@ async def create_gc_assignments(request):
     cache.delete(concurrent_request_key)
     if not response_model_data:
         return {"next": "continue"}
-    static_gc_model_fields = {
-        # from app
-        "skew_ratio": request.user.settingsmodel.def_skew_ratio,
-        "min_work_time": request.user.settingsmodel.def_min_work_time,
-        "break_days": request.user.settingsmodel.def_break_days,
-        "user": request.user,
-        "needs_more_info": True,
-        "is_integration_assignment": True,
-        "is_google_classroom_assignment": True,
-        # assumptions
-        "unit": "Minute",
-        "time_per_unit": 1,
-        "funct_round": 5,
-        # y is missing
-        "y": None,
-    }
     await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_gc_assignment_ids", ))
-    created = [TimewebModel(**assignment | static_gc_model_fields) for assignment in response_model_data]
+    created = [TimewebModel(**assignment | generate_static_integration_fields(request.user) | { "is_google_classroom_assignment": True }) for assignment in response_model_data]
     await sync_to_async(TimewebModel.objects.bulk_create)(created)
     return {
         "assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created],
