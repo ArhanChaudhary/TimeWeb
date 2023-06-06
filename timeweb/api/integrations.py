@@ -828,6 +828,19 @@ async def create_canvas_assignments(request):
         pass
     except (ConnectionError, RateLimitExceeded):
         pass
+    if not assignment_model_data:
+        return {"next": "continue"}
+    await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_canvas_assignment_ids", ))
+    created = [
+        TimewebModel(**assignment | generate_static_integration_fields(request.user) | { "is_canvas_assignment": True })
+        for assignment in assignment_model_data
+    ]
+    await sync_to_async(TimewebModel.objects.bulk_create)(created)
+    return {
+        "assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created],
+        "update_state": True,
+        "next": "continue",
+    }
 
 @require_http_methods(["GET"])
 def update_canvas_courses(request):
