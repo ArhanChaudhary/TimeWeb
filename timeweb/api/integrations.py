@@ -539,7 +539,8 @@ async def create_gc_assignments(request):
         }
     # If connection to the server randomly dies (could happen locally when wifi is off)
     except (ServerNotFoundError, TimeoutError):
-        pass
+        # return here or else assignment_model_data won't be defined and throw an error
+        return {"next": "continue"}
     cached_timestamp = cache.get(concurrent_request_key)
     if cached_timestamp != thread_timestamp:
         # The reason why we have to prevent concurrent requests is because although
@@ -826,7 +827,8 @@ async def create_canvas_assignments(request):
         # do stuff
         pass
     except (ConnectionError_, RateLimitExceeded):
-        pass
+        # return here or else assignment_model_data won't be defined and throw an error
+        return {"next": "continue"}
     if not assignment_model_data:
         return {"next": "continue"}
     await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_canvas_assignment_ids", ))
