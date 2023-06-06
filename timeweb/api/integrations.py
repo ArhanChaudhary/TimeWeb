@@ -49,6 +49,8 @@ import json
 from common.views import logger
 from django.utils.text import Truncator
 
+ASSIGNMENT_DATE_DAYS_CUTOFF = 30
+
 MAX_DESCENDING_COURSEWORK_PAGE_SIZE = 15
 MAX_ASCENDING_COURSEWORK_PAGE_SIZE = 35
 
@@ -419,7 +421,7 @@ async def create_gc_assignments(request):
                     tags.append("Important")
                 x_num = utils.days_between_two_dates(x, assignment_date)
             else:
-                if utils.days_between_two_dates(date_now, assignment_date) > 30:
+                if utils.days_between_two_dates(date_now, assignment_date) > ASSIGNMENT_DATE_DAYS_CUTOFF:
                     continue
                 due_time = None
                 x = None
@@ -757,7 +759,7 @@ async def create_canvas_assignments(request):
                 tags.append("Important")
             x_num = utils.days_between_two_dates(x, assignment_date)
         else:
-            if utils.days_between_two_dates(date_now, assignment_date) > 30:
+            if utils.days_between_two_dates(date_now, assignment_date) > ASSIGNMENT_DATE_DAYS_CUTOFF:
                 return
             due_time = None
             x = None
