@@ -819,7 +819,7 @@ async def create_canvas_assignments(request):
     except InvalidAccessToken:
         # do stuff
         pass
-    except ConnectionError:
+    except (ConnectionError, RateLimitExceeded):
         pass
 
 @require_http_methods(["GET"])
