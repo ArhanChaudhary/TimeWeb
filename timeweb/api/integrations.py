@@ -516,12 +516,17 @@ async def create_gc_assignments(request):
         if settings.DEBUG:
             logger.info("started gc requests")
             t = time.time()
-        assignment_model_data = [assignment_model for assignment_models in asyncio.as_completed([
-            loop.run_in_executor(None, lambda: get_assignment_models_from_response(order=order, page_size=page_size)) for order, page_size in (
-                ("desc", MAX_DESCENDING_COURSEWORK_PAGE_SIZE),
-                ("asc", MAX_ASCENDING_COURSEWORK_PAGE_SIZE),
-            )
-        ]) for assignment_model in await assignment_models]
+        assignment_model_data = [
+            assignment_model
+            for assignment_models in asyncio.as_completed([
+                loop.run_in_executor(None, lambda: get_assignment_models_from_response(order=order, page_size=page_size)) 
+                for order, page_size in (
+                    ("desc", MAX_DESCENDING_COURSEWORK_PAGE_SIZE),
+                    ("asc", MAX_ASCENDING_COURSEWORK_PAGE_SIZE),
+                )
+            ])
+            for assignment_model in await assignment_models
+        ]
         if settings.DEBUG:
             logger.info(f"finished gc requests in {time.time() - t}")
     except RefreshError:
