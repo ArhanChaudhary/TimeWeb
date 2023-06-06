@@ -58,7 +58,7 @@ INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT = (
     "works", "funct_round", "break_days", "skew_ratio", "fixed_mode", "dynamic_start", "id", "name",
     "soft", "unit", "description", "tags", "is_google_classroom_assignment",
     "alert_due_date_incremented", "dont_hide_again", "deletion_time", "needs_more_info",
-    "external_link", "is_integration_assignment",
+    "external_link", "is_integration_assignment", "is_canvas_assignment",
 )
 
 assert len(INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT) + len(EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) == len(TimewebModel._meta.fields), "update this list"

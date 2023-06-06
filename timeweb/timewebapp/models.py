@@ -144,6 +144,9 @@ class TimewebModel(models.Model):
     is_google_classroom_assignment = models.BooleanField(
         default=False,
     )
+    is_canvas_assignment = models.BooleanField(
+        default=False,
+    )
     external_link = models.URLField(
         null=True,
         blank=True,
