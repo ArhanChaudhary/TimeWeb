@@ -971,7 +971,7 @@ class Priority {
         const assignment_container = dom_assignment.parents(".assignment-container");
 
         var current_tag = priority_data.first_real_tag;
-        if (sa.is_google_classroom_assignment && sa.needs_more_info && priority_data.status_value !== Priority.DUE_DATE_PASSED && current_tag) {
+        if (sa.is_integration_assignment && sa.needs_more_info && priority_data.status_value !== Priority.DUE_DATE_PASSED && current_tag) {
             assignment_container.addClass("add-line-wrapper");
             // We need to check that.prev_gc_assignment !== that.prev_assignment
             // This deteects if there is a break between a wrapper. If there is,
