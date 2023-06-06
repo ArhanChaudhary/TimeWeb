@@ -352,12 +352,12 @@ async def create_gc_assignments(request):
                     complete_x.hour == 23 and complete_x.minute == 59 and 
                     # extra condtion #1: the google classroom assignment cannot be due later today
                     # we don't want to do this as the information would then be inaccurate to the user
-                    complete_x.replace(hour=0, minute=0) != date_now and
+                    complete_x.replace(hour=0, minute=0, second=0, microsecond=0) != date_now and
                     # extra condtion #2: the google classroom assignment must not be due on its assignment date
                     # this is applicable for assignments due in the future
-                    complete_x.replace(hour=0, minute=0) != assignment_date
+                    complete_x.replace(hour=0, minute=0, second=0, microsecond=0) != assignment_date
                 ):
-                    complete_x = complete_x.replace(hour=0, minute=0)
+                    complete_x = complete_x.replace(hour=0, minute=0, second=0, microsecond=0)
             else:
                 complete_x = None
             return (complete_assignment_date, complete_x)
@@ -414,7 +414,7 @@ async def create_gc_assignments(request):
                 if complete_x <= complete_assignment_date:
                     continue
                 due_time = complete_x.time()
-                x = complete_x.replace(hour=0, minute=0)
+                x = complete_x.replace(hour=0, minute=0, second=0, microsecond=0)
                 if date_now == x:
                     tags.append("Important")
                 x_num = utils.days_between_two_dates(x, assignment_date)
@@ -550,7 +550,10 @@ async def create_gc_assignments(request):
     if not assignment_model_data:
         return {"next": "continue"}
     await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_gc_assignment_ids", ))
-    created = [TimewebModel(**assignment | generate_static_integration_fields(request.user) | { "is_google_classroom_assignment": True }) for assignment in assignment_model_data]
+    created = [
+        TimewebModel(**assignment | generate_static_integration_fields(request.user) | { "is_google_classroom_assignment": True })
+        for assignment in assignment_model_data
+    ]
     await sync_to_async(TimewebModel.objects.bulk_create)(created)
     return {
         "assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created],
@@ -742,6 +745,7 @@ async def create_canvas_assignments(request):
             return
         complete_assignment_date = utils.utc_to_local(request, assignment.unlock_at_date if assignment.unlock_at else assignment.created_at_date)
         complete_x = utils.utc_to_local(request, assignment.due_at_date) if assignment.due_at else None
+        # NOTE: canvas dates go down to the second so this replace precision is absolutely necessary
         assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
         tags = []
         if complete_x:
