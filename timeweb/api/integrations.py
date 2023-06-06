@@ -34,6 +34,7 @@ from oauthlib.oauth2.rfc6749.errors import (
 
 # Canvas API
 from requests.exceptions import ConnectionError
+import html2text
 from canvasapi import Canvas
 from canvasapi.course import Course
 from canvasapi.exceptions import InvalidAccessToken, RateLimitExceeded
@@ -767,7 +768,7 @@ async def create_canvas_assignments(request):
             if assignment.course_id == i['id']
         ))
         if description := assignment.description:
-            description = utils.simplify_whitespace(description)
+            description = utils.simplify_whitespace(html2text.html2text(description))
         external_link = assignment.html_url
         adjusted_blue_line = app_utils.adjust_blue_line(request,
             old_data=None,
