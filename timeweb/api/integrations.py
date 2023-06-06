@@ -24,7 +24,7 @@ from google.auth.exceptions import RefreshError, TransportError
 from googleapiclient.discovery import build
 from googleapiclient.discovery_cache.base import Cache
 from googleapiclient.errors import HttpError
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError as ConnectionError_
 from httplib2.error import ServerNotFoundError
 from oauthlib.oauth2.rfc6749.errors import (
     AccessDeniedError,
@@ -33,7 +33,6 @@ from oauthlib.oauth2.rfc6749.errors import (
 )
 
 # Canvas API
-from requests.exceptions import ConnectionError
 import html2text
 from canvasapi import Canvas
 from canvasapi.course import Course
@@ -637,12 +636,12 @@ def gc_auth_callback(request):
     # turn those parameters into a token
     try:
         authorized_flow_token = flow.fetch_token(authorization_response=authorization_response)
-    except (InvalidGrantError, AccessDeniedError, MissingCodeError, ConnectionError):
+    except (InvalidGrantError, AccessDeniedError, MissingCodeError, ConnectionError_):
         # InvalidGrantError for bad requests
         # AccessDeniedError If the user enables no scopes or clicks cancel
         # MissingCodeError if the user manually gets this route and forgets "code" in the url
         # note that code is the only required url parameter
-        # ConnectionError if the wifi randomly dies (could happen when offline)
+        # ConnectionError_ if the wifi randomly dies (could happen when offline)
         return callback_failed()
     # the scope order MAY change
     # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
@@ -826,7 +825,7 @@ async def create_canvas_assignments(request):
     except InvalidAccessToken:
         # do stuff
         pass
-    except (ConnectionError, RateLimitExceeded):
+    except (ConnectionError_, RateLimitExceeded):
         pass
     if not assignment_model_data:
         return {"next": "continue"}
