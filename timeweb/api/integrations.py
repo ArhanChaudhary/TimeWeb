@@ -717,8 +717,9 @@ async def create_canvas_assignments(request):
     # django implementation reference: https://github.dev/Harvard-University-iCommons/django-canvas-oauth/tree/master/canvas_oauth
     await sync_to_async(lambda: request.user.settingsmodel)()
     loop = asyncio.get_event_loop()
+    complete_date_now = utils.utc_to_local(request, timezone.now())
+    date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
     def filter_response_data_after_now(response_data):
-        complete_date_now = timezone.now()
         now_search_left = 0
         now_search_right = len(response_data)
         while now_search_left < now_search_right:
@@ -735,6 +736,68 @@ async def create_canvas_assignments(request):
             else:
                 now_search_left = mid + 1
         return response_data[now_search_left:]
+    def format_response_datum(assignment):
+        if assignment.id in request.user.settingsmodel.added_canvas_assignment_ids:
+            return
+        complete_assignment_date = utils.utc_to_local(request, assignment.unlock_at_date if assignment.unlock_at else assignment.created_at_date)
+        complete_x = utils.utc_to_local(request, assignment.due_at_date) if assignment.due_at else None
+        assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        tags = []
+        if complete_x:
+            if complete_x <= complete_assignment_date:
+                return
+            due_time = complete_x.time()
+            x = complete_x.replace(hour=0, minute=0, second=0, microsecond=0)
+            if date_now == x:
+                tags.append("Important")
+            x_num = utils.days_between_two_dates(x, assignment_date)
+        else:
+            if utils.days_between_two_dates(date_now, assignment_date) > 30:
+                return
+            due_time = None
+            x = None
+            x_num = None
+        name = assignment.name
+        name = utils.simplify_whitespace(name)
+        name = Truncator(name).chars(TimewebModel.name.field.max_length)
+        # We don't need to worry if there if this raises a not found error because the courses we
+        # request assignments from are the ones in request.user.settingsmodel.gc_courses_cache itself
+        tags.insert(0, next(
+            i['name'] for i in request.user.settingsmodel.canvas_courses_cache
+            if assignment.course_id == i['id']
+        ))
+        if description := assignment.description:
+            description = utils.simplify_whitespace(description)
+        external_link = assignment.html_url
+        adjusted_blue_line = app_utils.adjust_blue_line(request,
+            old_data=None,
+            assignment_date=assignment_date,
+            x_num=x_num
+        )
+        blue_line_start = adjusted_blue_line['blue_line_start']
+        dynamic_start = blue_line_start
+        # we store these in utc
+        # convert at the end so it is easier to use with calculations with date_now
+        if x:
+            x = x.replace(tzinfo=timezone.utc)
+        if assignment_date:
+            assignment_date = assignment_date.replace(tzinfo=timezone.utc)
+        # TODO: find a better system that doesn't accumulate everything
+        request.user.settingsmodel.added_canvas_assignment_ids.append(assignment.id)
+        return {
+            # from api, can change
+            "name": name,
+            "assignment_date": assignment_date,
+            "x": x,
+            "due_time": due_time,
+            "description": description,
+            # from app, depends on api
+            "blue_line_start": blue_line_start,
+            "dynamic_start": dynamic_start,
+            # from api, cannot change
+            "external_link": external_link,
+            "tags": tags,
+        }
     try:
         if settings.DEBUG:
             logger.info("started canvas api requests")
