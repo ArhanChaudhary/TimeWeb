@@ -5,9 +5,9 @@ class Priority {
     static DUE_DATE_PASSED = 12;
     static INCOMPLETE_WORKS = 11;
     static NO_WORKING_DAYS = 10;
-    static NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG = 9;
-    static NEEDS_MORE_INFO_AND_GC_ASSIGNMENT = 8;
-    static NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT = 7;
+    static NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT_WITH_FIRST_TAG = 9;
+    static NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT = 8;
+    static NEEDS_MORE_INFO_AND_NOT_INTEGRATION_ASSIGNMENT = 7;
     static UNFINISHED_FOR_TODAY_AND_DUE_TODAY = 6;
     static UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW = 5;
     static UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW = 4;
@@ -373,10 +373,10 @@ class Priority {
 				status_image = 'question_mark';
                 if (sa.sa.is_google_classroom_assignment) {
                     status_message = "This Google Classroom assignment needs more info";
-                    status_value = first_real_tag ? Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG : Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT;
+                    status_value = first_real_tag ? Priority.NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT_WITH_FIRST_TAG : Priority.NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT;
                 } else {
                     status_message = "This assignment needs more info";
-                    status_value = Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT;
+                    status_value = Priority.NEEDS_MORE_INFO_AND_NOT_INTEGRATION_ASSIGNMENT;
                 }
                 // due_date_minus_today can be NaN sometimes and break the logic in assignmentSortingComparator
 				if (Number.isFinite(Math.floor(sa.sa.complete_x) - today_minus_assignment_date))
@@ -571,9 +571,10 @@ class Priority {
             const assignment_header_tick_svg = assignment_header_button.find(".tick-button");
             assignment_header_tick_svg.parents(".assignment-header-button").toggle(!(
                 [
-                    Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT,
-                    Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG,
-                    Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED,
+                    Priority.NEEDS_MORE_INFO_AND_NOT_INTEGRATION_ASSIGNMENT,
+                    Priority.NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT_WITH_FIRST_TAG,
+                    Priority.NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT,
+                    Priority.NOT_YET_ASSIGNED,
                     Priority.FINISHED_FOR_TODAY,
                     Priority.COMPLETELY_FINISHED,
                 ].includes(status_value)
@@ -800,7 +801,7 @@ class Priority {
         let a_status_value = a.status_value;
         let b_status_value = b.status_value;
         // +Ignore tags if its an integration assignment and it needs more info because important and not important can mess up some ordering
-        // -Not needed anymore because of Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG
+        // -Not needed anymore because of Priority.NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT_WITH_FIRST_TAG
         // if (!(sa.sa.is_integration_assignment && sa.sa.needs_more_info)) {
         if (!initial_monotonic_sort) {
             if (a.has_important_tag) {
@@ -889,9 +890,9 @@ class Priority {
         if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
 
         if ([
-            Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT,
-            Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG,
-            Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT,
+            Priority.NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT,
+            Priority.NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT_WITH_FIRST_TAG,
+            Priority.NEEDS_MORE_INFO_AND_NOT_INTEGRATION_ASSIGNMENT,
             Priority.COMPLETELY_FINISHED,
         ].includes(status_value)) {
             // exact same logic as above
@@ -914,9 +915,9 @@ class Priority {
         const that = this;
         let priority_percentage;
         switch (priority_data.status_value) {
-            case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT:
-            case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG:
-            case Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT:
+            case Priority.NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT:
+            case Priority.NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT_WITH_FIRST_TAG:
+            case Priority.NEEDS_MORE_INFO_AND_NOT_INTEGRATION_ASSIGNMENT:
             case Priority.NO_WORKING_DAYS:
             case Priority.INCOMPLETE_WORKS:
                 priority_percentage = NaN;
@@ -1206,9 +1207,9 @@ class Priority {
 
             that.addAssignmentShortcut(dom_assignment, priority_data);
             if (!first_available_tutorial_assignment && ![
-                    Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT,
-                    Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG,
-                    Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT,
+                    Priority.NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT,
+                    Priority.NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT_WITH_FIRST_TAG,
+                    Priority.NEEDS_MORE_INFO_AND_NOT_INTEGRATION_ASSIGNMENT,
                     Priority.NO_WORKING_DAYS,
                     Priority.INCOMPLETE_WORKS,
                     Priority.COMPLETELY_FINISHED,
