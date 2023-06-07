@@ -222,7 +222,7 @@ def update_gc_courses(request):
     except RefreshError:
         return {
             'invalid_credentials': True,
-            'reauthorization_url': gc_auth_enable(request, next_url="home", current_url="home"),
+            'reauthorization_url': generate_gc_authorization_url(request, next_url="home", current_url="home"),
             'next': 'stop',
         }
     # If connection to the server randomly dies (could happen locally when wifi is off)
@@ -299,7 +299,7 @@ async def create_gc_assignments(request):
             # In case users manually revoke access to their oauth scopes after authorizing
             return {
                 'invalid_credentials': True,
-                'reauthorization_url': gc_auth_enable(request, next_url="home", current_url="home"),
+                'reauthorization_url': generate_gc_authorization_url(request, next_url="home", current_url="home"),
                 'next': 'stop',
             }
         # If connection to the server randomly dies (could happen locally when wifi is off)
@@ -536,7 +536,7 @@ async def create_gc_assignments(request):
     except RefreshError:
         return {
             'invalid_credentials': True,
-            'reauthorization_url': gc_auth_enable(request, next_url="home", current_url="home"),
+            'reauthorization_url': generate_gc_authorization_url(request, next_url="home", current_url="home"),
             'next': 'stop',
         }
     # If connection to the server randomly dies (could happen locally when wifi is off)
@@ -586,10 +586,8 @@ def generate_gc_authorization_url(request, *, next_url, current_url):
     request.session["gc-callback-current-url"] = current_url
     return authorization_url
 
-def gc_auth_enable(request, *args, **kwargs):
-    return generate_gc_authorization_url(request, *args, **kwargs)
 
-def gc_auth_disable(request, *, save=True):
+def disable_gc_integration(request, *, save=True):
     # request.user.settingsmodel.oauth_token stores the user's access and refresh tokens
     request.user.settingsmodel.oauth_token = {"refresh_token": request.user.settingsmodel.oauth_token['refresh_token']}
     if settings.DEBUG:

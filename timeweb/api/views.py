@@ -12,7 +12,7 @@ from django.forms.models import model_to_dict
 # App stuff
 import common.utils as utils
 import timewebapp.utils as app_utils
-from . import integrations
+from .integrations import generate_gc_authorization_url, disable_gc_integration
 from timewebapp.models import TimewebModel
 from timewebapp.views import EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT
 from timewebapp.forms import TimewebForm
@@ -526,10 +526,10 @@ def change_setting(request):
         if value:
             return JsonResponse({
                 'should_redirect': True,
-                'redirect_url': integrations.gc_auth_enable(request, next_url="home", current_url="settings"),
+                'redirect_url': generate_gc_authorization_url(request, next_url="home", current_url="settings"),
             })
         else:
-            integrations.gc_auth_disable(request, save=True)
+            disable_gc_integration(request, save=True)
             return HttpResponse(status=204)
 
     # pretty cursed code that could possibly be improved by adding the settings model to the settings form as an instance (64baf58)

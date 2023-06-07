@@ -17,7 +17,7 @@ from timewebapp.views import ExampleAccountView
 from .forms import SettingsForm
 from .models import SettingsModel
 
-import api.integrations as integrations
+from api.integrations import disable_gc_integration, generate_gc_authorization_url
 from contact_form.views import ContactFormView
 
 from requests import get as requests_get
@@ -83,12 +83,12 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     
     def valid_form(self, request):
         if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in self.user.settingsmodel.oauth_token:
-            integrations.gc_auth_disable(request, save=False)
+            disable_gc_integration(request, save=False)
         self.form.save()
         logger.info(f'User \"{self.user}\" updated the settings page')
 
         if self.form.cleaned_data.get("enable_gc_integration") and not 'token' in self.user.settingsmodel.oauth_token:
-            return redirect(integrations.gc_auth_enable(request, next_url="home", current_url="settings"))
+            return redirect(generate_gc_authorization_url(request, next_url="home", current_url="settings"))
         if self.form.cleaned_data.get("view_deleted_assignments"):
             return redirect("deleted_assignments")
         else:
