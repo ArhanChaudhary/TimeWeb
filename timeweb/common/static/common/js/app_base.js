@@ -231,7 +231,7 @@ createIntegrationAssignments: function() {
                     },
                     "disable integration": {
                         action: function() {
-                            ajaxUtils.changeSetting({setting: "oauth_token", value: false});
+                            ajaxUtils.changeSetting({setting: "gc_token", value: false});
                         }
                     },
                     reauthenticate: {

@@ -36,10 +36,10 @@ DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS = (
     'immediately_delete_completely_finished_assignments', 'def_min_work_time',
     'def_break_days', 'def_skew_ratio', 'one_graph_at_a_time', 'close_graph_after_work_input', 'show_priority', 'highest_priority_color',
     'lowest_priority_color', 'default_dropdown_tags', 'horizontal_tag_position', 'vertical_tag_position', 'appearance', 'animation_speed',
-    'enable_tutorial', 'sorting_animation_threshold', 'oauth_token', 'added_gc_assignment_ids', 'seen_latest_changelog', 
+    'enable_tutorial', 'sorting_animation_threshold', 'gc_token', 'added_gc_assignment_ids', 'seen_latest_changelog', 
     'nudge_calendar', 'nudge_notifications', 'nudge_canvas', 'user', 'gc_courses_cache', 'device_uuid', 'device_uuid_api_timestamp',
     'display_working_days_left', 'background_image_text_shadow_width', 'gc_assignments_always_midnight', 'loosely_enforce_minimum_work_times', 
-    'priority_color_borders', 'font', 'should_alert_due_date_incremented', 'example_account', "oauth_token",
+    'priority_color_borders', 'font', 'should_alert_due_date_incremented', 'example_account', "gc_token",
     'added_canvas_assignment_ids', 'canvas_courses_cache',
 )
 
@@ -55,7 +55,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             self.user = request.user
         if "form" not in self.context:
             initial = {
-                'enable_gc_integration': 'token' in self.user.settingsmodel.oauth_token,
+                'enable_gc_integration': 'token' in self.user.settingsmodel.gc_token,
             }
             self.context['form'] = SettingsForm(initial=initial, instance=self.user.settingsmodel)
         self.context['default_settings'] = model_to_dict(SettingsForm().save(commit=False),
@@ -82,12 +82,12 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             return self.invalid_form(request)
     
     def valid_form(self, request):
-        if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in self.user.settingsmodel.oauth_token:
+        if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in self.user.settingsmodel.gc_token:
             disable_gc_integration(request, save=False)
         self.form.save()
         logger.info(f'User \"{self.user}\" updated the settings page')
 
-        if self.form.cleaned_data.get("enable_gc_integration") and not 'token' in self.user.settingsmodel.oauth_token:
+        if self.form.cleaned_data.get("enable_gc_integration") and not 'token' in self.user.settingsmodel.gc_token:
             return redirect(generate_gc_authorization_url(request, next_url="home", current_url="settings"))
         if self.form.cleaned_data.get("view_deleted_assignments"):
             return redirect("deleted_assignments")

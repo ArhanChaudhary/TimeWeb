@@ -522,7 +522,7 @@ def change_setting(request):
     setting = data['setting']
     value = json.loads(data['value'])
 
-    if setting == "oauth_token":
+    if setting == "gc_token":
         if value:
             return JsonResponse({
                 'should_redirect': True,

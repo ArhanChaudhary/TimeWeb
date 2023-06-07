@@ -20,7 +20,7 @@ class SettingsForm(forms.ModelForm):
     class Meta:
         model = SettingsModel
         exclude = (
-            "oauth_token",
+            "gc_token",
             "added_gc_assignment_ids",
             "user",
             "gc_courses_cache",

@@ -320,15 +320,15 @@ def gc_auth_callback(request):
     courses = courses.get('courses', [])
     request.user.settingsmodel.gc_courses_cache = format_gc_courses(courses)
     # Use .update() (dict method) instead of = so the refresh token isnt overwritten
-    request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
-    request.user.settingsmodel.save(update_fields=("gc_courses_cache", "oauth_token"))
+    request.user.settingsmodel.gc_token.update(json.loads(credentials.to_json()))
+    request.user.settingsmodel.save(update_fields=("gc_courses_cache", "gc_token"))
     logger.info(f"User {request.user} enabled google classroom API")
     del request.session["gc-callback-current-url"]
     return redirect(request.session.pop("gc-callback-next-url"))
 
 def disable_gc_integration(request, *, save=True):
-    # request.user.settingsmodel.oauth_token stores the user's access and refresh tokens
-    request.user.settingsmodel.oauth_token = {"refresh_token": request.user.settingsmodel.oauth_token['refresh_token']}
+    # request.user.settingsmodel.gc_token stores the user's access and refresh tokens
+    request.user.settingsmodel.gc_token = {"refresh_token": request.user.settingsmodel.gc_token['refresh_token']}
     if settings.DEBUG:
         # Re-add gc assignments in debug
         request.user.settingsmodel.added_gc_assignment_ids = []
@@ -341,12 +341,12 @@ def disable_gc_integration(request, *, save=True):
 # reminder: do not use this because thread_sensitive is True by default
 async def create_gc_assignments(request):
     await sync_to_async(lambda: request.user.settingsmodel)()
-    if 'token' not in request.user.settingsmodel.oauth_token:
+    if 'token' not in request.user.settingsmodel.gc_token:
         return HttpResponse(status=401)
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.oauth_token, settings.GC_SCOPES)
+    credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.gc_token, settings.GC_SCOPES)
     # If there are no valid credentials available, let the user log in.
     if not credentials.valid:
         can_be_refreshed = credentials.expired and credentials.refresh_token
@@ -366,8 +366,8 @@ async def create_gc_assignments(request):
         except TransportError:
             return {"next": "continue"}
         else:
-            request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
-            await sync_to_async(request.user.settingsmodel.save)(update_fields=("oauth_token", ))
+            request.user.settingsmodel.gc_token.update(json.loads(credentials.to_json()))
+            await sync_to_async(request.user.settingsmodel.save)(update_fields=("gc_token", ))
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
 
     def format_response_data(*, assignment_models, response_data, order, exception):
@@ -628,7 +628,7 @@ async def create_gc_assignments(request):
 def update_gc_courses(request):
     # NOTE: we cannot simply run this in create_gc_assignments after the response is sent because
     # we want to be able to alert the user if their credentials for listing courses is invalid
-    credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.oauth_token, settings.GC_SCOPES)
+    credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.gc_token, settings.GC_SCOPES)
     if not credentials.valid:
         # rest this logic on create_gc_assignments, idrc if its invalid here
         return {"next": "continue"}

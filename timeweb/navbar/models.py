@@ -222,7 +222,7 @@ class SettingsModel(models.Model):
     # will be compatible with the new encrypted field; that is decrypt_values on an
     # unencrypted data type will simply just return the same value courtesy of the author
     # of django-encrypted-json-fields :)
-    oauth_token = EncryptedJSONField(
+    gc_token = EncryptedJSONField(
         default=empty_dict,
         blank=True,
     )

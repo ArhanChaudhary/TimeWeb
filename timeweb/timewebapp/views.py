@@ -41,7 +41,7 @@ INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT = (
     'example_assignment',
 )
 EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT = (
-    "oauth_token", "added_gc_assignment_ids", "user", "background_image", "id", "nudge_calendar",
+    "gc_token", "added_gc_assignment_ids", "user", "background_image", "id", "nudge_calendar",
     "nudge_notifications", "nudge_canvas", "device_uuid", "device_uuid_api_timestamp",
     "gc_courses_cache", "gc_assignments_always_midnight", "background_image_text_shadow_width",
     "appearance", "priority_color_borders", "font", "canvas_token", "added_canvas_assignment_ids",
@@ -151,7 +151,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['assignment_models_as_json'] = [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in timewebmodels]
 
         self.context['settings_model_as_json'] = model_to_dict(self.user.settingsmodel, exclude=EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT)
-        self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in self.user.settingsmodel.oauth_token
+        self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in self.user.settingsmodel.gc_token
 
         if not self.user.settingsmodel.seen_latest_changelog:
             self.context['latest_changelog'] = CHANGELOGS[0]

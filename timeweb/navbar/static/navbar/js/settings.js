@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 "try again": {
                     action: () => {
                         alreadySubmitted = true;
-                        ajaxUtils.changeSetting({setting: "oauth_token", value: true});
+                        ajaxUtils.changeSetting({setting: "gc_token", value: true});
                     },
                 },
             },

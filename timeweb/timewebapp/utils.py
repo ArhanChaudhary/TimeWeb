@@ -91,8 +91,8 @@ def update_gc_courses_cache():
     from googleapiclient.discovery import build
     from common.utils import logger
     with transaction.atomic():
-        for s in SettingsModel.objects.exclude(oauth_token={}):
-            credentials = Credentials.from_authorized_user_info(s.oauth_token, settings.GC_SCOPES)
+        for s in SettingsModel.objects.exclude(gc_token={}):
+            credentials = Credentials.from_authorized_user_info(s.gc_token, settings.GC_SCOPES)
             try:
                 if not credentials.valid:
                     can_be_refreshed = credentials.expired and credentials.refresh_token
