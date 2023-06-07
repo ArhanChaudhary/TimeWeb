@@ -24,7 +24,10 @@ from google.auth.exceptions import RefreshError, TransportError
 from googleapiclient.discovery import build
 from googleapiclient.discovery_cache.base import Cache
 from googleapiclient.errors import HttpError
-from requests.exceptions import ConnectionError as ConnectionError_
+from requests.exceptions import (
+    ConnectionError as ConnectionError_,
+    ReadTimeout
+)
 from httplib2.error import ServerNotFoundError
 from oauthlib.oauth2.rfc6749.errors import (
     AccessDeniedError,
@@ -826,7 +829,7 @@ async def create_canvas_assignments(request):
     except InvalidAccessToken:
         # do stuff
         pass
-    except (ConnectionError_, RateLimitExceeded):
+    except (ConnectionError_, RateLimitExceeded, ReadTimeout):
         # return here or else assignment_model_data won't be defined and throw an error
         return {"next": "continue"}
     if not assignment_model_data:
