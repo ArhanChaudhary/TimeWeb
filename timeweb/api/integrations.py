@@ -14,9 +14,16 @@ import timewebapp.utils as app_utils
 from timewebapp.models import TimewebModel
 from timewebapp.views import EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT
 
-# Google API
+# Integrations stuff
 import asyncio
 from asgiref.sync import sync_to_async, async_to_sync
+from requests.exceptions import (
+    ConnectionError as ConnectionError_,
+    ReadTimeout
+)
+from httplib2.error import ServerNotFoundError
+
+# Google API
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import Flow
@@ -24,11 +31,6 @@ from google.auth.exceptions import RefreshError, TransportError
 from googleapiclient.discovery import build
 from googleapiclient.discovery_cache.base import Cache
 from googleapiclient.errors import HttpError
-from requests.exceptions import (
-    ConnectionError as ConnectionError_,
-    ReadTimeout
-)
-from httplib2.error import ServerNotFoundError
 from oauthlib.oauth2.rfc6749.errors import (
     AccessDeniedError,
     InvalidGrantError,
@@ -36,7 +38,6 @@ from oauthlib.oauth2.rfc6749.errors import (
 )
 
 # Canvas API
-import html2text
 from canvasapi import Canvas
 from canvasapi.course import Course
 from canvasapi.exceptions import InvalidAccessToken, RateLimitExceeded
@@ -47,6 +48,7 @@ if settings.DEBUG:
 import re
 import os
 import datetime
+import html2text
 import json
 from common.views import logger
 from django.utils.text import Truncator
