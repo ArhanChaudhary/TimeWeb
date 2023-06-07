@@ -370,6 +370,49 @@ async def create_gc_assignments(request):
             await sync_to_async(request.user.settingsmodel.save)(update_fields=("gc_token", ))
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
 
+    complete_date_now = utils.utc_to_local(request, timezone.now())
+    # Note about timezones: use the local tz because date_now repesents the date at the user's location
+    # This makes comparison logic work
+    date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
+    def parse_response_datum_dates(assignment):
+        # NOTE: scheduled assignments logically don't show up on the API
+        # this implies that assignments due in the future cannot be created with the Google Classroom API
+        # I am still going to assume this is possible with my validation logic and also check for "scheduledTime"
+        # for forward compatibility and to be safe
+        complete_assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
+        complete_assignment_date = utils.utc_to_local(request, datetime.datetime.fromisoformat(complete_assignment_date))
+        assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        if 'dueDate' in assignment:
+            # From https://developers.google.com/classroom/reference/rest/v1/courses.courseWork#CourseWork.FIELDS.due_time
+            # "This[the due time] must be specified if dueDate is specified."
+
+            # Assignments due at 2:31 AM UTC => assignment['dueTime'] = {'hours': 2, 'minutes': 31}
+            # Assignments due at 2:00 AM UTC => assignment['dueTime'] = {'hours': 2}
+            # Assignments due at 12:00 AM UTC => assignment['dueTime'] = {}
+            complete_x = utils.utc_to_local(request, datetime.datetime(
+                **assignment['dueDate'],
+                hour=assignment['dueTime'].get('hours', 0),
+                minute=assignment['dueTime'].get('minutes', 0),
+                tzinfo=timezone.utc,
+            ))
+            # Do this after utc_to_local to ensure I am checking local time
+            if (
+                # is setting enabled?
+                request.user.settingsmodel.gc_assignments_always_midnight and 
+                # is it due at 11:59 PM?
+                complete_x.hour == 23 and complete_x.minute == 59 and 
+                # extra condtion #1: the google classroom assignment cannot be due later today
+                # we don't want to do this as the information would then be inaccurate to the user
+                complete_x.replace(hour=0, minute=0, second=0, microsecond=0) != date_now and
+                # extra condtion #2: the google classroom assignment must not be due on its assignment date
+                # this is applicable for assignments due in the future
+                complete_x.replace(hour=0, minute=0, second=0, microsecond=0) != assignment_date
+            ):
+                complete_x = complete_x.replace(hour=0, minute=0, second=0, microsecond=0)
+        else:
+            complete_x = None
+        return (complete_assignment_date, complete_x)
+
     def format_response_data(*, assignment_models, response_data, order, exception):
         # it is possible for this function to process courses that are in the cache but archived
         # this does not matter
@@ -386,55 +429,13 @@ async def create_gc_assignments(request):
         # NOTE: there is no point trying to waste brain cells trying to return early if ascending order
         # response_data repeats the same assignments as in the descending order response as the loop
         # continues if an assignment has already been added
-        def parse_coursework_dates(assignment):
-            # NOTE: scheduled assignments logically don't show up on the API
-            # this implies that assignments due in the future cannot be created with the Google Classroom API
-            # I am still going to assume this is possible with my validation logic and also check for "scheduledTime"
-            # for forward compatibility and to be safe
-            complete_assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
-            complete_assignment_date = utils.utc_to_local(request, datetime.datetime.fromisoformat(complete_assignment_date))
-            assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
-            if 'dueDate' in assignment:
-                # From https://developers.google.com/classroom/reference/rest/v1/courses.courseWork#CourseWork.FIELDS.due_time
-                # "This[the due time] must be specified if dueDate is specified."
-
-                # Assignments due at 2:31 AM UTC => assignment['dueTime'] = {'hours': 2, 'minutes': 31}
-                # Assignments due at 2:00 AM UTC => assignment['dueTime'] = {'hours': 2}
-                # Assignments due at 12:00 AM UTC => assignment['dueTime'] = {}
-                complete_x = utils.utc_to_local(request, datetime.datetime(
-                    **assignment['dueDate'],
-                    hour=assignment['dueTime'].get('hours', 0),
-                    minute=assignment['dueTime'].get('minutes', 0),
-                    tzinfo=timezone.utc,
-                ))
-                # Do this after utc_to_local to ensure I am checking local time
-                if (
-                    # is setting enabled?
-                    request.user.settingsmodel.gc_assignments_always_midnight and 
-                    # is it due at 11:59 PM?
-                    complete_x.hour == 23 and complete_x.minute == 59 and 
-                    # extra condtion #1: the google classroom assignment cannot be due later today
-                    # we don't want to do this as the information would then be inaccurate to the user
-                    complete_x.replace(hour=0, minute=0, second=0, microsecond=0) != date_now and
-                    # extra condtion #2: the google classroom assignment must not be due on its assignment date
-                    # this is applicable for assignments due in the future
-                    complete_x.replace(hour=0, minute=0, second=0, microsecond=0) != assignment_date
-                ):
-                    complete_x = complete_x.replace(hour=0, minute=0, second=0, microsecond=0)
-            else:
-                complete_x = None
-            return (complete_assignment_date, complete_x)
-        complete_date_now = utils.utc_to_local(request, timezone.now())
-        # Note about timezones: use the local tz because date_now repesents the date at the user's location
-        # This makes comparison logic work
-        date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         response_data = response_data['courseWork']
         now_search_left = 0
         now_search_right = len(response_data)
         while now_search_left < now_search_right:
             mid = (now_search_left + now_search_right) // 2
             assignment = response_data[mid]
-            complete_assignment_date, complete_x = parse_coursework_dates(assignment)
+            complete_assignment_date, complete_x = parse_response_datum_dates(assignment)
             if complete_x:
                 due_before_today = complete_x <= complete_date_now
             else:
@@ -448,7 +449,7 @@ async def create_gc_assignments(request):
         while none_search_left < none_search_right:
             mid = (none_search_left + none_search_right) // 2
             assignment = response_data[mid]
-            complete_assignment_date, complete_x = parse_coursework_dates(assignment)
+            complete_assignment_date, complete_x = parse_response_datum_dates(assignment)
             if complete_x and order == "desc" or not complete_x and order == "asc":
                 none_search_left = mid + 1
             else:
@@ -470,7 +471,7 @@ async def create_gc_assignments(request):
             assignment_id = int(assignment['id'], 10)
             if assignment_id in request.user.settingsmodel.added_gc_assignment_ids:
                 continue
-            complete_assignment_date, complete_x = parse_coursework_dates(assignment)
+            complete_assignment_date, complete_x = parse_response_datum_dates(assignment)
             assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
             tags = []
             if complete_x:
