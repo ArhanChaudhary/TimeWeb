@@ -208,7 +208,6 @@ class MemoryCache(Cache):
     def set(self, url, content):
         MemoryCache._CACHE[url] = content
 
-@require_http_methods(["GET"])
 def update_gc_courses(request):
     # NOTE: we cannot simply run this in create_gc_assignments after the response is sent because
     # we want to be able to alert the user if their credentials for listing courses is invalid
@@ -846,7 +845,6 @@ async def create_canvas_assignments(request):
         "next": "continue",
     }
 
-@require_http_methods(["GET"])
 def update_canvas_courses(request):
     canvas = Canvas(settings.CANVAS_URL, settings.CANVAS_TOKEN)
     try:
