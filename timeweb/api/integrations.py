@@ -53,6 +53,10 @@ import json
 from common.views import logger
 from django.utils.text import Truncator
 
+# 
+# CONSTANTS
+# 
+
 ASSIGNMENT_DATE_DAYS_CUTOFF = 30
 
 MAX_DESCENDING_COURSEWORK_PAGE_SIZE = 15
@@ -73,21 +77,26 @@ COURSE_API_FIELDS = (
     "id",
 )
 
-generate_static_integration_fields = lambda user: {
-    # from app
-    "skew_ratio": user.settingsmodel.def_skew_ratio,
-    "min_work_time": user.settingsmodel.def_min_work_time,
-    "break_days": user.settingsmodel.def_break_days,
-    "user": user,
-    "needs_more_info": True,
-    "is_integration_assignment": True,
-    # assumptions
-    "unit": "Minute",
-    "time_per_unit": 1,
-    "funct_round": 5,
-    # y is missing
-    "y": None,
-}
+# 
+# COMMON INTEGRATION UTILITIES
+# 
+
+def generate_static_integration_fields(user):
+    return {
+        # from app
+        "skew_ratio": user.settingsmodel.def_skew_ratio,
+        "min_work_time": user.settingsmodel.def_min_work_time,
+        "break_days": user.settingsmodel.def_break_days,
+        "user": user,
+        "needs_more_info": True,
+        "is_integration_assignment": True,
+        # assumptions
+        "unit": "Minute",
+        "time_per_unit": 1,
+        "funct_round": 5,
+        # y is missing
+        "y": None,
+    }
 
 def simplify_course_name(tag_name):
     abbreviations = [
@@ -199,6 +208,10 @@ def simplify_course_name(tag_name):
     ], tag_name)
     return tag_name
 
+# 
+# GOOGLE CLASSROOM INTEGRATION
+# 
+
 # Taken from https://github.com/googleapis/google-api-python-client/issues/325#issuecomment-274349841
 # Probably wont be used since it is a document cache but whatever I guess it at least supressed the warning
 class MemoryCache(Cache):
@@ -210,72 +223,117 @@ class MemoryCache(Cache):
     def set(self, url, content):
         MemoryCache._CACHE[url] = content
 
-def update_gc_courses(request):
-    # NOTE: we cannot simply run this in create_gc_assignments after the response is sent because
-    # we want to be able to alert the user if their credentials for listing courses is invalid
-    credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.oauth_token, settings.GC_SCOPES)
-    if not credentials.valid:
-        # rest this logic on create_gc_assignments, idrc if its invalid here
-        return {"next": "continue"}
-    service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
-    try:
-        # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
-        courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in COURSE_API_FIELDS)).execute()
-    except RefreshError:
-        return {
-            'invalid_credentials': True,
-            'reauthorization_url': generate_gc_authorization_url(request, next_url="home", current_url="home"),
-            'next': 'stop',
-        }
-    # If connection to the server randomly dies (could happen locally when wifi is off)
-    except (ServerNotFoundError, TimeoutError):
-        return {"next": "continue"}
-    except HttpError as e:
-        if e.status_code == 429:
-            # Ratelimited, don't care
-            return {"next": "continue"}
-        if e.status_code >= 500:
-            # this happened one time:
-            # googleapiclient.errors.HttpError: <HttpError 503 when requesting https://classroom.googleapis.com/v1/courses?alt=json returned "The service is currently unavailable.". Details: "The service is currently unavailable.">
-            logger.error(e)
-            return {"next": "continue"}
-        raise e
-    courses = courses.get('courses', [])
-    old_courses = request.user.settingsmodel.gc_courses_cache
-    new_courses = format_gc_courses(courses, include_name=False)
-    if len(old_courses) != len(new_courses) or any(old_course["id"] != new_course["id"] for old_course, new_course in zip(old_courses, new_courses)):
-        # NOTE: request.user.settingsmodel is thread-safe
-        # i.e if one thread calls .save while another thread is still blocked in the api request call,
-        # the value of gc_courses_cache won't be affected by the .save and will still retain the original old value
-        # this makes it so that we don't need to use a similar caching system to the one used in create_gc_assignments
-        # as broken pipes no longer won't reload the user
-        request.user.settingsmodel.gc_courses_cache = format_gc_courses(courses)
-        request.user.settingsmodel.save(update_fields=("gc_courses_cache", ))
-        # If old contains every element in new, then we don't need to create_gc_assignments again
-        # As if all the elements of new are in old, then there are new classes to import assignment from.
-
-        # Let's look at some example test cases:
-
-        # old_courses = [1,2,3,4]
-        # new_courses [1,2,3,4,5] (you join a class)
-        # In this case, create_gc_assignments again
-
-        # old_courses = [1,2,3,4]
-        # new_courses = [1,2,3] (you leave a class)
-        # In this case, don't create_gc_assignments again
-
-        # old_courses = [1,2,3,4]
-        # new_courses = [1,2,5] (you leave two classes and join a new one)
-        # In this case, create_gc_assignments again
-        if not set(course['id'] for course in new_courses).issubset(set(course['id'] for course in old_courses)):
-            return async_to_sync(create_gc_assignments)(request)
-    return {"next": "stop"}
-
 def format_gc_courses(courses, include_name=True):
     return [{
                 "id": course["id"],
                 "name": simplify_course_name(course["name"]) if include_name else None,
             } for course in courses]
+
+def generate_gc_authorization_url(request, *, next_url, current_url):
+    flow = Flow.from_client_config(
+        settings.GC_CREDENTIALS_JSON,
+        scopes=settings.GC_SCOPES
+    )
+    flow.redirect_uri = settings.GC_REDIRECT_URI
+    # Generate URL for request to Google's OAuth 2.0 server.
+    # Use kwargs to set optional request parameters.
+    authorization_url, state = flow.authorization_url(
+        prompt='consent',
+        # Enable offline access so that you can refresh an access token without
+        # re-prompting the user for permission. Recommended for web server apps.
+        access_type='offline',
+        # Enable incremental authorization. Recommended as a best practice.
+        include_granted_scopes='true'
+    )
+
+    request.session["gc-callback-next-url"] = next_url
+    request.session["gc-callback-current-url"] = current_url
+    return authorization_url
+
+@require_http_methods(["GET"])
+def gc_auth_callback(request):
+    # Fail it early (for debugging
+    # print(request.build_absolute_uri())
+    # request.session['gc-init-failed'] = True
+    # return redirect("home")
+    def callback_failed():
+        request.session['gc-init-failed'] = True
+        del request.session["gc-callback-next-url"]
+        return redirect(request.session.pop("gc-callback-current-url"))
+    # Callback URI
+    state = request.GET.get('state')
+
+    flow = Flow.from_client_config(
+        settings.GC_CREDENTIALS_JSON,
+        scopes=settings.GC_SCOPES,
+        state=state
+    )
+    flow.redirect_uri = settings.GC_REDIRECT_URI
+
+    # get the full URL that we are on, including all the "?param1=token&param2=key" parameters that google has sent us
+    authorization_response = request.build_absolute_uri()
+
+    # convert http in authorization_response to https
+    # because timeweb runs on a reverse proxy, the requests seen
+    # by railway are http instead of https. We need to ensure the request
+    # is fully secure before bypassing the google https security checks
+    # check if HTTP_X_FORWARDED_PROTO, HTTP_ORIGIN, and HTTP_CF_VISITOR are in request.META
+    if os.environ.get("OAUTHLIB_INSECURE_TRANSPORT") != "1":
+        # HTTP_ORIGIN isn't in request.META after the invalid credentials alert
+        # let's assume it's also possible for every other header to be missing to be safe
+        if (
+            authorization_response.startswith("http://") and
+            request.META.get("HTTP_X_FORWARDED_PROTO", "https") == "https" and
+            request.META.get("HTTP_ORIGIN", "https").startswith("https") and
+            json.loads(request.META.get("HTTP_CF_VISITOR", '{"scheme": "https"}'))['scheme'] == "https"
+        ):
+            authorization_response = "https://" + authorization_response[7:]
+    # turn those parameters into a token
+    try:
+        authorized_flow_token = flow.fetch_token(authorization_response=authorization_response)
+    except (InvalidGrantError, AccessDeniedError, MissingCodeError, ConnectionError_):
+        # InvalidGrantError for bad requests
+        # AccessDeniedError If the user enables no scopes or clicks cancel
+        # MissingCodeError if the user manually gets this route and forgets "code" in the url
+        # note that code is the only required url parameter
+        # ConnectionError_ if the wifi randomly dies (could happen when offline)
+        return callback_failed()
+    # the scope order MAY change
+    # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
+    # Though this hasn't happened, let's be safe and ignore the order in this comparison
+    if set(authorized_flow_token['scope']) != set(settings.GC_SCOPES):
+        # If the user didn't enable both scopes
+        return callback_failed()
+    try:
+        credentials = flow.credentials
+    except ValueError:
+        # ValueError at /api/gc-auth-callback
+        # There is no access token for this session, did you call fetch_token?
+        return callback_failed()
+    service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
+    # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
+    # I don't need to worry about Ratelimit errors either because such a situation would be very rare
+    try:
+        courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in COURSE_API_FIELDS)).execute()
+    except TimeoutError:
+        return callback_failed()
+    courses = courses.get('courses', [])
+    request.user.settingsmodel.gc_courses_cache = format_gc_courses(courses)
+    # Use .update() (dict method) instead of = so the refresh token isnt overwritten
+    request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
+    request.user.settingsmodel.save(update_fields=("gc_courses_cache", "oauth_token"))
+    logger.info(f"User {request.user} enabled google classroom API")
+    del request.session["gc-callback-current-url"]
+    return redirect(request.session.pop("gc-callback-next-url"))
+
+def disable_gc_integration(request, *, save=True):
+    # request.user.settingsmodel.oauth_token stores the user's access and refresh tokens
+    request.user.settingsmodel.oauth_token = {"refresh_token": request.user.settingsmodel.oauth_token['refresh_token']}
+    if settings.DEBUG:
+        # Re-add gc assignments in debug
+        request.user.settingsmodel.added_gc_assignment_ids = []
+    if save:
+        request.user.settingsmodel.save()
 
 # @sync_to_async
 # @require_http_methods(["GET"])
@@ -567,150 +625,76 @@ async def create_gc_assignments(request):
         "next": "continue",
     }
 
-def generate_gc_authorization_url(request, *, next_url, current_url):
-    flow = Flow.from_client_config(
-        settings.GC_CREDENTIALS_JSON,
-        scopes=settings.GC_SCOPES
-    )
-    flow.redirect_uri = settings.GC_REDIRECT_URI
-    # Generate URL for request to Google's OAuth 2.0 server.
-    # Use kwargs to set optional request parameters.
-    authorization_url, state = flow.authorization_url(
-        prompt='consent',
-        # Enable offline access so that you can refresh an access token without
-        # re-prompting the user for permission. Recommended for web server apps.
-        access_type='offline',
-        # Enable incremental authorization. Recommended as a best practice.
-        include_granted_scopes='true'
-    )
-
-    request.session["gc-callback-next-url"] = next_url
-    request.session["gc-callback-current-url"] = current_url
-    return authorization_url
-
-
-def disable_gc_integration(request, *, save=True):
-    # request.user.settingsmodel.oauth_token stores the user's access and refresh tokens
-    request.user.settingsmodel.oauth_token = {"refresh_token": request.user.settingsmodel.oauth_token['refresh_token']}
-    if settings.DEBUG:
-        # Re-add gc assignments in debug
-        request.user.settingsmodel.added_gc_assignment_ids = []
-    if save:
-        request.user.settingsmodel.save()
-
-@require_http_methods(["GET"])
-def gc_auth_callback(request):
-    # Fail it early (for debugging
-    # print(request.build_absolute_uri())
-    # request.session['gc-init-failed'] = True
-    # return redirect("home")
-    def callback_failed():
-        request.session['gc-init-failed'] = True
-        del request.session["gc-callback-next-url"]
-        return redirect(request.session.pop("gc-callback-current-url"))
-    # Callback URI
-    state = request.GET.get('state')
-
-    flow = Flow.from_client_config(
-        settings.GC_CREDENTIALS_JSON,
-        scopes=settings.GC_SCOPES,
-        state=state
-    )
-    flow.redirect_uri = settings.GC_REDIRECT_URI
-
-    # get the full URL that we are on, including all the "?param1=token&param2=key" parameters that google has sent us
-    authorization_response = request.build_absolute_uri()
-
-    # convert http in authorization_response to https
-    # because timeweb runs on a reverse proxy, the requests seen
-    # by railway are http instead of https. We need to ensure the request
-    # is fully secure before bypassing the google https security checks
-    # check if HTTP_X_FORWARDED_PROTO, HTTP_ORIGIN, and HTTP_CF_VISITOR are in request.META
-    if os.environ.get("OAUTHLIB_INSECURE_TRANSPORT") != "1":
-        # HTTP_ORIGIN isn't in request.META after the invalid credentials alert
-        # let's assume it's also possible for every other header to be missing to be safe
-        if (
-            authorization_response.startswith("http://") and
-            request.META.get("HTTP_X_FORWARDED_PROTO", "https") == "https" and
-            request.META.get("HTTP_ORIGIN", "https").startswith("https") and
-            json.loads(request.META.get("HTTP_CF_VISITOR", '{"scheme": "https"}'))['scheme'] == "https"
-        ):
-            authorization_response = "https://" + authorization_response[7:]
-    # turn those parameters into a token
-    try:
-        authorized_flow_token = flow.fetch_token(authorization_response=authorization_response)
-    except (InvalidGrantError, AccessDeniedError, MissingCodeError, ConnectionError_):
-        # InvalidGrantError for bad requests
-        # AccessDeniedError If the user enables no scopes or clicks cancel
-        # MissingCodeError if the user manually gets this route and forgets "code" in the url
-        # note that code is the only required url parameter
-        # ConnectionError_ if the wifi randomly dies (could happen when offline)
-        return callback_failed()
-    # the scope order MAY change
-    # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
-    # Though this hasn't happened, let's be safe and ignore the order in this comparison
-    if set(authorized_flow_token['scope']) != set(settings.GC_SCOPES):
-        # If the user didn't enable both scopes
-        return callback_failed()
-    try:
-        credentials = flow.credentials
-    except ValueError:
-        # ValueError at /api/gc-auth-callback
-        # There is no access token for this session, did you call fetch_token?
-        return callback_failed()
+def update_gc_courses(request):
+    # NOTE: we cannot simply run this in create_gc_assignments after the response is sent because
+    # we want to be able to alert the user if their credentials for listing courses is invalid
+    credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.oauth_token, settings.GC_SCOPES)
+    if not credentials.valid:
+        # rest this logic on create_gc_assignments, idrc if its invalid here
+        return {"next": "continue"}
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
-    # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
-    # I don't need to worry about Ratelimit errors either because such a situation would be very rare
     try:
+        # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
         courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in COURSE_API_FIELDS)).execute()
-    except TimeoutError:
-        return callback_failed()
+    except RefreshError:
+        return {
+            'invalid_credentials': True,
+            'reauthorization_url': generate_gc_authorization_url(request, next_url="home", current_url="home"),
+            'next': 'stop',
+        }
+    # If connection to the server randomly dies (could happen locally when wifi is off)
+    except (ServerNotFoundError, TimeoutError):
+        return {"next": "continue"}
+    except HttpError as e:
+        if e.status_code == 429:
+            # Ratelimited, don't care
+            return {"next": "continue"}
+        if e.status_code >= 500:
+            # this happened one time:
+            # googleapiclient.errors.HttpError: <HttpError 503 when requesting https://classroom.googleapis.com/v1/courses?alt=json returned "The service is currently unavailable.". Details: "The service is currently unavailable.">
+            logger.error(e)
+            return {"next": "continue"}
+        raise e
     courses = courses.get('courses', [])
-    request.user.settingsmodel.gc_courses_cache = format_gc_courses(courses)
-    # Use .update() (dict method) instead of = so the refresh token isnt overwritten
-    request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
-    request.user.settingsmodel.save(update_fields=("gc_courses_cache", "oauth_token"))
-    logger.info(f"User {request.user} enabled google classroom API")
-    del request.session["gc-callback-current-url"]
-    return redirect(request.session.pop("gc-callback-next-url"))
+    old_courses = request.user.settingsmodel.gc_courses_cache
+    new_courses = format_gc_courses(courses, include_name=False)
+    if len(old_courses) != len(new_courses) or any(old_course["id"] != new_course["id"] for old_course, new_course in zip(old_courses, new_courses)):
+        # NOTE: request.user.settingsmodel is thread-safe
+        # i.e if one thread calls .save while another thread is still blocked in the api request call,
+        # the value of gc_courses_cache won't be affected by the .save and will still retain the original old value
+        # this makes it so that we don't need to use a similar caching system to the one used in create_gc_assignments
+        # as broken pipes no longer won't reload the user
+        request.user.settingsmodel.gc_courses_cache = format_gc_courses(courses)
+        request.user.settingsmodel.save(update_fields=("gc_courses_cache", ))
+        # If old contains every element in new, then we don't need to create_gc_assignments again
+        # As if all the elements of new are in old, then there are new classes to import assignment from.
+
+        # Let's look at some example test cases:
+
+        # old_courses = [1,2,3,4]
+        # new_courses [1,2,3,4,5] (you join a class)
+        # In this case, create_gc_assignments again
+
+        # old_courses = [1,2,3,4]
+        # new_courses = [1,2,3] (you leave a class)
+        # In this case, don't create_gc_assignments again
+
+        # old_courses = [1,2,3,4]
+        # new_courses = [1,2,5] (you leave two classes and join a new one)
+        # In this case, create_gc_assignments again
+        if not set(course['id'] for course in new_courses).issubset(set(course['id'] for course in old_courses)):
+            return async_to_sync(create_gc_assignments)(request)
+    return {"next": "stop"}
+
+# 
+# CANVAS INTEGRATION
+# 
 
 def format_canvas_courses(courses, include_name=True):
     return [{
                 "id": course.id,
                 "name": simplify_course_name(course.name) if include_name else None,
             } for course in courses]
-
-@sync_to_async
-@require_http_methods(["GET"])
-@async_to_sync
-async def create_integration_assignments(request):
-    if settings.DEBUG:
-        t = time.time()
-        logger.info("started integration requests")
-    ret = JsonResponse({
-        key: value for response_json in asyncio.as_completed(
-            [
-                create_gc_assignments(request),
-                create_canvas_assignments(request),
-            ]
-        ) for key, value in (await response_json).items()
-    })
-    if settings.DEBUG:
-        logger.info(f"finished integration requests in {time.time() - t}")
-    return ret
-
-@sync_to_async
-@require_http_methods(["GET"])
-@async_to_sync
-async def update_integration_courses(request):
-    return JsonResponse({
-        key: value for response_json in asyncio.as_completed(
-            [
-                sync_to_async(update_gc_courses)(request),
-                sync_to_async(update_canvas_courses)(request)
-            ]
-        ) for key, value in (await response_json).items()
-    })
 
 # @sync_to_async
 # @require_http_methods(["GET"])
@@ -863,3 +847,39 @@ def update_canvas_courses(request):
         if not set(course['id'] for course in new_courses).issubset(set(course['id'] for course in old_courses)):
             return async_to_sync(create_canvas_assignments)(request)
     return {"next": "stop"}
+
+# 
+# INTEGRATIONS API VIEW FUNCTIONS
+# 
+
+@sync_to_async
+@require_http_methods(["GET"])
+@async_to_sync
+async def create_integration_assignments(request):
+    if settings.DEBUG:
+        t = time.time()
+        logger.info("started integration requests")
+    ret = JsonResponse({
+        key: value for response_json in asyncio.as_completed(
+            [
+                create_gc_assignments(request),
+                create_canvas_assignments(request),
+            ]
+        ) for key, value in (await response_json).items()
+    })
+    if settings.DEBUG:
+        logger.info(f"finished integration requests in {time.time() - t}")
+    return ret
+
+@sync_to_async
+@require_http_methods(["GET"])
+@async_to_sync
+async def update_integration_courses(request):
+    return JsonResponse({
+        key: value for response_json in asyncio.as_completed(
+            [
+                sync_to_async(update_gc_courses)(request),
+                sync_to_async(update_canvas_courses)(request)
+            ]
+        ) for key, value in (await response_json).items()
+    })
