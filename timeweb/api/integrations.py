@@ -849,8 +849,13 @@ async def create_canvas_assignments(request):
 @require_http_methods(["GET"])
 def update_canvas_courses(request):
     canvas = Canvas(settings.CANVAS_URL, settings.CANVAS_TOKEN)
-
-    courses = list(canvas.get_courses(enrollment_state='active', state=['available']))
+    try:
+        courses = list(canvas.get_courses(enrollment_state='active', state=['available']))
+    except InvalidAccessToken:
+        # do stuff
+        pass
+    except (ConnectionError_, RateLimitExceeded):
+        return {"next": "continue"}
 
     old_courses = request.user.settingsmodel.canvas_courses_cache
     new_courses = format_canvas_courses(courses, include_name=False)
