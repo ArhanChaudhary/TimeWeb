@@ -697,6 +697,48 @@ def format_canvas_courses(courses, include_name=True):
                 "name": simplify_course_name(course.name) if include_name else None,
             } for course in courses]
 
+def generate_canvas_authorization_url(request, *, next_url, current_url):
+    # ... Generate authorization url from canvas oauth flow
+    authorization_url = None
+
+    request.session["canvas-callback-next-url"] = next_url
+    request.session["canvas-callback-current-url"] = current_url
+    return authorization_url
+
+@require_http_methods(["GET"])
+def canvas_auth_callback(request):
+    def callback_failed():
+        request.session['canvas-init-failed'] = True
+        del request.session["canvas-callback-next-url"]
+        return redirect(request.session.pop("canvas-callback-current-url"))
+
+    # ... Canvas oauth flow callback
+
+    canvas = Canvas(settings.CANVAS_URL, settings.CANVAS_TOKEN)
+    try:
+        courses = list(canvas.get_courses(enrollment_state='active', state=['available']))
+    except InvalidAccessToken:
+        # do stuff
+        pass
+    except (ConnectionError_, RateLimitExceeded):
+        return {"next": "continue"}
+    request.user.settingsmodel.canvas_courses_cache = format_canvas_courses(courses)
+    # ... update canvas token credentials
+    request.user.settingsmodel.save(update_fields=("canvas_courses_cache", "canvas_token"))
+    logger.info(f"User {request.user} enabled the canvas API")
+    del request.session["canvas-callback-current-url"]
+    return redirect(request.session.pop("canvas-callback-next-url"))
+
+def disable_canvas_integration(request, *, save=True):
+    request.user.settingsmodel.canvas_token = {"refresh_token": request.user.settingsmodel.canvas_token['refresh_token']}
+    # ids aren't unique to canvas as a whole, just to every canvas instance
+    request.user.settingsmodel.canvas_courses_cache = []
+    if settings.DEBUG:
+        # Re-add canvas assignments in debug
+        request.user.settingsmodel.added_canvas_assignment_ids = []
+    if save:
+        request.user.settingsmodel.save()
+
 # @sync_to_async
 # @require_http_methods(["GET"])
 # @async_to_sync
