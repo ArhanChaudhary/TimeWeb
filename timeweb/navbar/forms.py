@@ -32,7 +32,7 @@ class SettingsForm(forms.ModelForm):
             "canvas_courses_cache",
         )
         extra_fields = {
-            "enable_gc_integration": {
+            "gc_integration": {
                 "field": forms.BooleanField(
                     label="Google Classroom Integration",
                     help_text=mark_safe('''
@@ -51,7 +51,7 @@ class SettingsForm(forms.ModelForm):
                     widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
                     required=False,
                 ),
-                "order": "after enable_gc_integration",
+                "order": "after gc_integration",
             },
             "calendar_integration": {
                 "field": forms.BooleanField(

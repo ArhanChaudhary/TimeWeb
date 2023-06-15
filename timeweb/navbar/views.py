@@ -55,7 +55,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             self.user = request.user
         if "form" not in self.context:
             initial = {
-                'enable_gc_integration': 'token' in self.user.settingsmodel.gc_token,
+                'gc_integration': 'token' in self.user.settingsmodel.gc_token,
             }
             self.context['form'] = SettingsForm(initial=initial, instance=self.user.settingsmodel)
         self.context['default_settings'] = model_to_dict(SettingsForm().save(commit=False),
@@ -82,12 +82,12 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             return self.invalid_form(request)
     
     def valid_form(self, request):
-        if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in self.user.settingsmodel.gc_token:
+        if not self.form.cleaned_data.get("gc_integration") and 'token' in self.user.settingsmodel.gc_token:
             disable_gc_integration(request, save=False)
         self.form.save()
         logger.info(f'User \"{self.user}\" updated the settings page')
 
-        if self.form.cleaned_data.get("enable_gc_integration") and not 'token' in self.user.settingsmodel.gc_token:
+        if self.form.cleaned_data.get("gc_integration") and not 'token' in self.user.settingsmodel.gc_token:
             return redirect(generate_gc_authorization_url(request, next_url="home", current_url="settings"))
         if self.form.cleaned_data.get("view_deleted_assignments"):
             return redirect("deleted_assignments")

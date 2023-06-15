@@ -39,13 +39,13 @@
             <span class="error-note">{{ error|escape }}</span>
         {% endfor %}
         {% for field in form.visible_fields %}
-            {% if field.name == "enable_gc_integration" or field.name == "immediately_delete_completely_finished_assignments" or field.name == "def_min_work_time" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "appearance" or field.name == "enable_tutorial" %}
-                {% if field.name != "enable_gc_integration" %}
+            {% if field.name == "gc_integration" or field.name == "immediately_delete_completely_finished_assignments" or field.name == "def_min_work_time" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "appearance" or field.name == "enable_tutorial" %}
+                {% if field.name != "gc_integration" %}
                     </div>
                 {% endif %}
                 <div class="field-group">
                     <span class="field-group-label">
-                        {% if field.name == "enable_gc_integration" %}
+                        {% if field.name == "gc_integration" %}
                             Integrations
                         {% elif field.name == "immediately_delete_completely_finished_assignments" %}
                             Assignment Deletion
@@ -85,7 +85,7 @@
                                     {% if field.name == "view_deleted_assignments" %}
                                         View
                                     {% else %}
-                                        {% if field.name == "enable_gc_integration" or field.name == "calendar_integration" or field.name == "notifications_integration" or field.name == "canvas_integration" %}
+                                        {% if field.name == "gc_integration" or field.name == "calendar_integration" or field.name == "notifications_integration" or field.name == "canvas_integration" %}
                                             <span class="toggle-text">
                                                 Disable
                                             </span>
