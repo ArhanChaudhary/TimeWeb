@@ -583,10 +583,10 @@ async def create_gc_assignments(request):
             ))
         if settings.DEBUG:
             logger.info(f"started gc order {order}")
-            t = time.time()
+            t = time.perf_counter()
         batch.execute()
         if settings.DEBUG:
-            logger.info(f"finished gc order {order} in {time.time() - t}")
+            logger.info(f"finished gc order {order} in {time.perf_counter() - t}")
         return assignment_models
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
@@ -594,7 +594,7 @@ async def create_gc_assignments(request):
     try:
         if settings.DEBUG:
             logger.info("started gc requests")
-            t = time.time()
+            t = time.perf_counter()
         assignment_model_data = [
             assignment_model
             for assignment_models in asyncio.as_completed([
@@ -607,7 +607,7 @@ async def create_gc_assignments(request):
             for assignment_model in await assignment_models
         ]
         if settings.DEBUG:
-            logger.info(f"finished gc requests in {time.time() - t}")
+            logger.info(f"finished gc requests in {time.perf_counter() - t}")
     except RefreshError:
         return {
             'invalid_credentials': True,
@@ -861,7 +861,7 @@ async def create_canvas_assignments(request):
     try:
         if settings.DEBUG:
             logger.info("started canvas api requests")
-            t = time.time()
+            t = time.perf_counter()
         assignment_model_data = [
             assignment_model_datum
             for response_data in asyncio.as_completed([
@@ -875,7 +875,7 @@ async def create_canvas_assignments(request):
             if (assignment_model_datum := format_response_datum(response_datum)) is not None
         ]
         if settings.DEBUG:
-            logger.info(f"finished all canvas requests in {time.time() - t}")
+            logger.info(f"finished all canvas requests in {time.perf_counter() - t}")
     except InvalidAccessToken:
         # do stuff
         pass
@@ -924,7 +924,7 @@ def update_canvas_courses(request):
 @async_to_sync
 async def create_integration_assignments(request):
     if settings.DEBUG:
-        t = time.time()
+        t = time.perf_counter()
         logger.info("started integration requests")
     ret = JsonResponse({
         key: value
@@ -935,7 +935,7 @@ async def create_integration_assignments(request):
         for key, value in (await response_json).items()
     })
     if settings.DEBUG:
-        logger.info(f"finished integration requests in {time.time() - t}")
+        logger.info(f"finished integration requests in {time.perf_counter() - t}")
     return ret
 
 @sync_to_async
