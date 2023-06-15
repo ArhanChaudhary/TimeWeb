@@ -308,12 +308,7 @@ def gc_auth_callback(request):
     if set(authorized_token_response['scope']) != set(settings.GC_SCOPES):
         # If the user didn't enable both scopes
         return callback_failed()
-    try:
-        credentials = flow.credentials
-    except ValueError:
-        # ValueError at /api/gc-auth-callback
-        # There is no access token for this session, did you call fetch_token?
-        return callback_failed()
+    credentials = flow.credentials
     service = build(
         'classroom',
         'v1',
@@ -661,12 +656,6 @@ def update_gc_courses(request):
     )
     try:
         courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in GC_COURSE_API_FIELDS)).execute()
-    except RefreshError:
-        return {
-            'invalid_credentials': True,
-            'reauthorization_url': generate_gc_authorization_url(request, next_url="home", current_url="home"),
-            'next': 'stop',
-        }
     # If connection to the server randomly dies (could happen locally when wifi is off)
     except (ServerNotFoundError, TimeoutError):
         return {"next": "continue"}
@@ -706,7 +695,7 @@ def update_gc_courses(request):
         # In this case, create_gc_assignments again
         if not set(course['id'] for course in new_courses).issubset(set(course['id'] for course in old_courses)):
             return async_to_sync(create_gc_assignments)(request)
-    return {"next": "stop"}
+    return {"next": "continue"}
 
 # 
 # CANVAS INTEGRATION
@@ -742,9 +731,6 @@ def canvas_auth_callback(request):
     canvas = Canvas(settings.CANVAS_URL, settings.CANVAS_TOKEN)
     try:
         courses = list(canvas.get_courses(enrollment_state='active', state=['available']))
-    except InvalidAccessToken:
-        # do stuff
-        pass
     except ConnectionError_:
         return {"next": "continue"}
     request.user.settingsmodel.canvas_courses_cache = format_canvas_courses(courses)
@@ -902,9 +888,6 @@ def update_canvas_courses(request):
     canvas = Canvas(settings.CANVAS_URL, settings.CANVAS_TOKEN)
     try:
         courses = list(canvas.get_courses(enrollment_state='active', state=['available']))
-    except InvalidAccessToken:
-        # do stuff
-        pass
     except ConnectionError_:
         return {"next": "continue"}
 
