@@ -36,7 +36,7 @@ extractor._stop_chars_right |= {",", "."}
 # Make sure to change the logic comparing the old data too if a new field is expensive to equare
 TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("assignment_date", "x", "due_time", "blue_line_start", "y", "min_work_time", "time_per_unit",
                                         "works", "funct_round", "break_days", "skew_ratio", "fixed_mode", "dynamic_start", "hidden")
-DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("id", "name", "soft", "unit", "description", "tags", "is_google_classroom_assignment",
+DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("id", "name", "soft", "unit", "description", "tags", "is_gc_assignment",
                                         "external_link", "alert_due_date_incremented", "dont_hide_again",
                                         "deletion_time", "user", "needs_more_info", "is_integration_assignment", 
                                         "is_canvas_assignment", )

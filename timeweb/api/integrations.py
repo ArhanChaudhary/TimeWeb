@@ -603,7 +603,7 @@ async def create_gc_assignments(request):
     cache.delete(concurrent_request_key)
     await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_gc_assignment_ids", ))
     created = [
-        TimewebModel(**assignment | generate_static_integration_fields(request.user) | { "is_google_classroom_assignment": True })
+        TimewebModel(**assignment | generate_static_integration_fields(request.user) | { "is_gc_assignment": True })
         for assignment in assignment_model_data
     ]
     await sync_to_async(TimewebModel.objects.bulk_create)(created)

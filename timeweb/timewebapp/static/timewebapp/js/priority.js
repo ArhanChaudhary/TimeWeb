@@ -371,8 +371,8 @@ class Priority {
             // Instead, give it a question mark so it can be appropriately handled
             if (sa.sa.needs_more_info && !hard_due_date_passed) {
 				status_image = 'question_mark';
-                if (sa.sa.is_google_classroom_assignment || sa.sa.is_canvas_assignment) {
-                    if (sa.sa.is_google_classroom_assignment) {
+                if (sa.sa.is_gc_assignment || sa.sa.is_canvas_assignment) {
+                    if (sa.sa.is_gc_assignment) {
                         status_message = "This Google Classroom assignment needs more info";
                     } else if (sa.sa.is_canvas_assignment) {
                         status_message = "This Canvas assignment needs more info";

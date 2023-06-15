@@ -141,7 +141,7 @@ class TimewebModel(models.Model):
     is_integration_assignment = models.BooleanField(
         default=False,
     )
-    is_google_classroom_assignment = models.BooleanField(
+    is_gc_assignment = models.BooleanField(
         default=False,
     )
     is_canvas_assignment = models.BooleanField(
