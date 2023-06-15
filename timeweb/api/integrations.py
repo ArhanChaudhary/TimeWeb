@@ -348,7 +348,6 @@ def disable_gc_integration(request, *, save=True):
 # @async_to_sync
 # reminder: do not use this because thread_sensitive is True by default
 async def create_gc_assignments(request):
-    await sync_to_async(lambda: request.user.settingsmodel)()
     if 'token' not in request.user.settingsmodel.gc_token:
         return HttpResponse(status=401)
     credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.gc_token, settings.GC_SCOPES)
@@ -767,7 +766,6 @@ async def create_canvas_assignments(request):
     # create developer key reference: https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-developer-keys-for-an-account/ta-p/249
     # oauth spec reference: https://canvas.instructure.com/doc/api/file.oauth.html
     # django implementation reference: https://github.dev/Harvard-University-iCommons/django-canvas-oauth/tree/master/canvas_oauth
-    await sync_to_async(lambda: request.user.settingsmodel)()
     loop = asyncio.get_event_loop()
     complete_date_now = utils.utc_to_local(request, timezone.now())
     date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -905,7 +903,7 @@ def update_canvas_courses(request):
         request.user.settingsmodel.save(update_fields=("canvas_courses_cache", ))
         if not set(course['id'] for course in new_courses).issubset(set(course['id'] for course in old_courses)):
             return async_to_sync(create_canvas_assignments)(request)
-    return {"next": "stop"}
+    return {"next": "continue"}
 
 # 
 # INTEGRATIONS API VIEW FUNCTIONS
@@ -915,6 +913,7 @@ def update_canvas_courses(request):
 @require_http_methods(["GET"])
 @async_to_sync
 async def create_integration_assignments(request):
+    await sync_to_async(lambda: request.user.settingsmodel)()
     if settings.DEBUG:
         t = time.perf_counter()
         logger.info("started integration requests")
@@ -934,6 +933,7 @@ async def create_integration_assignments(request):
 @require_http_methods(["GET"])
 @async_to_sync
 async def update_integration_courses(request):
+    await sync_to_async(lambda: request.user.settingsmodel)()
     return JsonResponse({
         key: value
         for response_json in asyncio.as_completed([
