@@ -364,6 +364,7 @@ def disable_gc_integration(request, *, save=True):
 # @async_to_sync
 # reminder: do not use this because thread_sensitive is True by default
 async def create_gc_assignments(request):
+    loop = asyncio.get_event_loop()
     if 'token' not in request.user.settingsmodel.gc_token:
         return HttpResponse(status=401)
     credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.gc_token, settings.GC_SCOPES)
@@ -375,8 +376,8 @@ async def create_gc_assignments(request):
         try:
             if not can_be_refreshed:
                 raise RefreshError
-            # Other errors can happen because of network or any other miscellaneous issues. Don't except these exceptions so they can be logged
-            credentials.refresh(TimeoutRefreshRequest(timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT))
+            # make this async so integrations can concurrently refresh
+            await loop.run_in_executor(None, credentials.refresh, TimeoutRefreshRequest(timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT))
         except RefreshError:
             # In case users manually revoke access to their oauth scopes after authorizing
             return {
@@ -576,7 +577,6 @@ async def create_gc_assignments(request):
     # Ordering by due date descending puts assignments without due dates at the very bottom, so if we limit the number
     # of assignments its possible for them to get overlooked
     # So, we are forced to make a second request this time in ascending order to add assignments without due dates
-    loop = asyncio.get_event_loop()
     coursework_lazy = service.courses().courseWork()
     def get_assignment_models_from_response(*, order, page_size):
         assignment_models = []
@@ -742,7 +742,6 @@ def generate_canvas_authorization_url(request, *, next_url, current_url):
 @require_http_methods(["GET"])
 def canvas_auth_callback(request):
     def callback_failed():
-        request.session['canvas-init-failed'] = True
         del request.session["canvas-callback-next-url"]
         request.session['canvas-init-failed'] = True
         return redirect(request.session.pop("canvas-callback-current-url"))
