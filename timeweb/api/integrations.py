@@ -354,6 +354,9 @@ async def create_gc_assignments(request):
     credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.gc_token, settings.GC_SCOPES)
     if not credentials.valid:
         can_be_refreshed = credentials.expired and credentials.refresh_token
+        if settings.DEBUG:
+            logger.info(f"started gc refresh request")
+            t = time.perf_counter()
         try:
             if not can_be_refreshed:
                 raise RefreshError
@@ -370,6 +373,8 @@ async def create_gc_assignments(request):
         except TransportError:
             return {"next": "continue"}
         else:
+            if settings.DEBUG:
+                logger.info(f"finished gc refresh request in {time.perf_counter() - t} seconds")
             request.user.settingsmodel.gc_token.update(json.loads(credentials.to_json()))
             await sync_to_async(request.user.settingsmodel.save)(update_fields=("gc_token", ))
     service = build(
@@ -589,10 +594,10 @@ async def create_gc_assignments(request):
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
     cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
+    if settings.DEBUG:
+        logger.info("started gc requests")
+        t = time.perf_counter()
     try:
-        if settings.DEBUG:
-            logger.info("started gc requests")
-            t = time.perf_counter()
         assignment_model_data = [
             assignment_model
             for assignment_models in asyncio.as_completed([
@@ -604,8 +609,6 @@ async def create_gc_assignments(request):
             ])
             for assignment_model in await assignment_models
         ]
-        if settings.DEBUG:
-            logger.info(f"finished gc requests in {time.perf_counter() - t}")
     except RefreshError:
         return {
             'invalid_credentials': True,
@@ -616,6 +619,9 @@ async def create_gc_assignments(request):
     except (ServerNotFoundError, TimeoutError):
         # return here or else assignment_model_data won't be defined and throw an error
         assignment_model_data = []
+    else:
+        if settings.DEBUG:
+            logger.info(f"finished gc requests in {time.perf_counter() - t}")
     if not assignment_model_data:
         return {"next": "continue"}
     cached_timestamp = cache.get(concurrent_request_key)
@@ -846,10 +852,10 @@ async def create_canvas_assignments(request):
             "external_link": external_link,
             "tags": tags,
         }
+    if settings.DEBUG:
+        logger.info("started canvas requests")
+        t = time.perf_counter()
     try:
-        if settings.DEBUG:
-            logger.info("started canvas api requests")
-            t = time.perf_counter()
         assignment_model_data = [
             assignment_model_datum
             for response_data in asyncio.as_completed([
@@ -862,14 +868,15 @@ async def create_canvas_assignments(request):
             for response_datum in filter_response_data_after_now(await response_data)
             if (assignment_model_datum := format_response_datum(response_datum)) is not None
         ]
-        if settings.DEBUG:
-            logger.info(f"finished all canvas requests in {time.perf_counter() - t}")
     except InvalidAccessToken:
         # do stuff
         pass
     except (ConnectionError_, ReadTimeout):
         # return here or else assignment_model_data won't be defined and throw an error
         return {"next": "continue"}
+    else:
+        if settings.DEBUG:
+            logger.info(f"finished canvas requests in {time.perf_counter() - t}")
     if not assignment_model_data:
         return {"next": "continue"}
     await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_canvas_assignment_ids", ))
