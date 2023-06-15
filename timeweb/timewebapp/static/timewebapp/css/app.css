@@ -415,7 +415,7 @@ main.background-image-exists {
 
     /* Opacity should also be used to ensure the dark mode text coloring appearance works */
     opacity: var(--description-opacity);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     min-width: var(--left-side-of-header-width);
     max-width: var(--left-side-of-header-width);
     word-wrap: break-word;
