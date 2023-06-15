@@ -30,6 +30,8 @@ from google.auth.exceptions import RefreshError, TransportError
 from googleapiclient.discovery import build
 from googleapiclient.discovery_cache.base import Cache
 from googleapiclient.errors import HttpError
+from google_auth_httplib2 import AuthorizedHttp
+from httplib2 import Http
 from httplib2.error import ServerNotFoundError
 from oauthlib.oauth2.rfc6749.errors import (
     AccessDeniedError,
@@ -56,6 +58,8 @@ from django.utils.text import Truncator
 # 
 # CONSTANTS
 # 
+
+DEFAULT_INTEGRATION_REQUEST_TIMEOUT = 10
 
 ASSIGNMENT_DATE_DAYS_CUTOFF = 30
 
@@ -223,6 +227,14 @@ class MemoryCache(Cache):
     def set(self, url, content):
         MemoryCache._CACHE[url] = content
 
+class TimeoutRefreshRequest(RefreshRequest):
+    def __init__(self, *args, **kwargs):
+        self.__timeout = kwargs.pop("timeout", None)
+        super().__init__(*args, **kwargs)
+
+    def __call__(self, *args, **kwargs):
+        return super().__call__(*args, **kwargs, timeout=self.__timeout)
+
 def format_gc_courses(courses, include_name=True):
     return [
         {
@@ -262,8 +274,6 @@ def gc_auth_callback(request):
         state=state
     )
     flow.redirect_uri = settings.GC_REDIRECT_URI
-
-    # get the full URL that we are on, including all the "?param1=token&param2=key" parameters that google has sent us
     authorization_response = request.build_absolute_uri()
 
     # convert http in authorization_response to https
@@ -302,11 +312,20 @@ def gc_auth_callback(request):
         # ValueError at /api/gc-auth-callback
         # There is no access token for this session, did you call fetch_token?
         return callback_failed()
-    service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
-    # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
-    # I don't need to worry about Ratelimit errors either because such a situation would be very rare
+    service = build(
+        'classroom',
+        'v1',
+        cache=MemoryCache(),
+        http=AuthorizedHttp(
+            credentials,
+            http=Http(timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT)
+        )
+    )
     try:
-        courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in GC_COURSE_API_FIELDS)).execute()
+        courses = service.courses().list(
+            courseStates=["ACTIVE"],
+            fields=",".join(f"courses/{i}" for i in GC_COURSE_API_FIELDS)
+        ).execute()
     except TimeoutError:
         return callback_failed()
     courses = courses.get('courses', [])
@@ -341,7 +360,7 @@ async def create_gc_assignments(request):
             if not can_be_refreshed:
                 raise RefreshError
             # Other errors can happen because of network or any other miscellaneous issues. Don't except these exceptions so they can be logged
-            credentials.refresh(RefreshRequest())
+            credentials.refresh(TimeoutRefreshRequest(timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT))
         except RefreshError:
             # In case users manually revoke access to their oauth scopes after authorizing
             return {
@@ -355,7 +374,15 @@ async def create_gc_assignments(request):
         else:
             request.user.settingsmodel.gc_token.update(json.loads(credentials.to_json()))
             await sync_to_async(request.user.settingsmodel.save)(update_fields=("gc_token", ))
-    service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
+    service = build(
+        'classroom',
+        'v1',
+        cache=MemoryCache(),
+        http=AuthorizedHttp(
+            credentials,
+            http=Http(timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT)
+        )
+    )
 
     complete_date_now = utils.utc_to_local(request, timezone.now())
     # Note about timezones: use the local tz because date_now repesents the date at the user's location
@@ -620,9 +647,16 @@ def update_gc_courses(request):
     if not credentials.valid:
         # rest this logic on create_gc_assignments, idrc if its invalid here
         return {"next": "continue"}
-    service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
+    service = build(
+        'classroom',
+        'v1',
+        cache=MemoryCache(),
+        http=AuthorizedHttp(
+            credentials,
+            http=Http(timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT)
+        )
+    )
     try:
-        # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
         courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in GC_COURSE_API_FIELDS)).execute()
     except RefreshError:
         return {
