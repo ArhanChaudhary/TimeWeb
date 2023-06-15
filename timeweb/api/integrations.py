@@ -800,6 +800,7 @@ async def create_canvas_assignments(request):
         if assignment.id in request.user.settingsmodel.added_canvas_assignment_ids:
             return
         complete_assignment_date = utils.utc_to_local(request, assignment.unlock_at_date if assignment.unlock_at else assignment.created_at_date)
+        # "lock_at_date cannot be before due_at_date"
         complete_x = utils.utc_to_local(request, assignment.due_at_date) if assignment.due_at else None
         # NOTE: canvas dates go down to the second so this replace precision is absolutely necessary
         assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
