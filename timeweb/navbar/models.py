@@ -248,6 +248,11 @@ class SettingsModel(models.Model):
         default=empty_list,
         blank=True,
     )
+    canvas_instance_domain = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+    )
     seen_latest_changelog = models.BooleanField(
         default=True,
     )
