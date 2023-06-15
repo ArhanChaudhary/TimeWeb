@@ -259,7 +259,7 @@ createIntegrationAssignments: function() {
 
         // raised if:
         // concurrent requests are made
-        // update-gc-courses doesn't add any new courses (saves last ajax)
+        // update_integration_courses doesn't add any new courses (saves last ajax)
         // credentials are invalid
         if (response.next === "stop") return;
         // indicates: this ajax didn't create any assignments, go to the next

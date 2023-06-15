@@ -14,23 +14,23 @@ import timewebapp.utils as app_utils
 from timewebapp.models import TimewebModel
 from timewebapp.views import EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT
 
-# Integrations stuff
+# Common integrations stuff
 import asyncio
 from asgiref.sync import sync_to_async, async_to_sync
 from requests.exceptions import (
     ConnectionError as ConnectionError_,
     ReadTimeout
 )
-from httplib2.error import ServerNotFoundError
 
 # Google API
 from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request
+from google.auth.transport.requests import Request as RefreshRequest
 from google_auth_oauthlib.flow import Flow
 from google.auth.exceptions import RefreshError, TransportError
 from googleapiclient.discovery import build
 from googleapiclient.discovery_cache.base import Cache
 from googleapiclient.errors import HttpError
+from httplib2.error import ServerNotFoundError
 from oauthlib.oauth2.rfc6749.errors import (
     AccessDeniedError,
     InvalidGrantError,
@@ -62,7 +62,7 @@ ASSIGNMENT_DATE_DAYS_CUTOFF = 30
 MAX_DESCENDING_COURSEWORK_PAGE_SIZE = 15
 MAX_ASCENDING_COURSEWORK_PAGE_SIZE = 35
 
-COURSEWORK_API_FIELDS = (
+GC_COURSEWORK_API_FIELDS = (
     "alternateLink",
     "courseId",
     "creationTime",
@@ -72,7 +72,7 @@ COURSEWORK_API_FIELDS = (
     "id",
     "title",
 )
-COURSE_API_FIELDS = (
+GC_COURSE_API_FIELDS = (
     "name",
     "id",
 )
@@ -224,10 +224,13 @@ class MemoryCache(Cache):
         MemoryCache._CACHE[url] = content
 
 def format_gc_courses(courses, include_name=True):
-    return [{
-                "id": course["id"],
-                "name": simplify_course_name(course["name"]) if include_name else None,
-            } for course in courses]
+    return [
+        {
+            "id": course["id"],
+            "name": simplify_course_name(course["name"]) if include_name else None,
+        }
+        for course in courses
+    ]
 
 def generate_gc_authorization_url(request, *, next_url, current_url):
     flow = Flow.from_client_config(
@@ -235,14 +238,9 @@ def generate_gc_authorization_url(request, *, next_url, current_url):
         scopes=settings.GC_SCOPES
     )
     flow.redirect_uri = settings.GC_REDIRECT_URI
-    # Generate URL for request to Google's OAuth 2.0 server.
-    # Use kwargs to set optional request parameters.
     authorization_url, state = flow.authorization_url(
         prompt='consent',
-        # Enable offline access so that you can refresh an access token without
-        # re-prompting the user for permission. Recommended for web server apps.
         access_type='offline',
-        # Enable incremental authorization. Recommended as a best practice.
         include_granted_scopes='true'
     )
 
@@ -252,15 +250,10 @@ def generate_gc_authorization_url(request, *, next_url, current_url):
 
 @require_http_methods(["GET"])
 def gc_auth_callback(request):
-    # Fail it early (for debugging
-    # print(request.build_absolute_uri())
-    # request.session['gc-init-failed'] = True
-    # return redirect("home")
     def callback_failed():
         request.session['gc-init-failed'] = True
         del request.session["gc-callback-next-url"]
         return redirect(request.session.pop("gc-callback-current-url"))
-    # Callback URI
     state = request.GET.get('state')
 
     flow = Flow.from_client_config(
@@ -288,9 +281,8 @@ def gc_auth_callback(request):
             json.loads(request.META.get("HTTP_CF_VISITOR", '{"scheme": "https"}'))['scheme'] == "https"
         ):
             authorization_response = "https://" + authorization_response[7:]
-    # turn those parameters into a token
     try:
-        authorized_flow_token = flow.fetch_token(authorization_response=authorization_response)
+        authorized_token_response = flow.fetch_token(authorization_response=authorization_response)
     except (InvalidGrantError, AccessDeniedError, MissingCodeError, ConnectionError_):
         # InvalidGrantError for bad requests
         # AccessDeniedError If the user enables no scopes or clicks cancel
@@ -301,7 +293,7 @@ def gc_auth_callback(request):
     # the scope order MAY change
     # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
     # Though this hasn't happened, let's be safe and ignore the order in this comparison
-    if set(authorized_flow_token['scope']) != set(settings.GC_SCOPES):
+    if set(authorized_token_response['scope']) != set(settings.GC_SCOPES):
         # If the user didn't enable both scopes
         return callback_failed()
     try:
@@ -314,7 +306,7 @@ def gc_auth_callback(request):
     # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
     # I don't need to worry about Ratelimit errors either because such a situation would be very rare
     try:
-        courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in COURSE_API_FIELDS)).execute()
+        courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in GC_COURSE_API_FIELDS)).execute()
     except TimeoutError:
         return callback_failed()
     courses = courses.get('courses', [])
@@ -327,7 +319,6 @@ def gc_auth_callback(request):
     return redirect(request.session.pop("gc-callback-next-url"))
 
 def disable_gc_integration(request, *, save=True):
-    # request.user.settingsmodel.gc_token stores the user's access and refresh tokens
     request.user.settingsmodel.gc_token = {"refresh_token": request.user.settingsmodel.gc_token['refresh_token']}
     if settings.DEBUG:
         # Re-add gc assignments in debug
@@ -343,18 +334,14 @@ async def create_gc_assignments(request):
     await sync_to_async(lambda: request.user.settingsmodel)()
     if 'token' not in request.user.settingsmodel.gc_token:
         return HttpResponse(status=401)
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
     credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.gc_token, settings.GC_SCOPES)
-    # If there are no valid credentials available, let the user log in.
     if not credentials.valid:
         can_be_refreshed = credentials.expired and credentials.refresh_token
         try:
             if not can_be_refreshed:
                 raise RefreshError
             # Other errors can happen because of network or any other miscellaneous issues. Don't except these exceptions so they can be logged
-            credentials.refresh(Request())
+            credentials.refresh(RefreshRequest())
         except RefreshError:
             # In case users manually revoke access to their oauth scopes after authorizing
             return {
@@ -565,7 +552,7 @@ async def create_gc_assignments(request):
                 courseId=course["id"],
                 orderBy=f"dueDate {order}",
                 pageSize=page_size,
-                fields=",".join(f"courseWork/{i}" for i in COURSEWORK_API_FIELDS)
+                fields=",".join(f"courseWork/{i}" for i in GC_COURSEWORK_API_FIELDS)
             ))
         if settings.DEBUG:
             logger.info(f"started gc order {order}")
@@ -603,6 +590,8 @@ async def create_gc_assignments(request):
     # If connection to the server randomly dies (could happen locally when wifi is off)
     except (ServerNotFoundError, TimeoutError):
         # return here or else assignment_model_data won't be defined and throw an error
+        assignment_model_data = []
+    if not assignment_model_data:
         return {"next": "continue"}
     cached_timestamp = cache.get(concurrent_request_key)
     if cached_timestamp != thread_timestamp:
@@ -612,8 +601,6 @@ async def create_gc_assignments(request):
         # refer to the explanation in create_gc_assignments for more context
         return {"next": "stop"}
     cache.delete(concurrent_request_key)
-    if not assignment_model_data:
-        return {"next": "continue"}
     await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_gc_assignment_ids", ))
     created = [
         TimewebModel(**assignment | generate_static_integration_fields(request.user) | { "is_google_classroom_assignment": True })
@@ -636,7 +623,7 @@ def update_gc_courses(request):
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
     try:
         # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
-        courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in COURSE_API_FIELDS)).execute()
+        courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in GC_COURSE_API_FIELDS)).execute()
     except RefreshError:
         return {
             'invalid_credentials': True,
@@ -692,10 +679,13 @@ def update_gc_courses(request):
 # 
 
 def format_canvas_courses(courses, include_name=True):
-    return [{
-                "id": course.id,
-                "name": simplify_course_name(course.name) if include_name else None,
-            } for course in courses]
+    return [
+        {
+            "id": course.id,
+            "name": simplify_course_name(course.name) if include_name else None,
+        }
+        for course in courses
+    ]
 
 def generate_canvas_authorization_url(request, *, next_url, current_url):
     # ... Generate authorization url from canvas oauth flow
@@ -903,12 +893,12 @@ async def create_integration_assignments(request):
         t = time.time()
         logger.info("started integration requests")
     ret = JsonResponse({
-        key: value for response_json in asyncio.as_completed(
-            [
-                create_gc_assignments(request),
-                create_canvas_assignments(request),
-            ]
-        ) for key, value in (await response_json).items()
+        key: value
+        for response_json in asyncio.as_completed([
+            create_gc_assignments(request),
+            create_canvas_assignments(request),
+        ])
+        for key, value in (await response_json).items()
     })
     if settings.DEBUG:
         logger.info(f"finished integration requests in {time.time() - t}")
@@ -919,10 +909,10 @@ async def create_integration_assignments(request):
 @async_to_sync
 async def update_integration_courses(request):
     return JsonResponse({
-        key: value for response_json in asyncio.as_completed(
-            [
-                sync_to_async(update_gc_courses)(request),
-                sync_to_async(update_canvas_courses)(request)
-            ]
-        ) for key, value in (await response_json).items()
+        key: value
+        for response_json in asyncio.as_completed([
+            sync_to_async(update_gc_courses)(request),
+            sync_to_async(update_canvas_courses)(request)
+        ])
+        for key, value in (await response_json).items()
     })
