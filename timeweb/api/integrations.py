@@ -258,6 +258,7 @@ def generate_gc_authorization_url(request, *, next_url, current_url):
 
     request.session["gc-callback-next-url"] = next_url
     request.session["gc-callback-current-url"] = current_url
+    request.session["gc-oauth-state"] = state
     return authorization_url
 
 @require_http_methods(["GET"])
@@ -267,8 +268,8 @@ def gc_auth_callback(request):
         del request.session["gc-callback-next-url"]
         request.session['gc-init-failed'] = True
         return redirect(request.session.pop("gc-callback-current-url"))
-    state = request.GET.get('state')
 
+    state = request.session.get("gc-oauth-state")
     flow = Flow.from_client_config(
         settings.GC_CREDENTIALS_JSON,
         scopes=settings.GC_SCOPES,
@@ -335,6 +336,7 @@ def gc_auth_callback(request):
     request.user.settingsmodel.gc_token.update(json.loads(credentials.to_json()))
     request.user.settingsmodel.save(update_fields=("gc_courses_cache", "gc_token"))
     logger.info(f"User {request.user} enabled google classroom API")
+    del request.session["gc-oauth-state"]
     del request.session["gc-callback-current-url"]
     return redirect(request.session.pop("gc-callback-next-url"))
 
