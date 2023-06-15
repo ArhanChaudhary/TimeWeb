@@ -263,8 +263,9 @@ def generate_gc_authorization_url(request, *, next_url, current_url):
 @require_http_methods(["GET"])
 def gc_auth_callback(request):
     def callback_failed():
-        request.session['gc-init-failed'] = True
+        # throw on first line to ensure 2nd doesnt run
         del request.session["gc-callback-next-url"]
+        request.session['gc-init-failed'] = True
         return redirect(request.session.pop("gc-callback-current-url"))
     state = request.GET.get('state')
 
@@ -734,6 +735,7 @@ def canvas_auth_callback(request):
     def callback_failed():
         request.session['canvas-init-failed'] = True
         del request.session["canvas-callback-next-url"]
+        request.session['canvas-init-failed'] = True
         return redirect(request.session.pop("canvas-callback-current-url"))
 
     # ... Canvas oauth flow callback
