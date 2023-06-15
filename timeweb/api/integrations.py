@@ -336,6 +336,22 @@ def gc_auth_callback(request):
     return redirect(request.session.pop("gc-callback-next-url"))
 
 def disable_gc_integration(request, *, save=True):
+    flow = Flow.from_client_config(
+        settings.GC_CREDENTIALS_JSON,
+        scopes=settings.GC_SCOPES
+    )
+    try:
+        flow.oauth2session.post(
+            'https://oauth2.googleapis.com/revoke',
+            params={'token': request.user.settingsmodel.gc_token['token']},
+            headers={'content-type': 'application/x-www-form-urlencoded'},
+            timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
+        )
+    except (
+        ConnectionError_,
+        ReadTimeout
+    ):
+        pass
     request.user.settingsmodel.gc_token = {"refresh_token": request.user.settingsmodel.gc_token['refresh_token']}
     if settings.DEBUG:
         # Re-add gc assignments in debug
