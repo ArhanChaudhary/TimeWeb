@@ -136,9 +136,6 @@ document.addEventListener("DOMContentLoaded", function() {
                                 case "id_notifications_integration":
                                     var setting = "nudge_notifications";
                                     break;
-                                case "id_canvas_integration":
-                                    var setting = "nudge_canvas";
-                                    break;
                             }
                             ajaxUtils.changeSetting({setting: setting, value: true});
                         },

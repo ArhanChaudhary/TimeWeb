@@ -42,7 +42,7 @@ INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT = (
 )
 EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT = (
     "gc_token", "added_gc_assignment_ids", "user", "background_image", "id", "nudge_calendar",
-    "nudge_notifications", "nudge_canvas", "device_uuid", "device_uuid_api_timestamp",
+    "nudge_notifications", "device_uuid", "device_uuid_api_timestamp",
     "gc_courses_cache", "gc_assignments_always_midnight", "background_image_text_shadow_width",
     "appearance", "priority_color_borders", "font", "canvas_token", "added_canvas_assignment_ids",
     "canvas_courses_cache"

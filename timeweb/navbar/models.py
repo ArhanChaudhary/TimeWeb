@@ -257,9 +257,6 @@ class SettingsModel(models.Model):
     nudge_notifications = models.BooleanField(
         default=False,
     )
-    nudge_canvas = models.BooleanField(
-        default=False,
-    )
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

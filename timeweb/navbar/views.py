@@ -37,7 +37,7 @@ DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS = (
     'def_break_days', 'def_skew_ratio', 'one_graph_at_a_time', 'close_graph_after_work_input', 'show_priority', 'highest_priority_color',
     'lowest_priority_color', 'default_dropdown_tags', 'horizontal_tag_position', 'vertical_tag_position', 'appearance', 'animation_speed',
     'enable_tutorial', 'sorting_animation_threshold', 'gc_token', 'added_gc_assignment_ids', 'seen_latest_changelog', 
-    'nudge_calendar', 'nudge_notifications', 'nudge_canvas', 'user', 'gc_courses_cache', 'device_uuid', 'device_uuid_api_timestamp',
+    'nudge_calendar', 'nudge_notifications', 'user', 'gc_courses_cache', 'device_uuid', 'device_uuid_api_timestamp',
     'display_working_days_left', 'background_image_text_shadow_width', 'gc_assignments_always_midnight', 'loosely_enforce_minimum_work_times', 
     'priority_color_borders', 'font', 'should_alert_due_date_incremented', 'example_account', "gc_token",
     'added_canvas_assignment_ids', 'canvas_courses_cache',

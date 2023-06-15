@@ -91,7 +91,6 @@ class SettingsForm(forms.ModelForm):
             'seen_latest_changelog': forms.HiddenInput(),
             'nudge_calendar': forms.HiddenInput(),
             'nudge_notifications': forms.HiddenInput(),
-            'nudge_canvas': forms.HiddenInput(),
         }
         error_messages = {
             'def_min_work_time': {
