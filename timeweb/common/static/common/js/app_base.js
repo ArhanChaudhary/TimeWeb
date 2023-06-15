@@ -215,6 +215,8 @@ changeSetting: function(kwargs={}) {
     });
 },
 createIntegrationAssignments: function() {
+    if (!SETTINGS.integration_enabled)
+        return;
     const ajaxs = [
         {type: "GET", url: '/api/create-integration-assignments'},
         {type: "GET", url: '/api/update-integration-courses'},

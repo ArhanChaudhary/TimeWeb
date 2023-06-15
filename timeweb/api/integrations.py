@@ -42,7 +42,7 @@ from oauthlib.oauth2.rfc6749.errors import (
 # Canvas API
 from canvasapi import Canvas
 from canvasapi.course import Course
-from canvasapi.exceptions import InvalidAccessToken, RateLimitExceeded
+from canvasapi.exceptions import InvalidAccessToken
 
 # Misc
 if settings.DEBUG:
@@ -671,9 +671,6 @@ def update_gc_courses(request):
     except (ServerNotFoundError, TimeoutError):
         return {"next": "continue"}
     except HttpError as e:
-        if e.status_code == 429:
-            # Ratelimited, don't care
-            return {"next": "continue"}
         if e.status_code >= 500:
             # this happened one time:
             # googleapiclient.errors.HttpError: <HttpError 503 when requesting https://classroom.googleapis.com/v1/courses?alt=json returned "The service is currently unavailable.". Details: "The service is currently unavailable.">
@@ -748,7 +745,7 @@ def canvas_auth_callback(request):
     except InvalidAccessToken:
         # do stuff
         pass
-    except (ConnectionError_, RateLimitExceeded):
+    except ConnectionError_:
         return {"next": "continue"}
     request.user.settingsmodel.canvas_courses_cache = format_canvas_courses(courses)
     # ... update canvas token credentials
@@ -883,7 +880,7 @@ async def create_canvas_assignments(request):
     except InvalidAccessToken:
         # do stuff
         pass
-    except (ConnectionError_, RateLimitExceeded, ReadTimeout):
+    except (ConnectionError_, ReadTimeout):
         # return here or else assignment_model_data won't be defined and throw an error
         return {"next": "continue"}
     if not assignment_model_data:
@@ -907,7 +904,7 @@ def update_canvas_courses(request):
     except InvalidAccessToken:
         # do stuff
         pass
-    except (ConnectionError_, RateLimitExceeded):
+    except ConnectionError_:
         return {"next": "continue"}
 
     old_courses = request.user.settingsmodel.canvas_courses_cache

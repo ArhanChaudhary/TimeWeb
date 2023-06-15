@@ -1707,7 +1707,7 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.displayFullDueDateOnHover();
     setTimeout(() => {
         if (!VIEWING_DELETED_ASSIGNMENTS) {
-            if (SETTINGS.gc_integration_enabled) ajaxUtils.createIntegrationAssignments();
+            ajaxUtils.createIntegrationAssignments();
             utils.ui.setClickHandlers.tickButtons();
             utils.ui.setClickHandlers.assignmentSorting();
         }
@@ -1763,7 +1763,7 @@ document.addEventListener("DOMContentLoaded", function() {
             minuteCounter = 0;
             $(window).trigger("resize");
             ajaxUtils.evaluateCurrentState();
-            if (SETTINGS.gc_integration_enabled) ajaxUtils.createIntegrationAssignments();
+            ajaxUtils.createIntegrationAssignments();
         }, 60 * 1000);
     }, secondsRemaining);
 });
