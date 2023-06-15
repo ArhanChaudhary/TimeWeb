@@ -747,8 +747,6 @@ def canvas_auth_callback(request):
 
 def disable_canvas_integration(request, *, save=True):
     request.user.settingsmodel.canvas_token = {"refresh_token": request.user.settingsmodel.canvas_token['refresh_token']}
-    # ids aren't unique to canvas as a whole, just to every canvas instance
-    request.user.settingsmodel.canvas_courses_cache = []
     if settings.DEBUG:
         # Re-add canvas assignments in debug
         request.user.settingsmodel.added_canvas_assignment_ids = []
