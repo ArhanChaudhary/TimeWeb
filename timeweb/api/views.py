@@ -12,7 +12,12 @@ from django.forms.models import model_to_dict
 # App stuff
 import common.utils as utils
 import timewebapp.utils as app_utils
-from .integrations import generate_gc_authorization_url, disable_gc_integration
+from .integrations import (
+    generate_gc_authorization_url,
+    disable_gc_integration,
+    generate_canvas_authorization_url,
+    disable_canvas_integration,
+)
 from timewebapp.models import TimewebModel
 from timewebapp.views import EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT
 from timewebapp.forms import TimewebForm
@@ -530,6 +535,15 @@ def change_setting(request):
             })
         else:
             disable_gc_integration(request, save=True)
+            return HttpResponse(status=204)
+    elif setting == "canvas_token":
+        if value:
+            return JsonResponse({
+                'should_redirect': True,
+                'redirect_url': generate_canvas_authorization_url(request, next_url="home", current_url="settings"),
+            })
+        else:
+            disable_canvas_integration(request, save=True)
             return HttpResponse(status=204)
 
     # pretty cursed code that could possibly be improved by adding the settings model to the settings form as an instance (64baf58)

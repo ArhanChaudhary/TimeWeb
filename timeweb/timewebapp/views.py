@@ -151,7 +151,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['assignment_models_as_json'] = [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in timewebmodels]
 
         self.context['settings_model_as_json'] = model_to_dict(self.user.settingsmodel, exclude=EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT)
-        self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in self.user.settingsmodel.gc_token
+        self.context['settings_model_as_json']['integration_enabled'] = 'token' in self.user.settingsmodel.gc_token or 'token' in self.user.settingsmodel.canvas_token
 
         if not self.user.settingsmodel.seen_latest_changelog:
             self.context['latest_changelog'] = CHANGELOGS[0]

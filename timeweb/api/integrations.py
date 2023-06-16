@@ -383,6 +383,7 @@ async def create_gc_assignments(request):
         except RefreshError: # users manually revoke roken
             return {
                 'invalid_credentials': True,
+                'integration_name': 'gc',
                 'reauthorization_url': generate_gc_authorization_url(request, next_url="home", current_url="home"),
                 'next': 'stop',
             }
@@ -632,6 +633,7 @@ async def create_gc_assignments(request):
         if isinstance(e, RefreshError): # user manually revokes third party app
             return {
                 'invalid_credentials': True,
+                'integration_name': 'gc',
                 'reauthorization_url': generate_gc_authorization_url(request, next_url="home", current_url="home"),
                 'next': 'stop',
             }

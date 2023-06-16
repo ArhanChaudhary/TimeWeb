@@ -225,15 +225,14 @@ createIntegrationAssignments: function() {
         if (response.invalid_credentials) {
             $.alert({
                 title: "Invalid credentials.",
-                // gc or canvas
-                content: "Your Google Classroom integration credentials are invalid. Please reauthenticate or disable the integration.",
+                content: `Your ${{'gc': 'Google Classroom', 'canvas': 'Canvas'}[response.integration_name]} integration credentials are invalid. Please reauthenticate or disable the integration.`,
                 buttons: {
                     ok: {
 
                     },
                     "disable integration": {
                         action: function() {
-                            ajaxUtils.changeSetting({setting: "gc_token", value: false});
+                            ajaxUtils.changeSetting({setting: `${response.integration_name}_token`, value: false});
                         }
                     },
                     reauthenticate: {
