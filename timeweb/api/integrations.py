@@ -757,6 +757,7 @@ def generate_canvas_authorization_url(request, *, next_url, current_url):
     )
     request.session["canvas-callback-next-url"] = next_url
     request.session["canvas-callback-current-url"] = current_url
+    request.session["canvas-oauth-state"] = state
     return authorization_url
 
 @require_http_methods(["GET"])
@@ -766,17 +767,49 @@ def canvas_auth_callback(request):
         request.session['canvas-init-failed'] = True
         return redirect(request.session.pop("canvas-callback-current-url"))
 
-    # ... Canvas oauth flow callback
+    if request.GET.get('error'):
+        return callback_failed()
 
-    canvas = Canvas(settings.CANVAS_URL, settings.CANVAS_TOKEN)
+    state = request.session.get("canvas-oauth-state")
+    flow = OAuth2Session(
+        client_id=settings.CANVAS_CREDENTIALS_JSON['client_id'],
+        redirect_uri=settings.CANVAS_REDIRECT_URI,
+        scope=settings.CANVAS_SCOPES,
+        state=state,
+    )
+
+    authorization_response = request.build_absolute_uri()
+    try:
+        authorized_token_response = flow.fetch_token(
+            f'{canvas_instance_url(request)}/login/oauth2/token',
+            authorization_response=authorization_response,
+            client_secret=settings.CANVAS_CREDENTIALS_JSON['client_secret'],
+        )
+    except (
+        InvalidGrantError, # reuse authorization code
+        MismatchingStateError, # state doesn't match
+        ConnectionError_,
+    ):
+        return callback_failed()
+
+    canvas = Canvas(
+        canvas_instance_url(request),
+        authorized_token_response['access_token'],
+    )
     try:
         courses = list(canvas.get_courses(enrollment_state='active', state=['available']))
     except ConnectionError_:
-        return {"next": "continue"}
+        return callback_failed()
     request.user.settingsmodel.canvas_courses_cache = format_canvas_courses(courses)
-    # ... update canvas token credentials
+    request.user.settingsmodel.canvas_token = {
+        'token': authorized_token_response['access_token'],
+        'refresh_token': authorized_token_response['refresh_token'],
+        'expires_at': authorized_token_response['expires_at'],
+    }
     request.user.settingsmodel.save(update_fields=("canvas_courses_cache", "canvas_token"))
+
     logger.info(f"User {request.user} enabled the canvas API")
+    del request.session["canvas-oauth-state"]
     del request.session["canvas-callback-current-url"]
     return redirect(request.session.pop("canvas-callback-next-url"))
 
