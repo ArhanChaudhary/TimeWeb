@@ -1006,7 +1006,14 @@ async def create_canvas_assignments(request):
     }
 
 def update_canvas_courses(request):
-    canvas = Canvas(settings.CANVAS_URL, settings.CANVAS_TOKEN)
+    canvas = Canvas(
+        canvas_instance_url(request),
+        request.user.settingsmodel.canvas_token['token'],
+    )
+    if (
+        datetime.datetime.now(tz=timezone.utc).timestamp() >= request.user.settingsmodel.canvas_token['expires_at']
+    ):
+        return {"next": "continue"}
     try:
         courses = list(canvas.get_courses(enrollment_state='active', state=['available']))
     except ConnectionError_:
