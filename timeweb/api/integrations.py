@@ -36,7 +36,7 @@ from httplib2.error import ServerNotFoundError
 from oauthlib.oauth2.rfc6749.errors import (
     AccessDeniedError,
     InvalidGrantError,
-    MissingCodeError
+    MismatchingStateError,
 )
 
 # Canvas API
@@ -294,13 +294,17 @@ def gc_auth_callback(request):
         ):
             authorization_response = "https://" + authorization_response[7:]
     try:
-        authorized_token_response = flow.fetch_token(authorization_response=authorization_response)
-    except (InvalidGrantError, AccessDeniedError, MissingCodeError, ConnectionError_):
-        # InvalidGrantError for bad requests
-        # AccessDeniedError If the user enables no scopes or clicks cancel
-        # MissingCodeError if the user manually gets this route and forgets "code" in the url
-        # note that code is the only required url parameter
-        # ConnectionError_ if the wifi randomly dies (could happen when offline)
+        authorized_token_response = flow.fetch_token(
+            authorization_response=authorization_response,
+            timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
+        )
+    except (
+        InvalidGrantError, # if you reuse a code
+        AccessDeniedError, # enable no scopes or click cancel
+        MismatchingStateError, # csrf
+        ConnectionError_,
+        ReadTimeout,
+    ):
         return callback_failed()
     # the scope order MAY change
     # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
@@ -323,7 +327,10 @@ def gc_auth_callback(request):
             courseStates=["ACTIVE"],
             fields=",".join(f"courses/{i}" for i in GC_COURSE_API_FIELDS)
         ).execute()
-    except TimeoutError:
+    except (
+        ServerNotFoundError, # connection dies attempting to start the request
+        TimeoutError, # connection dies during the request
+    ):
         return callback_failed()
     courses = courses.get('courses', [])
     request.user.settingsmodel.gc_courses_cache = format_gc_courses(courses)
@@ -378,15 +385,13 @@ async def create_gc_assignments(request):
                 raise RefreshError
             # make this async so integrations can concurrently refresh
             await loop.run_in_executor(None, credentials.refresh, TimeoutRefreshRequest(timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT))
-        except RefreshError:
-            # In case users manually revoke access to their oauth scopes after authorizing
+        except RefreshError: # users manually revoke roken
             return {
                 'invalid_credentials': True,
                 'reauthorization_url': generate_gc_authorization_url(request, next_url="home", current_url="home"),
                 'next': 'stop',
             }
-        # If connection to the server randomly dies (could happen locally when wifi is off)
-        except TransportError:
+        except TransportError: # basically ConnectionError_ and TimeoutError
             return {"next": "continue"}
         else:
             if settings.DEBUG:
@@ -635,8 +640,10 @@ async def create_gc_assignments(request):
                 'reauthorization_url': generate_gc_authorization_url(request, next_url="home", current_url="home"),
                 'next': 'stop',
             }
-        # If connection to the server randomly dies (could happen locally when wifi is off)
-        elif isinstance(e, (ServerNotFoundError, TimeoutError)):
+        elif isinstance(e, (
+            ServerNotFoundError, # connection dies attempting to start the request
+            TimeoutError, # connection dies during the request
+        )):
             assignment_model_data = []
     else:
         if settings.DEBUG:
@@ -681,8 +688,10 @@ def update_gc_courses(request):
     )
     try:
         courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in GC_COURSE_API_FIELDS)).execute()
-    # If connection to the server randomly dies (could happen locally when wifi is off)
-    except (ServerNotFoundError, TimeoutError):
+    except (
+        ServerNotFoundError, # connection dies attempting to start the request
+        TimeoutError, # connection dies during the request
+    ):
         return {"next": "continue"}
     except HttpError as e:
         if e.status_code >= 500:
