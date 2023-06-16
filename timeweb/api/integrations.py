@@ -814,6 +814,16 @@ def canvas_auth_callback(request):
     return redirect(request.session.pop("canvas-callback-next-url"))
 
 def disable_canvas_integration(request, *, save=True):
+    flow = OAuth2Session()
+    try:
+        flow.delete(
+            f'{canvas_instance_url(request)}/login/oauth2/token',
+            data={
+                'access_token': request.user.settingsmodel.canvas_token['token'],
+            },
+        )
+    except ReadTimeout:
+        pass
     request.user.settingsmodel.canvas_token = {"refresh_token": request.user.settingsmodel.canvas_token['refresh_token']}
     if settings.DEBUG:
         # Re-add canvas assignments in debug
