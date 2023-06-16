@@ -103,6 +103,19 @@ def generate_static_integration_fields(user):
         "y": None,
     }
 
+async def prepare_integration_response(request, assignment_model_data, integration_name):
+    await sync_to_async(request.user.settingsmodel.save)(update_fields=(f"added_{integration_name}_assignment_ids", ))
+    created = [
+        TimewebModel(**assignment | generate_static_integration_fields(request.user) | { f"is_{integration_name}_assignment": True })
+        for assignment in assignment_model_data
+    ]
+    await sync_to_async(TimewebModel.objects.bulk_create)(created)
+    return {
+        "assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created],
+        "update_state": True,
+        "next": "continue",
+    }
+
 def simplify_course_name(tag_name):
     abbreviations = [
         (r"(rec)ommendation", r"\1"),
@@ -649,17 +662,7 @@ async def create_gc_assignments(request):
     if cached_timestamp != request.thread_timestamp:
         return {"next": "continue"}
     request.delete_cache = True
-    await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_gc_assignment_ids", ))
-    created = [
-        TimewebModel(**assignment | generate_static_integration_fields(request.user) | { "is_gc_assignment": True })
-        for assignment in assignment_model_data
-    ]
-    await sync_to_async(TimewebModel.objects.bulk_create)(created)
-    return {
-        "assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created],
-        "update_state": True,
-        "next": "continue",
-    }
+    return await prepare_integration_response(request, assignment_model_data, "gc")
 
 def update_gc_courses(request):
     # NOTE: we cannot simply run this in create_gc_assignments after the response is sent because
@@ -1005,17 +1008,7 @@ async def create_canvas_assignments(request):
     if cached_timestamp != request.thread_timestamp:
         return {"next": "continue"}
     request.delete_cache = True
-    await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_canvas_assignment_ids", ))
-    created = [
-        TimewebModel(**assignment | generate_static_integration_fields(request.user) | { "is_canvas_assignment": True })
-        for assignment in assignment_model_data
-    ]
-    await sync_to_async(TimewebModel.objects.bulk_create)(created)
-    return {
-        "assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created],
-        "update_state": True,
-        "next": "continue",
-    }
+    return await prepare_integration_response(request, assignment_model_data, "canvas")
 
 def update_canvas_courses(request):
     canvas = Canvas(
