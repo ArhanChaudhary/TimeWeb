@@ -62,6 +62,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         if "form" not in self.context:
             initial = {
                 'gc_integration': 'token' in self.user.settingsmodel.gc_token,
+                'canvas_integration': 'token' in self.user.settingsmodel.canvas_token,
             }
             self.context['form'] = SettingsForm(initial=initial, instance=self.user.settingsmodel)
         self.context['default_settings'] = model_to_dict(SettingsForm().save(commit=False),

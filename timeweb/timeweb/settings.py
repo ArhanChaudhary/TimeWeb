@@ -381,5 +381,13 @@ LOGGING = {
 
 
 import os
-CANVAS_URL = os.environ.get("CANVAS_URL")
-CANVAS_TOKEN = os.environ.get("CANVAS_TOKEN")
+CANVAS_CREDENTIALS_JSON = os.environ.get("CANVAS_API_CREDENTIALS")
+if CANVAS_CREDENTIALS_JSON is None:
+    print("CANVAS_API_CREDENTIALS is not set; Canvas API will not work")
+else:
+    CANVAS_CREDENTIALS_JSON = json.loads(CANVAS_CREDENTIALS_JSON)
+CANVAS_SCOPES = ['url:GET|/api/v1/courses', 'url:GET|/api/v1/courses/:course_id/assignments']
+if DEBUG or FIX_DEBUG_LOCALLY:
+    CANVAS_REDIRECT_URI = "http://localhost:8000/api/canvas-auth-callback/"
+else:
+    CANVAS_REDIRECT_URI = "https://timeweb.io/api/canvas-auth-callback/"
