@@ -2,7 +2,7 @@ arrow==1.2.3
 asgiref==3.5.2
 beautifulsoup4==4.11.1
 cachetools==4.2.2
-canvasapi==3.2.0
+canvasapi @ git+https://github.com/ArhanChaudhary/canvasapi.git@de3149a2164af864daf2d0b3d1f9993da38727f7
 certifi==2022.12.7
 cffi==1.15.1
 chardet==4.0.0

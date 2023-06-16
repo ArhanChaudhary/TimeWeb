@@ -784,21 +784,27 @@ def canvas_auth_callback(request):
             f'{canvas_instance_url(request)}/login/oauth2/token',
             authorization_response=authorization_response,
             client_secret=settings.CANVAS_CREDENTIALS_JSON['client_secret'],
+            timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
         )
     except (
         InvalidGrantError, # reuse authorization code
         MismatchingStateError, # state doesn't match
         ConnectionError_,
+        ReadTimeout,
     ):
         return callback_failed()
 
     canvas = Canvas(
         canvas_instance_url(request),
         authorized_token_response['access_token'],
+        default_timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
     )
     try:
         courses = list(canvas.get_courses(enrollment_state='active', state=['available']))
-    except ConnectionError_:
+    except (
+        ConnectionError_,
+        ReadTimeout,
+    ):
         return callback_failed()
     request.user.settingsmodel.canvas_courses_cache = format_canvas_courses(courses)
     request.user.settingsmodel.canvas_token = {
@@ -821,8 +827,12 @@ def disable_canvas_integration(request, *, save=True):
             data={
                 'access_token': request.user.settingsmodel.canvas_token['token'],
             },
+            timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
         )
-    except ReadTimeout:
+    except (
+        ConnectionError_,
+        ReadTimeout,
+    ):
         pass
     request.user.settingsmodel.canvas_token = {"refresh_token": request.user.settingsmodel.canvas_token['refresh_token']}
     if settings.DEBUG:
@@ -850,6 +860,7 @@ async def create_canvas_assignments(request):
                 client_id=settings.CANVAS_CREDENTIALS_JSON['client_id'],
                 client_secret=settings.CANVAS_CREDENTIALS_JSON['client_secret'],
                 refresh_token=request.user.settingsmodel.canvas_token['refresh_token'],
+                timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
             ))
         except InvalidGrantError: # access token is manually revoked
             return {
@@ -858,7 +869,10 @@ async def create_canvas_assignments(request):
                 'reauthorization_url': generate_canvas_authorization_url(request, next_url="home", current_url="home"),
                 'next': 'stop',
             }
-        except ConnectionError_:
+        except (
+            ConnectionError_,
+            ReadTimeout,
+        ):
             return {"next": "continue"}
         else:
             if settings.DEBUG:
@@ -869,6 +883,7 @@ async def create_canvas_assignments(request):
     canvas = Canvas(
         canvas_instance_url(request),
         request.user.settingsmodel.canvas_token['token'],
+        default_timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
     )
     complete_date_now = utils.utc_to_local(request, timezone.now())
     date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -1009,6 +1024,7 @@ def update_canvas_courses(request):
     canvas = Canvas(
         canvas_instance_url(request),
         request.user.settingsmodel.canvas_token['token'],
+        default_timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
     )
     if (
         datetime.datetime.now(tz=timezone.utc).timestamp() >= request.user.settingsmodel.canvas_token['expires_at']
@@ -1016,7 +1032,10 @@ def update_canvas_courses(request):
         return {"next": "continue"}
     try:
         courses = list(canvas.get_courses(enrollment_state='active', state=['available']))
-    except ConnectionError_:
+    except (
+        ConnectionError_,
+        ReadTimeout,
+    ):
         return {"next": "continue"}
 
     old_courses = request.user.settingsmodel.canvas_courses_cache
