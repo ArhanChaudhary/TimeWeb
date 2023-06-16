@@ -978,8 +978,12 @@ async def create_canvas_assignments(request):
         for future in canvas_requests:
             future.cancel()
         if isinstance(e, InvalidAccessToken): # manually revoke access token
-            # do stuff
-            pass
+            return {
+                'invalid_credentials': True,
+                'integration_name': 'canvas',
+                'reauthorization_url': generate_canvas_authorization_url(request, next_url="home", current_url="home"),
+                'next': 'stop',
+            }
         # NOTE: rate limits are done per access token, not by registered app, so we will never hit them
         # read: https://community.canvaslms.com/t5/Canvas-Developers-Group/API-Rate-Limiting/ba-p/255845#toc-hId-1773472610
         elif isinstance(e, (ConnectionError_, ReadTimeout)):
