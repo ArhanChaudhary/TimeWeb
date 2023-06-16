@@ -608,9 +608,6 @@ async def create_gc_assignments(request):
         if settings.DEBUG:
             logger.info(f"finished gc order {order} in {time.perf_counter() - t}")
         return assignment_models
-    concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
-    thread_timestamp = datetime.datetime.now().timestamp()
-    cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
     gc_requests = [
         loop.run_in_executor(None, lambda: get_assignment_models_from_response(**request_data))
         for request_data in (
@@ -648,14 +645,10 @@ async def create_gc_assignments(request):
             logger.info(f"finished gc requests in {time.perf_counter() - t}")
     if not assignment_model_data:
         return {"next": "continue"}
-    cached_timestamp = cache.get(concurrent_request_key)
-    if cached_timestamp != thread_timestamp:
-        # The reason why we have to prevent concurrent requests is because although
-        # request.user.settingsmodel.save() is thread-safe, bulk_create runs directly
-        # through the ORM is not
-        # refer to the explanation in create_gc_assignments for more context
-        return {"next": "stop"}
-    cache.delete(concurrent_request_key)
+    cached_timestamp = cache.get(request.concurrent_request_key)
+    if cached_timestamp != request.thread_timestamp:
+        return {"next": "continue"}
+    request.delete_cache = True
     await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_gc_assignment_ids", ))
     created = [
         TimewebModel(**assignment | generate_static_integration_fields(request.user) | { "is_gc_assignment": True })
@@ -1008,6 +1001,10 @@ async def create_canvas_assignments(request):
             logger.info(f"finished canvas requests in {time.perf_counter() - t}")
     if not assignment_model_data:
         return {"next": "continue"}
+    cached_timestamp = cache.get(request.concurrent_request_key)
+    if cached_timestamp != request.thread_timestamp:
+        return {"next": "continue"}
+    request.delete_cache = True
     await sync_to_async(request.user.settingsmodel.save)(update_fields=("added_canvas_assignment_ids", ))
     created = [
         TimewebModel(**assignment | generate_static_integration_fields(request.user) | { "is_canvas_assignment": True })
@@ -1069,10 +1066,17 @@ async def create_integration_assignments(request):
         integration_tasks.append(create_gc_assignments(request))
     if 'token' in request.user.settingsmodel.canvas_token:
         integration_tasks.append(create_canvas_assignments(request))
+    if integration_tasks:
+        request.concurrent_request_key = f"concurrent_integration_request_{request.user.id}"
+        request.thread_timestamp = datetime.datetime.now().timestamp()
+        cache.set(request.concurrent_request_key, request.thread_timestamp, 2 * 60)
     ret = {}
     for response_json in asyncio.as_completed(integration_tasks):
         for key, value in (await response_json).items():
             merge_integration_response(ret, key, value)
+    if getattr(request, 'delete_cache', False):
+        delattr(request, 'delete_cache')
+        cache.delete(request.concurrent_request_key)
     if settings.DEBUG:
         logger.info(f"finished integration requests in {time.perf_counter() - t}")
     return JsonResponse(ret)
