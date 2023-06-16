@@ -939,6 +939,14 @@ def update_canvas_courses(request):
 # INTEGRATIONS API VIEW FUNCTIONS
 # 
 
+def merge_integration_response(ret, key, value):
+    if key == 'assignments':
+        ret.setdefault('assignments', []).extend(value)
+    elif key == 'next' and ret.get('next') == 'stop' and value == 'continue':
+        pass
+    else:
+        ret[key] = value
+
 @sync_to_async
 @require_http_methods(["GET"])
 @async_to_sync
@@ -952,14 +960,13 @@ async def create_integration_assignments(request):
         integration_tasks.append(create_gc_assignments(request))
     if 'token' in request.user.settingsmodel.canvas_token:
         integration_tasks.append(create_canvas_assignments(request))
-    ret = JsonResponse({
-        key: value
-        for response_json in asyncio.as_completed(integration_tasks)
-        for key, value in (await response_json).items()
-    })
+    ret = {}
+    for response_json in asyncio.as_completed(integration_tasks):
+        for key, value in (await response_json).items():
+            merge_integration_response(ret, key, value)
     if settings.DEBUG:
         logger.info(f"finished integration requests in {time.perf_counter() - t}")
-    return ret
+    return JsonResponse(ret)
 
 @sync_to_async
 @require_http_methods(["GET"])
@@ -972,8 +979,8 @@ async def update_integration_courses(request):
         integration_tasks.append(loop.run_in_executor(None, update_gc_courses, request))
     if 'token' in request.user.settingsmodel.canvas_token:
         integration_tasks.append(loop.run_in_executor(None, update_canvas_courses, request))
-    return JsonResponse({
-        key: value
-        for response_json in asyncio.as_completed(integration_tasks)
-        for key, value in (await response_json).items()
-    })
+    ret = {}
+    for response_json in asyncio.as_completed(integration_tasks):
+        for key, value in (await response_json).items():
+            merge_integration_response(ret, key, value)
+    return JsonResponse(ret)
