@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.core.cache import cache
 from django.conf import settings
 from django.utils.translation import gettext as _
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django.forms.models import model_to_dict
@@ -372,17 +372,12 @@ def disable_gc_integration(request, *, save=True):
 # reminder: do not use this because thread_sensitive is True by default
 async def create_gc_assignments(request):
     loop = asyncio.get_event_loop()
-    if 'token' not in request.user.settingsmodel.gc_token:
-        return HttpResponse(status=401)
     credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.gc_token, settings.GC_SCOPES)
-    if not credentials.valid:
-        can_be_refreshed = credentials.expired and credentials.refresh_token
+    if credentials.expired:
         if settings.DEBUG:
             logger.info(f"started gc refresh request")
             t = time.perf_counter()
         try:
-            if not can_be_refreshed:
-                raise RefreshError
             # make this async so integrations can concurrently refresh
             await loop.run_in_executor(None, credentials.refresh, TimeoutRefreshRequest(timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT))
         except RefreshError: # users manually revoke roken
@@ -674,7 +669,7 @@ def update_gc_courses(request):
     # NOTE: we cannot simply run this in create_gc_assignments after the response is sent because
     # we want to be able to alert the user if their credentials for listing courses is invalid
     credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.gc_token, settings.GC_SCOPES)
-    if not credentials.valid:
+    if credentials.expired:
         # rest this logic on create_gc_assignments, idrc if its invalid here
         return {"next": "continue"}
     service = build(
@@ -952,12 +947,14 @@ async def create_integration_assignments(request):
     if settings.DEBUG:
         t = time.perf_counter()
         logger.info("started integration requests")
+    integration_tasks = []
+    if 'token' in request.user.settingsmodel.gc_token:
+        integration_tasks.append(create_gc_assignments(request))
+    if 'token' in request.user.settingsmodel.canvas_token:
+        integration_tasks.append(create_canvas_assignments(request))
     ret = JsonResponse({
         key: value
-        for response_json in asyncio.as_completed([
-            create_gc_assignments(request),
-            create_canvas_assignments(request),
-        ])
+        for response_json in asyncio.as_completed(integration_tasks)
         for key, value in (await response_json).items()
     })
     if settings.DEBUG:
@@ -969,11 +966,14 @@ async def create_integration_assignments(request):
 @async_to_sync
 async def update_integration_courses(request):
     await sync_to_async(lambda: request.user.settingsmodel)()
+    loop = asyncio.get_event_loop()
+    integration_tasks = []
+    if 'token' in request.user.settingsmodel.gc_token:
+        integration_tasks.append(loop.run_in_executor(None, update_gc_courses, request))
+    if 'token' in request.user.settingsmodel.canvas_token:
+        integration_tasks.append(loop.run_in_executor(None, update_canvas_courses, request))
     return JsonResponse({
         key: value
-        for response_json in asyncio.as_completed([
-            sync_to_async(update_gc_courses)(request),
-            sync_to_async(update_canvas_courses)(request)
-        ])
+        for response_json in asyncio.as_completed(integration_tasks)
         for key, value in (await response_json).items()
     })
