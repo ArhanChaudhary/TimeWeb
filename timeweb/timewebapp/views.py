@@ -80,6 +80,8 @@ def append_default_context(request):
     }
     if request.session.pop("gc-init-failed", None):
         context["GC_API_INIT_FAILED"] = True
+    if request.session.pop("canvas-init-failed", None):
+        context["CANVAS_API_INIT_FAILED"] = True
     return context
 
 @method_decorator(ratelimit(key=utils.get_client_ip, rate='30/m', method="GET", block=True), name='get')

@@ -77,7 +77,24 @@ document.addEventListener("DOMContentLoaded", function() {
             },
         });
     }
+    if (CANVAS_API_INIT_FAILED) {
+        $.alert({
+            title: "Could not enable the Canvas integration.",
+            content: "Authorization failed. Please try again.",
+            backgroundDismiss: false,
+            buttons: {
+                ok: {
 
+                },
+                "try again": {
+                    action: () => {
+                        alreadySubmitted = true;
+                        ajaxUtils.changeSetting({setting: "canvas_token", value: true});
+                    },
+                },
+            },
+        });
+    }
     $("#logo-container").click(function(e) {
         e.preventDefault();
         $("#submit-settings-button").click();
