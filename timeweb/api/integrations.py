@@ -40,6 +40,7 @@ from oauthlib.oauth2.rfc6749.errors import (
 )
 
 # Canvas API
+from requests_oauthlib import OAuth2Session
 from canvasapi import Canvas
 from canvasapi.course import Course
 from canvasapi.exceptions import InvalidAccessToken
@@ -741,10 +742,19 @@ def format_canvas_courses(courses, include_name=True):
         for course in courses
     ]
 
-def generate_canvas_authorization_url(request, *, next_url, current_url):
-    # ... Generate authorization url from canvas oauth flow
-    authorization_url = None
+def canvas_instance_url(request):
+    return f'http{"" if settings.DEBUG else "s"}://{request.user.settingsmodel.canvas_instance_domain}'
 
+def generate_canvas_authorization_url(request, *, next_url, current_url):
+    flow = OAuth2Session(
+        client_id=settings.CANVAS_CREDENTIALS_JSON['client_id'],
+        redirect_uri=settings.CANVAS_REDIRECT_URI,
+        scope=settings.CANVAS_SCOPES,
+    )
+    authorization_url, state = flow.authorization_url(
+        f'{canvas_instance_url(request)}/login/oauth2/auth',
+        force_login='1',
+    )
     request.session["canvas-callback-next-url"] = next_url
     request.session["canvas-callback-current-url"] = current_url
     return authorization_url
