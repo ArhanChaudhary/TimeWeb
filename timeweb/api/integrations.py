@@ -609,31 +609,35 @@ async def create_gc_assignments(request):
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
     cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
+    gc_requests = [
+        loop.run_in_executor(None, lambda: get_assignment_models_from_response(**request_data))
+        for request_data in (
+            {"order": "desc", "page_size": MAX_DESCENDING_COURSEWORK_PAGE_SIZE},
+            {"order": "asc", "page_size": MAX_ASCENDING_COURSEWORK_PAGE_SIZE},
+        )
+    ]
     if settings.DEBUG:
         logger.info("started gc requests")
         t = time.perf_counter()
     try:
         assignment_model_data = [
             assignment_model
-            for assignment_models in asyncio.as_completed([
-                loop.run_in_executor(None, lambda: get_assignment_models_from_response(order=order, page_size=page_size)) 
-                for order, page_size in (
-                    ("desc", MAX_DESCENDING_COURSEWORK_PAGE_SIZE),
-                    ("asc", MAX_ASCENDING_COURSEWORK_PAGE_SIZE),
-                )
-            ])
+            for assignment_models in asyncio.as_completed(gc_requests)
             for assignment_model in await assignment_models
         ]
-    except RefreshError:
-        return {
-            'invalid_credentials': True,
-            'reauthorization_url': generate_gc_authorization_url(request, next_url="home", current_url="home"),
-            'next': 'stop',
-        }
-    # If connection to the server randomly dies (could happen locally when wifi is off)
-    except (ServerNotFoundError, TimeoutError):
-        # return here or else assignment_model_data won't be defined and throw an error
-        assignment_model_data = []
+    except Exception as e:
+        # cancel all other requests because errors are not re-caught in a try except block
+        for future in gc_requests:
+            future.cancel()
+        if isinstance(e, RefreshError): # user manually revokes third party app
+            return {
+                'invalid_credentials': True,
+                'reauthorization_url': generate_gc_authorization_url(request, next_url="home", current_url="home"),
+                'next': 'stop',
+            }
+        # If connection to the server randomly dies (could happen locally when wifi is off)
+        elif isinstance(e, (ServerNotFoundError, TimeoutError)):
+            assignment_model_data = []
     else:
         if settings.DEBUG:
             logger.info(f"finished gc requests in {time.perf_counter() - t}")
@@ -863,28 +867,37 @@ async def create_canvas_assignments(request):
             "external_link": external_link,
             "tags": tags,
         }
+    canvas_requests = [
+        loop.run_in_executor(None, lambda: list(Course(
+            canvas._Canvas__requester,
+            {'id': course_id['id']}
+        ).get_assignments(
+            order_by='due_at',
+            # bucket=("undated", "upcoming", "future"), doesn't work because canvas api only supports one string parameter for bucket
+        )))
+        for course_id in request.user.settingsmodel.canvas_courses_cache
+    ]
     if settings.DEBUG:
         logger.info("started canvas requests")
         t = time.perf_counter()
     try:
         assignment_model_data = [
             assignment_model_datum
-            for response_data in asyncio.as_completed([
-                loop.run_in_executor(None, lambda: list(Course(canvas._Canvas__requester, {'id': course_id['id']}).get_assignments(
-                    order_by='due_at',
-                    # bucket=("undated", "upcoming", "future"), doesn't work because canvas api only supports one string parameter for bucket
-                )))
-                for course_id in request.user.settingsmodel.canvas_courses_cache
-            ])
+            for response_data in asyncio.as_completed(canvas_requests)
             for response_datum in filter_response_data_after_now(await response_data)
             if (assignment_model_datum := format_response_datum(response_datum)) is not None
         ]
-    except InvalidAccessToken:
-        # do stuff
-        pass
-    except (ConnectionError_, ReadTimeout):
-        # return here or else assignment_model_data won't be defined and throw an error
-        return {"next": "continue"}
+    except Exception as e:
+        # cancel all other requests because errors are not re-caught in a try except block
+        for future in canvas_requests:
+            future.cancel()
+        if isinstance(e, InvalidAccessToken): # manually revoke access token
+            # do stuff
+            pass
+        # NOTE: rate limits are done per access token, not by registered app, so we will never hit them
+        # read: https://community.canvaslms.com/t5/Canvas-Developers-Group/API-Rate-Limiting/ba-p/255845#toc-hId-1773472610
+        elif isinstance(e, (ConnectionError_, ReadTimeout)):
+            assignment_model_data = []
     else:
         if settings.DEBUG:
             logger.info(f"finished canvas requests in {time.perf_counter() - t}")
