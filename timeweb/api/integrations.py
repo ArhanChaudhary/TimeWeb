@@ -836,13 +836,40 @@ def disable_canvas_integration(request, *, save=True):
 # @async_to_sync
 # reminder: do not use this because thread_sensitive is True by default
 async def create_canvas_assignments(request):
-    canvas = Canvas(settings.CANVAS_URL, settings.CANVAS_TOKEN)
-
-    # clone and run locally: https://github.com/instructure/canvas-lms
-    # create developer key reference: https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-developer-keys-for-an-account/ta-p/249
-    # oauth spec reference: https://canvas.instructure.com/doc/api/file.oauth.html
-    # django implementation reference: https://github.dev/Harvard-University-iCommons/django-canvas-oauth/tree/master/canvas_oauth
     loop = asyncio.get_event_loop()
+    if (
+        datetime.datetime.now(tz=timezone.utc).timestamp() >= request.user.settingsmodel.canvas_token['expires_at']
+    ):
+        flow = OAuth2Session()
+        if settings.DEBUG:
+            logger.info(f"started canvas refresh request")
+            t = time.perf_counter()
+        try:
+            authorized_token_response = await loop.run_in_executor(None, lambda: flow.refresh_token(
+                f'{canvas_instance_url(request)}/login/oauth2/token',
+                client_id=settings.CANVAS_CREDENTIALS_JSON['client_id'],
+                client_secret=settings.CANVAS_CREDENTIALS_JSON['client_secret'],
+                refresh_token=request.user.settingsmodel.canvas_token['refresh_token'],
+            ))
+        except InvalidGrantError: # access token is manually revoked
+            return {
+                'invalid_credentials': True,
+                'integration_name': 'canvas',
+                'reauthorization_url': generate_canvas_authorization_url(request, next_url="home", current_url="home"),
+                'next': 'stop',
+            }
+        except ConnectionError_:
+            return {"next": "continue"}
+        else:
+            if settings.DEBUG:
+                logger.info(f"finished canvas refresh request in {time.perf_counter() - t} seconds")
+            request.user.settingsmodel.canvas_token['token'] = authorized_token_response['access_token']
+            request.user.settingsmodel.canvas_token['expires_at'] = authorized_token_response['expires_at']
+            await sync_to_async(request.user.settingsmodel.save)(update_fields=("canvas_token", ))
+    canvas = Canvas(
+        canvas_instance_url(request),
+        request.user.settingsmodel.canvas_token['token'],
+    )
     complete_date_now = utils.utc_to_local(request, timezone.now())
     date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
     def filter_response_data_after_now(response_data):
