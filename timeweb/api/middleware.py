@@ -44,13 +44,9 @@ class APIValidationMiddleware:
             resolved.url_name in CONDITIONALLY_EXCLUDE_FROM_STATE_EVALUATION and not json.loads(res.content.decode('utf-8') or '{}').get('update_state')
         ):
             return res
-        # update SET_NULL from example_assignment and added_gc_assignment_ids and etc
-        # https://www.youtube.com/watch?v=RY_2gElt3SA <-- what's happening
-        # refresh everything for forward compatibility
-        request.user.settingsmodel.refresh_from_db()
         request.user.settingsmodel.device_uuid = device_uuid
         request.user.settingsmodel.device_uuid_api_timestamp = timezone.now()
-        request.user.settingsmodel.save()
+        request.user.settingsmodel.save(update_fields=('device_uuid', 'device_uuid_api_timestamp', ))
         return res
 
 # CatchRequestDataTooBig must be a global middleware so it can be ordered before PopulatePost
