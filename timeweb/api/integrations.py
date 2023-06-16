@@ -1059,9 +1059,6 @@ def merge_integration_response(ret, key, value):
     else:
         ret[key] = value
 
-@sync_to_async
-@require_http_methods(["GET"])
-@async_to_sync
 async def create_integration_assignments(request):
     await sync_to_async(lambda: request.user.settingsmodel)()
     if settings.DEBUG:
@@ -1080,9 +1077,6 @@ async def create_integration_assignments(request):
         logger.info(f"finished integration requests in {time.perf_counter() - t}")
     return JsonResponse(ret)
 
-@sync_to_async
-@require_http_methods(["GET"])
-@async_to_sync
 async def update_integration_courses(request):
     await sync_to_async(lambda: request.user.settingsmodel)()
     loop = asyncio.get_event_loop()
