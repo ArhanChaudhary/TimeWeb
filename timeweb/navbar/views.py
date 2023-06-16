@@ -17,9 +17,15 @@ from timewebapp.views import ExampleAccountView
 from .forms import SettingsForm
 from .models import SettingsModel
 
-from api.integrations import disable_gc_integration, generate_gc_authorization_url
+from api.integrations import (
+    disable_gc_integration,
+    generate_gc_authorization_url,
+    disable_canvas_integration,
+    generate_canvas_authorization_url,
+)
 from contact_form.views import ContactFormView
 
+import asyncio
 from requests import get as requests_get
 
 EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS = (
@@ -82,13 +88,40 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             return self.invalid_form(request)
     
     def valid_form(self, request):
-        if not self.form.cleaned_data.get("gc_integration") and 'token' in self.user.settingsmodel.gc_token:
-            disable_gc_integration(request, save=False)
+        disabled_gc_integration = not self.form.cleaned_data.get("gc_integration") and 'token' in self.user.settingsmodel.gc_token
+        disabled_canvas_integration = not self.form.cleaned_data.get("canvas_integration") and 'token' in self.user.settingsmodel.canvas_token
+        enabled_gc_integration = self.form.cleaned_data.get("gc_integration") and not 'token' in self.user.settingsmodel.gc_token
+        enabled_canvas_integration = self.form.cleaned_data.get("canvas_integration") and not 'token' in self.user.settingsmodel.canvas_token
+        async def disable_integrations():
+            loop = asyncio.get_event_loop()
+            disable_integration_tasks = []
+            if disabled_gc_integration:
+                disable_integration_tasks.append(loop.run_in_executor(None, lambda: disable_gc_integration(request, save=False)))
+            if disabled_canvas_integration:
+                disable_integration_tasks.append(loop.run_in_executor(None, lambda: disable_canvas_integration(request, save=False)))
+            await asyncio.gather(*disable_integration_tasks)
+        asyncio.run(disable_integrations())
         self.form.save()
         logger.info(f'User \"{self.user}\" updated the settings page')
 
-        if self.form.cleaned_data.get("gc_integration") and not 'token' in self.user.settingsmodel.gc_token:
-            return redirect(generate_gc_authorization_url(request, next_url="home", current_url="settings"))
+        integration_authorization_urls = []
+        if enabled_gc_integration:
+            integration_authorization_urls.append(
+                lambda next_url: generate_gc_authorization_url(request, next_url=next_url, current_url="settings")
+            )
+        if enabled_canvas_integration:
+            integration_authorization_urls.append(
+                lambda next_url: generate_canvas_authorization_url(request, next_url=next_url, current_url="settings")
+            )
+        prev_url = None
+        for current_url in reversed(integration_authorization_urls):
+            if prev_url is None:
+                prev_url = current_url("home")
+            else:
+                prev_url = current_url(prev_url)
+        if prev_url is not None:
+            return redirect(prev_url)
+
         if self.form.cleaned_data.get("view_deleted_assignments"):
             return redirect("deleted_assignments")
         else:
