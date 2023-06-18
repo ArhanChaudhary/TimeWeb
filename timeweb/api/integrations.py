@@ -283,6 +283,9 @@ def gc_auth_callback(request):
         request.session['gc-init-failed'] = True
         return redirect(request.session.pop("gc-callback-current-url"))
 
+    if request.GET.get('error'):
+        return callback_failed()
+
     state = request.session.get("gc-oauth-state")
     flow = Flow.from_client_config(
         settings.GC_CREDENTIALS_JSON,
