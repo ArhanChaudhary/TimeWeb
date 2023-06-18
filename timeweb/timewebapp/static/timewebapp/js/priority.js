@@ -960,7 +960,7 @@ class Priority {
     }
     addAssignmentShortcut(dom_assignment, priority_data) {
         const that = this;
-        // Loops through every google classroom assignment that needs more info AND has a tag (representing their class) to add "delete assignments of this class"
+        // Loops through every integration assignment that needs more info AND has a tag (representing their class) to add "delete assignments of this class"
         // Uses the same below logic for delete starred assignments and autoill work done
 
         // This has to be looped before they are sorted so setInitialAssignmentTopOffset is accurate

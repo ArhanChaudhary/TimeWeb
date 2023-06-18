@@ -401,7 +401,7 @@ setClickHandlers: {
     },
     generateJConfirmParams: function(params) {
         return {
-            title: `Are you sure you want to delete ${params.assignments_in_wrapper.length} ${pluralize("assignment", params.assignments_in_wrapper.length)} from class "${utils.loadAssignmentData(params.assignment_container.children(".assignment")).tags[0]}"?<br>(A Google Classroom assignment's first tag is considered its class name)`,
+            title: `Are you sure you want to delete ${params.assignments_in_wrapper.length} ${pluralize("assignment", params.assignments_in_wrapper.length)} from class "${utils.loadAssignmentData(params.assignment_container.children(".assignment")).tags[0]}"?<br>(An integration assignment's first tag is considered its class name)`,
             content: utils.formatting.getReversibilityStatus(),
             buttons: {
                 confirm: {

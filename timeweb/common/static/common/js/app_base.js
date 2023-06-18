@@ -244,7 +244,7 @@ createIntegrationAssignments: function() {
             });
         }
 
-        // indicates: this ajax means google classroom assignments were
+        // indicates: this ajax means integration assignments were
         // created
         if (response.assignments) {
             for (let sa of response.assignments) {
