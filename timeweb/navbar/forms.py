@@ -195,18 +195,19 @@ class SettingsForm(forms.ModelForm):
         return background_image
     
     def clean_canvas_instance_domain(self):
-        if canvas_instance_domain := self.cleaned_data["canvas_instance_domain"]:
-            canvas_instance_domain += ".instructure.com"
-        if canvas_instance_domain not in settings.CANVAS_CREDENTIALS_JSON:
-            self.add_error("canvas_instance_domain", _("Your institution hasn't approved TimeWeb's access"))
-        return canvas_instance_domain
+        return self.cleaned_data["canvas_instance_domain"] + ".instructure.com" \
+            if self.cleaned_data["canvas_instance_domain"] \
+            else self.cleaned_data["canvas_instance_domain"]
 
     def clean(self):
         cleaned_data = super().clean()
         canvas_integration = cleaned_data.get("canvas_integration")
         canvas_instance_domain = cleaned_data.get("canvas_instance_domain")
-        if canvas_integration and not canvas_instance_domain:
-            self.add_error("canvas_instance_domain", _("Please enter your institution's Canvas domain"))
+        if canvas_integration:
+            if not canvas_instance_domain:
+                self.add_error("canvas_instance_domain", _("Please enter your institution's Canvas domain"))
+            elif canvas_instance_domain not in settings.CANVAS_CREDENTIALS_JSON:
+                self.add_error("canvas_instance_domain", _("Your institution hasn't approved TimeWeb's access"))
         return cleaned_data
 
 class ContactForm(BaseContactForm):
