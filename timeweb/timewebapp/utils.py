@@ -109,6 +109,7 @@ def update_gc_courses_cache():
                         raise RefreshError
                     credentials.refresh(RefreshRequest())
                     print("Finished refreshing token for", s.user.username)
+                    s.gc_token.update(json.loads(credentials.to_json()))
                 service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
                 print("Fetching courses for", s.user.username)
                 courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in GC_COURSE_API_FIELDS)).execute()
@@ -118,11 +119,57 @@ def update_gc_courses_cache():
             else:
                 courses = courses.get('courses', [])
                 s.gc_courses_cache = format_gc_courses(courses)
-                s.gc_token.update(json.loads(credentials.to_json()))
                 s.save()
     print("\nSuccess\n")
     for s in SettingsModel.objects.exclude(gc_courses_cache=[]):
         print(f"{s.user.username}: {s.gc_courses_cache}\n")
+
+def update_canvas_courses_cache():
+    """
+    This function is manually invoked to update every user's canvas_courses_cache
+    """
+    from django.db import transaction
+    from api.integrations import (
+        OAuth2Session,
+        settings,
+        datetime,
+        Canvas,
+        logger,
+        format_canvas_courses
+    )
+    from navbar.models import SettingsModel
+    with transaction.atomic():
+        for s in SettingsModel.objects.exclude(canvas_token={}):
+            try:
+                if (
+                    datetime.datetime.now(tz=timezone.utc).timestamp() >= s.canvas_token['expires_at']
+                ):
+                    print("Refreshing token for", s.user.username)
+                    flow = OAuth2Session()
+                    authorized_token_response = flow.refresh_token(
+                        f'http{"" if settings.DEBUG else "s"}://{s.canvas_instance_domain}/login/oauth2/token',
+                        client_id=settings.CANVAS_CREDENTIALS_JSON['client_id'],
+                        client_secret=settings.CANVAS_CREDENTIALS_JSON['client_secret'],
+                        refresh_token=s.canvas_token['refresh_token'],
+                    )
+                    print("Finished refreshing token for", s.user.username)
+                    s.canvas_token['token'] = authorized_token_response['access_token']
+                    s.canvas_token['expires_at'] = authorized_token_response['expires_at']
+                canvas = Canvas(
+                    f'http{"" if settings.DEBUG else "s"}://{s.canvas_instance_domain}',
+                    s.canvas_token['token'],
+                )
+                print("Fetching courses for", s.user.username)
+                courses = list(canvas.get_courses(enrollment_state='active', state=['available']))
+                print("Finished fetching courses for", s.user.username)
+            except Exception as e:
+                logger.error("Error with token: %s", e)
+            else:
+                s.canvas_courses_cache = format_canvas_courses(courses)
+                s.save()
+    print("\nSuccess\n")
+    for s in SettingsModel.objects.exclude(canvas_courses_cache=[]):
+        print(f"{s.user.username}: {s.canvas_courses_cache}\n")
 
 def adjust_blue_line(request, *, old_data, assignment_date, x_num):
     assert assignment_date is not None
