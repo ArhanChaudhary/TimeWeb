@@ -70,19 +70,15 @@ def create_user_settings_model(sender, instance, created, **kwargs):
     SettingsModel.objects.create(user=instance)
 
 def append_default_context(request):
-    context = {
+    return {
         "EXAMPLE_ACCOUNT_EMAIL": settings.EXAMPLE_ACCOUNT_EMAIL,
         "MAX_NUMBER_OF_TAGS": MAX_NUMBER_OF_TAGS,
         "EDITING_EXAMPLE_ACCOUNT": settings.EDITING_EXAMPLE_ACCOUNT,
         "DEBUG": settings.DEBUG,
         "ADD_CHECKBOX_WIDGET_FIELDS": TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS,
         "RELOAD_VIEWS": [reverse(i) for i in RELOAD_VIEWS],
+        "INTEGRATION_INIT_FAILURE": request.session.pop("integration-init-failure", None),
     }
-    if request.session.pop("gc-init-failed", None):
-        context["GC_API_INIT_FAILED"] = True
-    if request.session.pop("canvas-init-failed", None):
-        context["CANVAS_API_INIT_FAILED"] = True
-    return context
 
 @method_decorator(ratelimit(key=utils.get_client_ip, rate='30/m', method="GET", block=True), name='get')
 @method_decorator(ratelimit(key=utils.get_client_ip, rate='100/h', method="GET", block=True), name='get')

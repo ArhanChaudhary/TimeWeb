@@ -280,7 +280,7 @@ def gc_auth_callback(request):
     def callback_failed():
         # throw on first line to ensure 2nd doesnt run
         del request.session["gc-callback-next-url"]
-        request.session['gc-init-failed'] = True
+        request.session['integration-init-failure'] = 'gc'
         return redirect(request.session.pop("gc-callback-current-url"))
 
     if request.GET.get('error'):
@@ -763,7 +763,7 @@ def generate_canvas_authorization_url(request, *, next_url, current_url):
 def canvas_auth_callback(request):
     def callback_failed():
         del request.session["canvas-callback-next-url"]
-        request.session['canvas-init-failed'] = True
+        request.session['integration-init-failure'] = 'canvas'
         return redirect(request.session.pop("canvas-callback-current-url"))
 
     if request.GET.get('error'):

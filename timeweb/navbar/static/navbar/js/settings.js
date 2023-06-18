@@ -59,9 +59,9 @@ document.addEventListener("DOMContentLoaded", function() {
     $("option:not([value])").attr("value", "");
 
     let alreadySubmitted = false;
-    if (GC_API_INIT_FAILED) {
+    if (INTEGRATION_INIT_FAILURE) {
         $.alert({
-            title: "Could not enable the Google Classroom integration.",
+            title: `Could not enable the ${{'gc': 'Google Classroom', 'canvas': 'Canvas'}[INTEGRATION_INIT_FAILURE]} integration.`,
             content: "Authorization failed. Please try again.",
             backgroundDismiss: false,
             buttons: {
@@ -71,25 +71,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 "try again": {
                     action: () => {
                         alreadySubmitted = true;
-                        ajaxUtils.changeSetting({setting: "gc_token", value: true});
-                    },
-                },
-            },
-        });
-    }
-    if (CANVAS_API_INIT_FAILED) {
-        $.alert({
-            title: "Could not enable the Canvas integration.",
-            content: "Authorization failed. Please try again.",
-            backgroundDismiss: false,
-            buttons: {
-                ok: {
-
-                },
-                "try again": {
-                    action: () => {
-                        alreadySubmitted = true;
-                        ajaxUtils.changeSetting({setting: "canvas_token", value: true});
+                        ajaxUtils.changeSetting({setting: `${INTEGRATION_INIT_FAILURE}_token`, value: true});
                     },
                 },
             },
