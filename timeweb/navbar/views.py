@@ -27,6 +27,7 @@ from contact_form.views import ContactFormView
 
 import asyncio
 from requests import get as requests_get
+from copy import deepcopy
 
 EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS = (
     # cannot be json serialized
@@ -63,6 +64,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             initial = {
                 'gc_integration': 'token' in self.user.settingsmodel.gc_token,
                 'canvas_integration': 'token' in self.user.settingsmodel.canvas_token,
+                'canvas_instance_domain': self.user.settingsmodel.canvas_instance_domain.replace(".instructure.com", ""),
             }
             self.context['form'] = SettingsForm(initial=initial, instance=self.user.settingsmodel)
         self.context['default_settings'] = model_to_dict(SettingsForm().save(commit=False),
@@ -75,6 +77,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     def post(self, request):
         if self.user is None:
             self.user = request.user
+        self.old_settings = deepcopy(self.user.settingsmodel)
         self.form = SettingsForm(data=request.POST, files=request.FILES, instance=self.user.settingsmodel)
         if request.path == reverse("example_settings"):
             # don't run this after is_valid because is_valid updates self.user.settingsmodel which then is later
@@ -89,10 +92,17 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             return self.invalid_form(request)
     
     def valid_form(self, request):
-        disabled_gc_integration = not self.form.cleaned_data.get("gc_integration") and 'token' in self.user.settingsmodel.gc_token
-        disabled_canvas_integration = not self.form.cleaned_data.get("canvas_integration") and 'token' in self.user.settingsmodel.canvas_token
         enabled_gc_integration = self.form.cleaned_data.get("gc_integration") and not 'token' in self.user.settingsmodel.gc_token
+        disabled_gc_integration = not self.form.cleaned_data.get("gc_integration") and 'token' in self.user.settingsmodel.gc_token
         enabled_canvas_integration = self.form.cleaned_data.get("canvas_integration") and not 'token' in self.user.settingsmodel.canvas_token
+        disabled_canvas_integration = not self.form.cleaned_data.get("canvas_integration") and 'token' in self.user.settingsmodel.canvas_token
+        if (
+            self.form.cleaned_data.get("canvas_instance_domain") != self.old_settings.canvas_instance_domain
+            and self.form.cleaned_data.get("canvas_integration")
+            and 'token' in self.user.settingsmodel.canvas_token
+        ):
+            disabled_canvas_integration = True
+            enabled_canvas_integration = True
         async def disable_integrations():
             loop = asyncio.get_event_loop()
             disable_integration_tasks = []
@@ -102,6 +112,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
                 disable_integration_tasks.append(loop.run_in_executor(None, lambda: disable_canvas_integration(request, save=False)))
             await asyncio.gather(*disable_integration_tasks)
         asyncio.run(disable_integrations())
+
         self.form.save()
         logger.info(f'User \"{self.user}\" updated the settings page')
 

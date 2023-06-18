@@ -195,6 +195,21 @@ class SettingsForm(forms.ModelForm):
         if background_image and background_image.size > settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE:
             raise forms.ValidationError(_('This file is too big (>%(amount)d megabytes)') % {'amount': settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE/1048576})
         return background_image
+    
+    def clean_canvas_instance_domain(self):
+        if canvas_instance_domain := self.cleaned_data["canvas_instance_domain"]:
+            canvas_instance_domain += ".instructure.com"
+        if canvas_instance_domain not in settings.CANVAS_CREDENTIALS_JSON:
+            self.add_error("canvas_instance_domain", _("Your institution hasn't approved TimeWeb's access"))
+        return canvas_instance_domain
+
+    def clean(self):
+        cleaned_data = super().clean()
+        canvas_integration = cleaned_data.get("canvas_integration")
+        canvas_instance_domain = cleaned_data.get("canvas_instance_domain")
+        if canvas_integration and not canvas_instance_domain:
+            self.add_error("canvas_instance_domain", _("Please enter your institution's Canvas domain"))
+        return cleaned_data
 
 class ContactForm(BaseContactForm):
     body = forms.CharField(widget=forms.Textarea, label=_("Ask me anything"))

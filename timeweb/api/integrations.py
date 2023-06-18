@@ -743,7 +743,7 @@ def canvas_instance_url(request):
 
 def generate_canvas_authorization_url(request, *, next_url, current_url):
     flow = OAuth2Session(
-        client_id=settings.CANVAS_CREDENTIALS_JSON['client_id'],
+        client_id=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_domain]['client_id'],
         redirect_uri=settings.CANVAS_REDIRECT_URI,
         scope=settings.CANVAS_SCOPES,
     )
@@ -768,7 +768,7 @@ def canvas_auth_callback(request):
 
     state = request.session.get("canvas-oauth-state")
     flow = OAuth2Session(
-        client_id=settings.CANVAS_CREDENTIALS_JSON['client_id'],
+        client_id=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_domain]['client_id'],
         redirect_uri=settings.CANVAS_REDIRECT_URI,
         scope=settings.CANVAS_SCOPES,
         state=state,
@@ -779,7 +779,7 @@ def canvas_auth_callback(request):
         authorized_token_response = flow.fetch_token(
             f'{canvas_instance_url(request)}/login/oauth2/token',
             authorization_response=authorization_response,
-            client_secret=settings.CANVAS_CREDENTIALS_JSON['client_secret'],
+            client_secret=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_domain]['client_secret'],
             timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
         )
     except (
@@ -853,8 +853,8 @@ async def create_canvas_assignments(request):
         try:
             authorized_token_response = await loop.run_in_executor(None, lambda: flow.refresh_token(
                 f'{canvas_instance_url(request)}/login/oauth2/token',
-                client_id=settings.CANVAS_CREDENTIALS_JSON['client_id'],
-                client_secret=settings.CANVAS_CREDENTIALS_JSON['client_secret'],
+                client_id=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_domain]['client_id'],
+                client_secret=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_domain]['client_secret'],
                 refresh_token=request.user.settingsmodel.canvas_token['refresh_token'],
                 timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
             ))

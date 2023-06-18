@@ -62,7 +62,7 @@
                         {% endif %}
                     </span>
             {% endif %}
-            {% if field.name != "assignment_sorting" %}
+            {% if field.name != "assignment_sorting" and field.name != "canvas_instance_domain" %}
                 <div class="field-container">
                     <span class="left-side-of-field">
                         {{ field.label }}
@@ -102,6 +102,12 @@
                                         {% endif %}
                                     {% endif %}
                                 </label>
+                            {% endif %}
+                            {% if field.name == "canvas_integration" %}
+                                {% for error in form.canvas_instance_domain.errors %}
+                                    <h3 class="error-note">{{ error|escape }}</h3>
+                                {% endfor %}
+                                {{ form.canvas_instance_domain }}<span id="canvas-instance-domain-wrapper">.instructure.com</span>
                             {% endif %}
                         {% endif %}
                     </span>
