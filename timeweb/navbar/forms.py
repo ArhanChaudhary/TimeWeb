@@ -196,7 +196,7 @@ class SettingsForm(forms.ModelForm):
     
     def clean_canvas_instance_domain(self):
         return self.cleaned_data["canvas_instance_domain"] + ".instructure.com" \
-            if self.cleaned_data["canvas_instance_domain"] \
+            if self.cleaned_data["canvas_instance_domain"] and not settings.DEBUG \
             else self.cleaned_data["canvas_instance_domain"]
 
     def clean(self):
