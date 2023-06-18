@@ -208,7 +208,7 @@ def simplify_course_name(tag_name):
     # information to identify the class,
     # 3) less info is anyways better to fit the assignment tag length
     tag_name = tag_name_re_subs([
-        r"(\d{2,})",
+        r"\(\d{2,}\)",
         # :)
         "31181",
 
