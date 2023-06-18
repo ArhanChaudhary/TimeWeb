@@ -1,5 +1,6 @@
 # Abstractions
-from django.shortcuts import redirect
+from django.shortcuts import redirect, reverse
+from django.urls.exceptions import NoReverseMatch
 from django.core.cache import cache
 from django.conf import settings
 from django.utils.translation import gettext as _
@@ -86,6 +87,14 @@ GC_COURSE_API_FIELDS = (
 # COMMON INTEGRATION UTILITIES
 # 
 
+def is_app_url(url):
+    try:
+        reverse(url)
+    except NoReverseMatch:
+        return False
+    else:
+        return True
+
 def generate_static_integration_fields(user):
     return {
         # from app
@@ -115,6 +124,27 @@ async def prepare_integration_response(request, assignment_model_data, integrati
         "update_state": True,
         "next": "continue",
     }
+
+def integration_session_urls_init(request, next_url, current_url):
+    try:
+        if is_app_url(next_url) and not is_app_url(request.session["integration-callback-next-url"][-1]):
+            pass
+        else:
+            request.session["integration-callback-next-url"].append(next_url)
+    except IndexError:
+        request.session["integration-callback-next-url"].append(next_url)
+    except KeyError:
+        request.session["integration-callback-next-url"] = [next_url]
+    request.session["integration-callback-current-url"] = current_url
+
+def integration_session_urls_exit(request):
+    next_url = request.session["integration-callback-next-url"].pop()
+    if is_app_url(next_url):
+        del request.session["integration-callback-next-url"]
+        del request.session["integration-callback-current-url"]
+    elif not request.session["integration-callback-next-url"]:
+        del request.session["integration-callback-next-url"]
+    return redirect(next_url)
 
 def simplify_course_name(tag_name):
     abbreviations = [
@@ -269,19 +299,15 @@ def generate_gc_authorization_url(request, *, next_url, current_url):
         access_type='offline',
         include_granted_scopes='true'
     )
-
-    request.session["gc-callback-next-url"] = next_url
-    request.session["gc-callback-current-url"] = current_url
+    integration_session_urls_init(request, next_url, current_url)
     request.session["gc-oauth-state"] = state
     return authorization_url
 
 @require_http_methods(["GET"])
 def gc_auth_callback(request):
     def callback_failed():
-        # throw on first line to ensure 2nd doesnt run
-        del request.session["gc-callback-next-url"]
         request.session['integration-init-failure'] = 'gc'
-        return redirect(request.session.pop("gc-callback-current-url"))
+        return redirect(request.session.pop("integration-callback-current-url"))
 
     if request.GET.get('error'):
         return callback_failed()
@@ -354,10 +380,10 @@ def gc_auth_callback(request):
     # Use .update() (dict method) instead of = so the refresh token isnt overwritten
     request.user.settingsmodel.gc_token.update(json.loads(credentials.to_json()))
     request.user.settingsmodel.save(update_fields=("gc_courses_cache", "gc_token"))
+
     logger.info(f"User {request.user} enabled google classroom API")
     del request.session["gc-oauth-state"]
-    del request.session["gc-callback-current-url"]
-    return redirect(request.session.pop("gc-callback-next-url"))
+    return integration_session_urls_exit(request)
 
 def disable_gc_integration(request, *, save=True):
     flow = Flow.from_client_config(
@@ -754,17 +780,15 @@ def generate_canvas_authorization_url(request, *, next_url, current_url):
         f'{canvas_instance_url(request)}/login/oauth2/auth',
         force_login='1',
     )
-    request.session["canvas-callback-next-url"] = next_url
-    request.session["canvas-callback-current-url"] = current_url
+    integration_session_urls_init(request, next_url, current_url)
     request.session["canvas-oauth-state"] = state
     return authorization_url
 
 @require_http_methods(["GET"])
 def canvas_auth_callback(request):
     def callback_failed():
-        del request.session["canvas-callback-next-url"]
         request.session['integration-init-failure'] = 'canvas'
-        return redirect(request.session.pop("canvas-callback-current-url"))
+        return redirect(request.session.pop("integration-callback-current-url"))
 
     if request.GET.get('error'):
         return callback_failed()
@@ -815,8 +839,7 @@ def canvas_auth_callback(request):
 
     logger.info(f"User {request.user} enabled the canvas API")
     del request.session["canvas-oauth-state"]
-    del request.session["canvas-callback-current-url"]
-    return redirect(request.session.pop("canvas-callback-next-url"))
+    return integration_session_urls_exit(request)
 
 def disable_canvas_integration(request, *, save=True):
     flow = OAuth2Session()
