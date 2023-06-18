@@ -64,7 +64,9 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             initial = {
                 'gc_integration': 'token' in self.user.settingsmodel.gc_token,
                 'canvas_integration': 'token' in self.user.settingsmodel.canvas_token,
-                'canvas_instance_domain': self.user.settingsmodel.canvas_instance_domain.replace(".instructure.com", ""),
+                'canvas_instance_domain': self.user.settingsmodel.canvas_instance_domain.replace(".instructure.com", "")
+                    if self.user.settingsmodel.canvas_instance_domain
+                    else self.user.settingsmodel.canvas_instance_domain,
             }
             self.context['form'] = SettingsForm(initial=initial, instance=self.user.settingsmodel)
         self.context['default_settings'] = model_to_dict(SettingsForm().save(commit=False),
