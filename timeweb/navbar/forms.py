@@ -35,11 +35,7 @@ class SettingsForm(forms.ModelForm):
             "gc_integration": {
                 "field": forms.BooleanField(
                     label="Google Classroom Integration",
-                    help_text=mark_safe('''
-                        Imports assignments from Google Classroom. Some are <a target="_blank" href="/user-guide#adding-google-classroom-assignments">automatically filtered</a>. If nothing happens after authorization, there aren&#x27;t any valid Google Classroom assignments to add.<br>
-                        <br>
-                        Note that you can use a different Google account for the Google Classroom integration than the one used to log in to TimeWeb.
-                    '''),
+                    help_text="You can use a different Google account than the one used to log in to TimeWeb.",
                     required=False,
                 ),
                 "order": "before immediately_delete_completely_finished_assignments",
@@ -47,8 +43,10 @@ class SettingsForm(forms.ModelForm):
             "canvas_integration": {
                 "field": forms.BooleanField(
                     label="Canvas Integration",
-                    help_text="Not yet implemented.",
-                    widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
+                    help_text=mark_safe('''
+                        TimeWeb must be manually approved by your educational institution.
+                        Please <a href="/contact">contact us</a> if you would like us to request your Canvas administrator to allow TimeWeb to use the Canvas integration.
+                    '''),
                     required=False,
                 ),
                 "order": "after gc_integration",
