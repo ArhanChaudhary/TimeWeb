@@ -1,5 +1,4 @@
 from django.utils import timezone
-from django.db import transaction
 
 import common.utils as utils
 
@@ -62,6 +61,7 @@ def deletion_time_fix():
     """
     This function is manually invoked to ensure all deletion times are unique
     """
+    from django.db import transaction
     from common.models import User
     import datetime
     with transaction.atomic():
@@ -82,31 +82,45 @@ def update_gc_courses_cache():
     """
     This function is manually invoked to update every user's gc_courses_cache
     """
-    from django.conf import settings
-    from api.integrations import MemoryCache, format_gc_courses
+    from django.db import transaction
+    from api.integrations import (
+        MemoryCache,
+        format_gc_courses,
+        settings,
+        Credentials,
+        RefreshError,
+        RefreshRequest,
+        build,
+        logger,
+        json,
+        GC_COURSE_API_FIELDS
+    )
     from navbar.models import SettingsModel
-    from google.oauth2.credentials import Credentials
-    from google.auth.exceptions import RefreshError
-    from google.auth.transport.requests import Request
-    from googleapiclient.discovery import build
-    from common.utils import logger
     with transaction.atomic():
         for s in SettingsModel.objects.exclude(gc_token={}):
+            if 'token' not in s.gc_token:
+                continue
             credentials = Credentials.from_authorized_user_info(s.gc_token, settings.GC_SCOPES)
             try:
-                if not credentials.valid:
+                if credentials.expired:
+                    print("Refreshing token for", s.user.username)
                     can_be_refreshed = credentials.expired and credentials.refresh_token
                     if not can_be_refreshed:
                         raise RefreshError
-                    credentials.refresh(Request())
+                    credentials.refresh(RefreshRequest())
+                    print("Finished refreshing token for", s.user.username)
                 service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
-                courses = service.courses().list(courseStates=["ACTIVE"]).execute()
-            except RefreshError as e:
+                print("Fetching courses for", s.user.username)
+                courses = service.courses().list(courseStates=["ACTIVE"], fields=",".join(f"courses/{i}" for i in GC_COURSE_API_FIELDS)).execute()
+                print("Finished fetching courses for", s.user.username)
+            except Exception as e:
                 logger.error("Error with token: %s", e)
-                continue
-            courses = courses.get('courses', [])
-            s.gc_courses_cache = format_gc_courses(courses)
-    print("Success\n")
+            else:
+                courses = courses.get('courses', [])
+                s.gc_courses_cache = format_gc_courses(courses)
+                s.gc_token.update(json.loads(credentials.to_json()))
+                s.save()
+    print("\nSuccess\n")
     for s in SettingsModel.objects.exclude(gc_courses_cache=[]):
         print(f"{s.user.username}: {s.gc_courses_cache}\n")
 
