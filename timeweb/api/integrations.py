@@ -25,7 +25,6 @@ from requests.exceptions import (
     ReadTimeout
 )
 from oauthlib.oauth2.rfc6749.errors import (
-    AccessDeniedError,
     InvalidGrantError,
     MismatchingStateError,
 )
@@ -344,7 +343,6 @@ def gc_auth_callback(request):
         )
     except (
         InvalidGrantError, # if you reuse a code
-        AccessDeniedError, # enable no scopes or click cancel
         MismatchingStateError, # csrf
         ConnectionError_,
         ReadTimeout,
