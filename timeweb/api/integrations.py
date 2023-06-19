@@ -17,10 +17,17 @@ from timewebapp.views import EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT
 
 # Common integrations stuff
 import asyncio
+from requests_oauthlib import OAuth2Session
 from asgiref.sync import sync_to_async, async_to_sync
+from google.auth._helpers import CLOCK_SKEW_SECS
 from requests.exceptions import (
     ConnectionError as ConnectionError_,
     ReadTimeout
+)
+from oauthlib.oauth2.rfc6749.errors import (
+    AccessDeniedError,
+    InvalidGrantError,
+    MismatchingStateError,
 )
 
 # Google API
@@ -34,14 +41,8 @@ from googleapiclient.errors import HttpError
 from google_auth_httplib2 import AuthorizedHttp
 from httplib2 import Http
 from httplib2.error import ServerNotFoundError
-from oauthlib.oauth2.rfc6749.errors import (
-    AccessDeniedError,
-    InvalidGrantError,
-    MismatchingStateError,
-)
 
 # Canvas API
-from requests_oauthlib import OAuth2Session
 from canvasapi import Canvas
 from canvasapi.course import Course
 from canvasapi.exceptions import InvalidAccessToken
@@ -870,7 +871,7 @@ def disable_canvas_integration(request, *, save=True):
 async def create_canvas_assignments(request):
     loop = asyncio.get_event_loop()
     if (
-        datetime.datetime.now(tz=timezone.utc).timestamp() >= request.user.settingsmodel.canvas_token['expires_at']
+        datetime.datetime.now(tz=timezone.utc).timestamp() >= request.user.settingsmodel.canvas_token['expires_at'] - CLOCK_SKEW_SECS
     ):
         flow = OAuth2Session()
         if settings.DEBUG:
@@ -1043,7 +1044,7 @@ def update_canvas_courses(request):
         default_timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
     )
     if (
-        datetime.datetime.now(tz=timezone.utc).timestamp() >= request.user.settingsmodel.canvas_token['expires_at']
+        datetime.datetime.now(tz=timezone.utc).timestamp() >= request.user.settingsmodel.canvas_token['expires_at'] - CLOCK_SKEW_SECS
     ):
         return {"next": "continue"}
     try:
