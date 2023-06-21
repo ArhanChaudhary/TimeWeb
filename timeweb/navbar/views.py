@@ -23,6 +23,7 @@ from api.integrations import (
     generate_canvas_authorization_url,
     disable_canvas_integration,
     generate_moodle_authorization_url,
+    disable_moodle_integration,
 )
 from contact_form.views import ContactFormView
 
@@ -101,6 +102,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         enabled_canvas_integration = self.form.cleaned_data.get("canvas_integration") and not 'token' in self.user.settingsmodel.canvas_token
         disabled_canvas_integration = not self.form.cleaned_data.get("canvas_integration") and 'token' in self.user.settingsmodel.canvas_token
         enabled_moodle_integration = self.form.cleaned_data.get("moodle_integration") and not 'token' in self.user.settingsmodel.moodle_token
+        disabled_moodle_integration = not self.form.cleaned_data.get("moodle_integration") and 'token' in self.user.settingsmodel.moodle_token
         if (
             self.form.cleaned_data.get("canvas_instance_domain") != self.old_settings.canvas_instance_domain
             and self.form.cleaned_data.get("canvas_integration")
@@ -121,6 +123,8 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
                 disable_integration_tasks.append(loop.run_in_executor(None, lambda: disable_gc_integration(request, save=False)))
             if disabled_canvas_integration:
                 disable_integration_tasks.append(loop.run_in_executor(None, lambda: disable_canvas_integration(request, save=False)))
+            if disabled_moodle_integration:
+                disable_integration_tasks.append(loop.run_in_executor(None, lambda: disable_moodle_integration(request, save=False)))
             await asyncio.gather(*disable_integration_tasks)
         asyncio.run(disable_integrations())
 

@@ -18,6 +18,7 @@ from .integrations import (
     generate_canvas_authorization_url,
     disable_canvas_integration,
     generate_moodle_authorization_url,
+    disable_moodle_integration,
 )
 from timewebapp.models import TimewebModel
 from timewebapp.views import EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT
@@ -553,6 +554,7 @@ def change_setting(request):
                 'redirect_url': generate_moodle_authorization_url(request, next_url="home", current_url="settings"),
             })
         else:
+            disable_moodle_integration(request, save=True)
             return HttpResponse(status=204)
 
     # pretty cursed code that could possibly be improved by adding the settings model to the settings form as an instance (64baf58)

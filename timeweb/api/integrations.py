@@ -1075,7 +1075,13 @@ def moodle_instance_url(request):
     return f'http{"" if settings.DEBUG else "s"}://{request.user.settingsmodel.moodle_instance_domain}'
 
 def generate_moodle_authorization_url(request, *, next_url, current_url):
-    pass
+
+def disable_moodle_integration(request, *, save=True):
+    request.user.settingsmodel.moodle_token = {}
+    if settings.DEBUG:
+        request.user.settingsmodel.added_moodle_assignment_ids = []
+    if save:
+        request.user.settingsmodel.save()
 
 def create_moodle_assignments(request):
     # remember to check if token is expired
