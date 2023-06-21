@@ -215,17 +215,18 @@ changeSetting: function(kwargs={}) {
     });
 },
 createIntegrationAssignments: function() {
-    if (!SETTINGS.integration_enabled)
-        return;
-    const ajaxs = [
-        {type: "GET", url: '/api/create-integration-assignments'},
-        {type: "GET", url: '/api/update-integration-courses'},
-    ];
+    const ajaxs = []
+    if (SETTINGS.gc_integration_enabled || SETTINGS.canvas_integration_enabled || SETTINGS.moodle_integration_enabled) {
+        ajaxs.push({type: "GET", url: '/api/create-integration-assignments'});
+    }
+    if (SETTINGS.gc_integration_enabled || SETTINGS.canvas_integration_enabled) {
+        ajaxs.push({type: "GET", url: '/api/update-integration-courses'});
+    }
     let ajaxCallback = function(response) {
         if (response.invalid_credentials) {
             $.alert({
                 title: "Invalid credentials.",
-                content: `Your ${{'gc': 'Google Classroom', 'canvas': 'Canvas'}[response.integration_name]} integration credentials are invalid. Please reauthenticate or disable the integration.`,
+                content: `Your ${{'gc': 'Google Classroom', 'canvas': 'Canvas', 'moodle': 'Moodle'}[response.integration_name]} integration credentials are invalid. Please reauthenticate or disable the integration.`,
                 buttons: {
                     ok: {
 

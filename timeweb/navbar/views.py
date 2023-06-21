@@ -18,10 +18,11 @@ from .forms import SettingsForm
 from .models import SettingsModel
 
 from api.integrations import (
-    disable_gc_integration,
     generate_gc_authorization_url,
-    disable_canvas_integration,
+    disable_gc_integration,
     generate_canvas_authorization_url,
+    disable_canvas_integration,
+    generate_moodle_authorization_url,
 )
 from contact_form.views import ContactFormView
 
@@ -47,7 +48,8 @@ DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS = (
     'nudge_calendar', 'nudge_notifications', 'user', 'gc_courses_cache', 'device_uuid', 'device_uuid_api_timestamp',
     'display_working_days_left', 'background_image_text_shadow_width', 'gc_assignments_always_midnight', 'loosely_enforce_minimum_work_times', 
     'priority_color_borders', 'font', 'should_alert_due_date_incremented', 'example_account', "gc_token",
-    'added_canvas_assignment_ids', 'canvas_courses_cache', 'canvas_instance_domain',
+    'added_canvas_assignment_ids', 'canvas_courses_cache', 'canvas_instance_domain', 'moodle_token', 'added_moodle_assignment_ids',
+    'moodle_instance_domain'
 )
 
 assert len(EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS) + len(DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS) == len(SettingsModel._meta.fields), "update this list"
@@ -65,6 +67,8 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
                 'gc_integration': 'token' in self.user.settingsmodel.gc_token,
                 'canvas_integration': 'token' in self.user.settingsmodel.canvas_token,
                 'canvas_instance_domain': self.user.settingsmodel.canvas_instance_domain,
+                'moodle_integration': 'token' in self.user.settingsmodel.moodle_token,
+                'moodle_instance_domain': self.user.settingsmodel.moodle_instance_domain,
             }
             self.context['form'] = SettingsForm(initial=initial, instance=self.user.settingsmodel)
         self.context['default_settings'] = model_to_dict(SettingsForm().save(commit=False),
@@ -96,6 +100,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         disabled_gc_integration = not self.form.cleaned_data.get("gc_integration") and 'token' in self.user.settingsmodel.gc_token
         enabled_canvas_integration = self.form.cleaned_data.get("canvas_integration") and not 'token' in self.user.settingsmodel.canvas_token
         disabled_canvas_integration = not self.form.cleaned_data.get("canvas_integration") and 'token' in self.user.settingsmodel.canvas_token
+        enabled_moodle_integration = self.form.cleaned_data.get("moodle_integration") and not 'token' in self.user.settingsmodel.moodle_token
         if (
             self.form.cleaned_data.get("canvas_instance_domain") != self.old_settings.canvas_instance_domain
             and self.form.cleaned_data.get("canvas_integration")
@@ -103,6 +108,12 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         ):
             disabled_canvas_integration = True
             enabled_canvas_integration = True
+        if (
+            self.form.cleaned_data.get("moodle_instance_domain") != self.old_settings.moodle_instance_domain
+            and self.form.cleaned_data.get("moodle_integration")
+            and 'token' in self.user.settingsmodel.moodle_token
+        ):
+            enabled_moodle_integration = True
         async def disable_integrations():
             loop = asyncio.get_event_loop()
             disable_integration_tasks = []
@@ -124,6 +135,10 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         if enabled_canvas_integration:
             integration_authorization_urls.append(
                 lambda next_url: generate_canvas_authorization_url(request, next_url=next_url, current_url="settings")
+            )
+        if enabled_moodle_integration:
+            integration_authorization_urls.append(
+                lambda next_url: generate_moodle_authorization_url(request, next_url=next_url, current_url="settings")
             )
         prev_url = None
         for current_url in reversed(integration_authorization_urls):

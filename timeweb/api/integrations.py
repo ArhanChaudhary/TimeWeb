@@ -17,6 +17,7 @@ from timewebapp.views import EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT
 
 # Common integrations stuff
 import asyncio
+import requests
 from requests_oauthlib import OAuth2Session
 from asgiref.sync import sync_to_async, async_to_sync
 from google.auth._helpers import CLOCK_SKEW_SECS
@@ -45,6 +46,9 @@ from httplib2.error import ServerNotFoundError
 from canvasapi import Canvas
 from canvasapi.course import Course
 from canvasapi.exceptions import InvalidAccessToken
+
+# Moodle API
+pass
 
 # Misc
 if settings.DEBUG:
@@ -1063,6 +1067,19 @@ def update_canvas_courses(request):
     return {"next": "continue"}
 
 # 
+# MOODLE INTEGRATION
+# 
+
+def moodle_instance_url(request):
+    return f'http{"" if settings.DEBUG else "s"}://{request.user.settingsmodel.moodle_instance_domain}'
+
+def generate_moodle_authorization_url(request, *, next_url, current_url):
+    pass
+
+async def create_moodle_assignments(request):
+    pass
+
+# 
 # INTEGRATIONS API VIEW FUNCTIONS
 # 
 
@@ -1084,6 +1101,8 @@ async def create_integration_assignments(request):
         integration_tasks.append(create_gc_assignments(request))
     if 'token' in request.user.settingsmodel.canvas_token:
         integration_tasks.append(create_canvas_assignments(request))
+    if 'token' in request.user.settingsmodel.moodle_token:
+        integration_tasks.append(create_moodle_assignments(request))
     if integration_tasks:
         request.concurrent_request_key = f"concurrent_integration_request_{request.user.id}"
         request.thread_timestamp = datetime.datetime.now().timestamp()

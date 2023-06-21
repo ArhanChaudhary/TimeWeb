@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let alreadySubmitted = false;
     if (INTEGRATION_INIT_FAILURE) {
         $.alert({
-            title: `Could not enable the ${{'gc': 'Google Classroom', 'canvas': 'Canvas'}[INTEGRATION_INIT_FAILURE]} integration.`,
+            title: `Could not enable the ${{'gc': 'Google Classroom', 'canvas': 'Canvas', 'moodle': 'Moodle'}[INTEGRATION_INIT_FAILURE]} integration.`,
             content: "Authorization failed. Please try again.",
             backgroundDismiss: false,
             buttons: {

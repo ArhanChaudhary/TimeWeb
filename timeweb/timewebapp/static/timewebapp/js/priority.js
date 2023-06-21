@@ -371,11 +371,13 @@ class Priority {
             // Instead, give it a question mark so it can be appropriately handled
             if (sa.sa.needs_more_info && !hard_due_date_passed) {
 				status_image = 'question_mark';
-                if (sa.sa.is_gc_assignment || sa.sa.is_canvas_assignment) {
+                if (sa.sa.is_integration_assignment) {
                     if (sa.sa.is_gc_assignment) {
                         status_message = "This Google Classroom assignment needs more info";
                     } else if (sa.sa.is_canvas_assignment) {
                         status_message = "This Canvas assignment needs more info";
+                    } else if (sa.sa.is_moodle_assignment) {
+                        status_message = "This Moodle assignment needs more info";
                     }
                     status_value = first_real_tag ? Priority.NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT_WITH_FIRST_TAG : Priority.NEEDS_MORE_INFO_AND_INTEGRATION_ASSIGNMENT;
                 } else {

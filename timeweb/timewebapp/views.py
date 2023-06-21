@@ -45,7 +45,8 @@ EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT = (
     "nudge_notifications", "device_uuid", "device_uuid_api_timestamp",
     "gc_courses_cache", "gc_assignments_always_midnight", "background_image_text_shadow_width",
     "appearance", "priority_color_borders", "font", "canvas_token", "added_canvas_assignment_ids",
-    "canvas_courses_cache", "canvas_instance_domain",
+    "canvas_courses_cache", "canvas_instance_domain", "moodle_token", "added_moodle_assignment_ids",
+    "moodle_instance_domain",
 )
 
 assert len(INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT) + len(EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT) == len(SettingsModel._meta.fields), "update this list"
@@ -58,7 +59,7 @@ INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT = (
     "works", "funct_round", "break_days", "skew_ratio", "fixed_mode", "dynamic_start", "id", "name",
     "soft", "unit", "description", "tags", "is_gc_assignment",
     "alert_due_date_incremented", "dont_hide_again", "deletion_time", "needs_more_info",
-    "external_link", "is_integration_assignment", "is_canvas_assignment",
+    "external_link", "is_integration_assignment", "is_canvas_assignment", "is_moodle_assignment",
 )
 
 assert len(INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT) + len(EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) == len(TimewebModel._meta.fields), "update this list"
@@ -149,7 +150,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['assignment_models_as_json'] = [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in timewebmodels]
 
         self.context['settings_model_as_json'] = model_to_dict(self.user.settingsmodel, exclude=EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT)
-        self.context['settings_model_as_json']['integration_enabled'] = 'token' in self.user.settingsmodel.gc_token or 'token' in self.user.settingsmodel.canvas_token
+        self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in self.user.settingsmodel.gc_token
+        self.context['settings_model_as_json']['canvas_integration_enabled'] = 'token' in self.user.settingsmodel.canvas_token
+        self.context['settings_model_as_json']['moodle_integration_enabled'] = 'token' in self.user.settingsmodel.moodle_token
 
         if not self.user.settingsmodel.seen_latest_changelog:
             self.context['latest_changelog'] = CHANGELOGS[0]

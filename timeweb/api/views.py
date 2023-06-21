@@ -17,6 +17,7 @@ from .integrations import (
     disable_gc_integration,
     generate_canvas_authorization_url,
     disable_canvas_integration,
+    generate_moodle_authorization_url,
 )
 from timewebapp.models import TimewebModel
 from timewebapp.views import EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT
@@ -44,7 +45,7 @@ TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("assignment_date", "x", "due_time", "blue_l
 DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("id", "name", "soft", "unit", "description", "tags", "is_gc_assignment",
                                         "external_link", "alert_due_date_incremented", "dont_hide_again",
                                         "deletion_time", "user", "needs_more_info", "is_integration_assignment", 
-                                        "is_canvas_assignment", )
+                                        "is_canvas_assignment", "is_moodle_assignment", )
 assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(TimewebModel._meta.fields), "update this list"
 
 @require_http_methods(["POST"])
@@ -544,6 +545,14 @@ def change_setting(request):
             })
         else:
             disable_canvas_integration(request, save=True)
+            return HttpResponse(status=204)
+    elif setting == "moodle_token":
+        if value:
+            return JsonResponse({
+                'should_redirect': True,
+                'redirect_url': generate_moodle_authorization_url(request, next_url="home", current_url="settings"),
+            })
+        else:
             return HttpResponse(status=204)
 
     # pretty cursed code that could possibly be improved by adding the settings model to the settings form as an instance (64baf58)

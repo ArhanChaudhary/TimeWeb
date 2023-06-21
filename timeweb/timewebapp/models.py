@@ -147,6 +147,9 @@ class TimewebModel(models.Model):
     is_canvas_assignment = models.BooleanField(
         default=False,
     )
+    is_moodle_assignment = models.BooleanField(
+        default=False,
+    )
     external_link = models.URLField(
         null=True,
         blank=True,

@@ -30,6 +30,8 @@ class SettingsForm(forms.ModelForm):
             "canvas_token",
             "added_canvas_assignment_ids",
             "canvas_courses_cache",
+            "moodle_token",
+            "added_moodle_assignment_ids",
         )
         extra_fields = {
             "gc_integration": {
@@ -51,6 +53,14 @@ class SettingsForm(forms.ModelForm):
                 ),
                 "order": "after gc_integration",
             },
+            "moodle_integration": {
+                "field": forms.BooleanField(
+                    label="Moodle Integration",
+                    help_text="Not yet implemented.",
+                    required=False,
+                ),
+                "order": "after canvas_integration",
+            },
             "calendar_integration": {
                 "field": forms.BooleanField(
                     label="Google Calendar Integration",
@@ -58,7 +68,7 @@ class SettingsForm(forms.ModelForm):
                     widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
                     help_text="Not yet implemented.",
                 ),
-                "order": "after canvas_integration",
+                "order": "after moodle_integration",
             },
             "notifications_integration": {
                 "field": forms.BooleanField(
@@ -198,11 +208,18 @@ class SettingsForm(forms.ModelForm):
         cleaned_data = super().clean()
         canvas_integration = cleaned_data.get("canvas_integration")
         canvas_instance_domain = cleaned_data.get("canvas_instance_domain")
+        moodle_integration = cleaned_data.get("moodle_integration")
+        moodle_instance_domain = cleaned_data.get("moodle_instance_domain")
         if canvas_integration:
             if not canvas_instance_domain:
                 self.add_error("canvas_instance_domain", _("Please enter your institution's Canvas domain"))
             elif canvas_instance_domain not in settings.CANVAS_CREDENTIALS_JSON:
                 self.add_error("canvas_instance_domain", _("Your institution hasn't approved TimeWeb's access"))
+        if moodle_integration:
+            if not moodle_instance_domain:
+                self.add_error("moodle_instance_domain", _("Please enter your institution's Moodle domain"))
+            elif moodle_instance_domain not in settings.APPROVED_MOODLE_DOMAINS:
+                self.add_error("moodle_instance_domain", _("Your institution hasn't approved TimeWeb's access"))
         return cleaned_data
 
 class ContactForm(BaseContactForm):

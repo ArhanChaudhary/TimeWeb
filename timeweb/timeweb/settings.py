@@ -391,3 +391,8 @@ if DEBUG or FIX_DEBUG_LOCALLY:
     CANVAS_REDIRECT_URI = "http://localhost:8000/api/canvas-auth-callback/"
 else:
     CANVAS_REDIRECT_URI = "https://timeweb.io/api/canvas-auth-callback/"
+
+# APPROVED_MOODLE_DOMAINS = os.environ.get("CANVAS_API_CREDENTIALS")
+APPROVED_MOODLE_DOMAINS = '["localhost:8888"]'
+if APPROVED_MOODLE_DOMAINS is not None:
+    APPROVED_MOODLE_DOMAINS = json.loads(APPROVED_MOODLE_DOMAINS)

@@ -73,8 +73,6 @@ FONTS = (
 
 MAX_FONTS_LENGTH = len(max([i[0] for i in FONTS], key=len))
 
-MAX_CANVAS_TOKEN_LENGTH = 69
-
 class SettingsModel(models.Model):
     # Group "Assignment Deletion"
     immediately_delete_completely_finished_assignments = models.BooleanField(
@@ -249,6 +247,19 @@ class SettingsModel(models.Model):
         blank=True,
     )
     canvas_instance_domain = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+    )
+    moodle_token = EncryptedJSONField(
+        default=empty_dict,
+        blank=True,
+    )
+    added_moodle_assignment_ids = models.JSONField(
+        default=empty_list,
+        blank=True,
+    )
+    moodle_instance_domain = models.CharField(
         max_length=255,
         null=True,
         blank=True,
