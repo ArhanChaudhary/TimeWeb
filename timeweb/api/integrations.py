@@ -1087,14 +1087,22 @@ def create_moodle_assignments(request):
         if assignment['id'] in request.user.settingsmodel.added_moodle_assignment_ids:
             return
         complete_assignment_date = datetime.datetime.fromtimestamp(
-            assignment['allowsubmissionsfromdate'],
+            assignment['allowsubmissionsfromdate'] if assignment['allowsubmissionsfromdate'] != 0 else assignment['timemodified'],
             timezone.utc
         ).replace(tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
-        # "lock_at_date cannot be before due_at_date"
-        complete_x = datetime.datetime.fromtimestamp(
-            assignment['duedate'],
-            timezone.utc
-        ).replace(tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
+        # "Cut-off date cannot be earlier than the due date."
+        if assignment['duedate'] != 0:
+            complete_x = datetime.datetime.fromtimestamp(
+                assignment['duedate'],
+                timezone.utc
+            ).replace(tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
+        elif assignment['cutoffdate'] != 0:
+            complete_x = datetime.datetime.fromtimestamp(
+                assignment['cutoffdate'],
+                timezone.utc
+            ).replace(tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
+        else:
+            complete_x = None
         assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
         tags = []
         if complete_x:
@@ -1116,7 +1124,8 @@ def create_moodle_assignments(request):
         name = Truncator(name).chars(TimewebModel.name.field.max_length)
         tags.insert(0, course_name)
         # introformat int  Optional //intro format (1 = HTML, 0 = MOODLE, 2 = PLAIN, or 4 = MARKDOWN
-        if description := assignment['intro']:
+        # intro is optional so use .get
+        if description := assignment.get('intro'):
             description = utils.simplify_whitespace(html2text.html2text(description))
         external_link = f"{moodle_instance_url(request)}/mod/assign/view.php?id={assignment['cmid']}"
         adjusted_blue_line = app_utils.adjust_blue_line(request,
