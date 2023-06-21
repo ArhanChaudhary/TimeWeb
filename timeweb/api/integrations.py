@@ -494,7 +494,7 @@ async def create_gc_assignments(request):
     def format_response_data(*, assignment_models, response_data, order, exception):
         # it is possible for this function to process courses that are in the cache but archived
         # this does not matter
-        if exception is not None:
+        if exception is not None and exception.reason != 'The caller does not have permission':
             # 403 if you are a teacher of a class
             # 404 if the cached courses are outdated and a course has been deleted
             # 429 if you are ratelimited, don't care
