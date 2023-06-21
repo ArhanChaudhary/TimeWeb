@@ -683,6 +683,8 @@ async def create_gc_assignments(request):
             TimeoutError, # connection dies during the request
         )):
             assignment_model_data = []
+        else:
+            raise e
     else:
         if settings.DEBUG:
             logger.info(f"finished gc requests in {time.perf_counter() - t}")
@@ -1025,6 +1027,8 @@ async def create_canvas_assignments(request):
         # read: https://community.canvaslms.com/t5/Canvas-Developers-Group/API-Rate-Limiting/ba-p/255845#toc-hId-1773472610
         elif isinstance(e, (ConnectionError_, ReadTimeout)):
             assignment_model_data = []
+        else:
+            raise e
     else:
         if settings.DEBUG:
             logger.info(f"finished canvas requests in {time.perf_counter() - t}")
