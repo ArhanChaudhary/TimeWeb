@@ -96,8 +96,7 @@ def is_app_url(url):
         reverse(url)
     except NoReverseMatch:
         return False
-    else:
-        return True
+    return True
 
 def generate_static_integration_fields(user):
     return {
@@ -435,11 +434,10 @@ async def create_gc_assignments(request):
             }
         except TransportError: # basically ConnectionError_ and TimeoutError
             return {"next": "continue"}
-        else:
-            if settings.DEBUG:
-                logger.info(f"finished gc refresh request in {time.perf_counter() - t} seconds")
-            request.user.settingsmodel.gc_token.update(json.loads(credentials.to_json()))
-            await sync_to_async(request.user.settingsmodel.save)(update_fields=("gc_token", ))
+        if settings.DEBUG:
+            logger.info(f"finished gc refresh request in {time.perf_counter() - t} seconds")
+        request.user.settingsmodel.gc_token.update(json.loads(credentials.to_json()))
+        await sync_to_async(request.user.settingsmodel.save)(update_fields=("gc_token", ))
     service = build(
         'classroom',
         'v1',
@@ -899,12 +897,11 @@ async def create_canvas_assignments(request):
             ReadTimeout,
         ):
             return {"next": "continue"}
-        else:
-            if settings.DEBUG:
-                logger.info(f"finished canvas refresh request in {time.perf_counter() - t} seconds")
-            request.user.settingsmodel.canvas_token['token'] = authorized_token_response['access_token']
-            request.user.settingsmodel.canvas_token['expires_at'] = authorized_token_response['expires_at']
-            await sync_to_async(request.user.settingsmodel.save)(update_fields=("canvas_token", ))
+        if settings.DEBUG:
+            logger.info(f"finished canvas refresh request in {time.perf_counter() - t} seconds")
+        request.user.settingsmodel.canvas_token['token'] = authorized_token_response['access_token']
+        request.user.settingsmodel.canvas_token['expires_at'] = authorized_token_response['expires_at']
+        await sync_to_async(request.user.settingsmodel.save)(update_fields=("canvas_token", ))
     canvas = Canvas(
         canvas_instance_url(request),
         request.user.settingsmodel.canvas_token['token'],
