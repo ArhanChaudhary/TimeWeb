@@ -193,11 +193,6 @@ class SettingsForm(forms.ModelForm):
         if background_image and background_image.size > settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE:
             raise forms.ValidationError(_('This file is too big (>%(amount)d megabytes)') % {'amount': settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE/1048576})
         return background_image
-    
-    def clean_canvas_instance_domain(self):
-        return self.cleaned_data["canvas_instance_domain"] + ".instructure.com" \
-            if self.cleaned_data["canvas_instance_domain"] and not settings.DEBUG \
-            else self.cleaned_data["canvas_instance_domain"]
 
     def clean(self):
         cleaned_data = super().clean()

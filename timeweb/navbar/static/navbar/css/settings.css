@@ -138,18 +138,10 @@ body {
     --nothing-height: auto;
 }
 #id_canvas_instance_domain {
-    width: 60px;
-    height: 20px;
-    display: inline !important;
-    font-size: 14px;
     margin-top: 7px;
 }
 .error-note + #id_canvas_instance_domain {
     margin-top: 0;
-}
-#canvas-instance-domain-wrapper {
-    display: inline !important;
-    font-size: 17px;
 }
 [type="checkbox"] ~ label:not(.break-days-label):hover:active {
     --box-shadow: 0 0 11px -1px hsl(0, 0%, 73%);
