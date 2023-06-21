@@ -1077,8 +1077,113 @@ def moodle_instance_url(request):
 def generate_moodle_authorization_url(request, *, next_url, current_url):
     pass
 
-async def create_moodle_assignments(request):
-    pass
+def create_moodle_assignments(request):
+    # remember to check if token is expired
+    complete_date_now = utils.utc_to_local(request, timezone.now())
+    # Note about timezones: use the local tz because date_now repesents the date at the user's location
+    # This makes comparison logic work
+    date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
+    def format_response_datum(assignment, course_name):
+        if assignment['id'] in request.user.settingsmodel.added_moodle_assignment_ids:
+            return
+        complete_assignment_date = datetime.datetime.fromtimestamp(
+            assignment['allowsubmissionsfromdate'],
+            timezone.utc
+        ).replace(tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
+        # "lock_at_date cannot be before due_at_date"
+        complete_x = datetime.datetime.fromtimestamp(
+            assignment['duedate'],
+            timezone.utc
+        ).replace(tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
+        assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        tags = []
+        if complete_x:
+            if complete_x <= complete_assignment_date:
+                return
+            due_time = complete_x.time()
+            x = complete_x.replace(hour=0, minute=0, second=0, microsecond=0)
+            if date_now == x:
+                tags.append("Important")
+            x_num = utils.days_between_two_dates(x, assignment_date)
+        else:
+            if utils.days_between_two_dates(date_now, assignment_date) > ASSIGNMENT_DATE_DAYS_CUTOFF:
+                return
+            due_time = None
+            x = None
+            x_num = None
+        name = assignment['name']
+        name = utils.simplify_whitespace(name)
+        name = Truncator(name).chars(TimewebModel.name.field.max_length)
+        tags.insert(0, course_name)
+        # introformat int  Optional //intro format (1 = HTML, 0 = MOODLE, 2 = PLAIN, or 4 = MARKDOWN
+        if description := assignment['intro']:
+            description = utils.simplify_whitespace(html2text.html2text(description))
+        external_link = f"{moodle_instance_url(request)}/mod/assign/view.php?id={assignment['cmid']}"
+        adjusted_blue_line = app_utils.adjust_blue_line(request,
+            old_data=None,
+            assignment_date=assignment_date,
+            x_num=x_num
+        )
+        blue_line_start = adjusted_blue_line['blue_line_start']
+        dynamic_start = blue_line_start
+        # we store these in utc
+        # convert at the end so it is easier to use with calculations with date_now
+        if x:
+            x = x.replace(tzinfo=timezone.utc)
+        if assignment_date:
+            assignment_date = assignment_date.replace(tzinfo=timezone.utc)
+        # TODO: find a better system that doesn't accumulate everything
+        request.user.settingsmodel.added_moodle_assignment_ids.append(assignment['id'])
+        return {
+            # from api, can change
+            "name": name,
+            "assignment_date": assignment_date,
+            "x": x,
+            "due_time": due_time,
+            "description": description,
+            # from app, depends on api
+            "blue_line_start": blue_line_start,
+            "dynamic_start": dynamic_start,
+            # from api, cannot change
+            "external_link": external_link,
+            "tags": tags,
+        }
+    if settings.DEBUG:
+        logger.info("started moodle requests")
+        t = time.perf_counter()
+    try:
+        response_data = requests.get(
+            f"{moodle_instance_url(request)}/webservice/rest/server.php",
+            params={
+                'wstoken': request.user.settingsmodel.moodle_token['token'],
+                'wsfunction': 'mod_assign_get_assignments',
+                'moodlewsrestformat': 'json',
+            },
+            timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
+        )
+    except (
+        ConnectionError_,
+        ReadTimeout,
+    ):
+        assignment_model_data = []
+    except Exception as e:
+        breakpoint()
+    else:
+        if settings.DEBUG:
+            logger.info(f"finished moodle requests in {time.perf_counter() - t}")
+        assignment_model_data = [
+            assignment_model_datum
+            for course in response_data.json()['courses']
+            for assignment in course['assignments']
+            if (assignment_model_datum := format_response_datum(assignment, course['shortname'])) is not None
+        ]
+    if not assignment_model_data:
+        return {"next": "continue"}
+    cached_timestamp = cache.get(request.concurrent_request_key)
+    if cached_timestamp != request.thread_timestamp:
+        return {"next": "continue"}
+    request.delete_cache = True
+    return async_to_sync(prepare_integration_response)(request, assignment_model_data, "moodle")
 
 # 
 # INTEGRATIONS API VIEW FUNCTIONS
@@ -1094,6 +1199,7 @@ def merge_integration_response(ret, key, value):
 
 async def create_integration_assignments(request):
     await sync_to_async(lambda: request.user.settingsmodel)()
+    loop = asyncio.get_event_loop()
     if settings.DEBUG:
         t = time.perf_counter()
         logger.info("started integration requests")
@@ -1103,7 +1209,7 @@ async def create_integration_assignments(request):
     if 'token' in request.user.settingsmodel.canvas_token:
         integration_tasks.append(create_canvas_assignments(request))
     if 'token' in request.user.settingsmodel.moodle_token:
-        integration_tasks.append(create_moodle_assignments(request))
+        integration_tasks.append(loop.run_in_executor(None, create_moodle_assignments, request))
     if integration_tasks:
         request.concurrent_request_key = f"concurrent_integration_request_{request.user.id}"
         request.thread_timestamp = datetime.datetime.now().timestamp()
