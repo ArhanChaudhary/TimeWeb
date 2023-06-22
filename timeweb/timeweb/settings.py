@@ -392,10 +392,10 @@ if DEBUG or FIX_DEBUG_LOCALLY:
 else:
     CANVAS_REDIRECT_URI = "https://timeweb.io/api/canvas-auth-callback/"
 
-APPROVED_MOODLE_DOMAINS = os.environ.get("APPROVED_MOODLE_DOMAINS")
-if APPROVED_MOODLE_DOMAINS is None:
-    APPROVED_MOODLE_DOMAINS = []
+APPROVED_MOODLE_URLS = os.environ.get("APPROVED_MOODLE_URLS")
+if APPROVED_MOODLE_URLS is None:
+    APPROVED_MOODLE_URLS = []
 else:
-    APPROVED_MOODLE_DOMAINS = json.loads(APPROVED_MOODLE_DOMAINS)
+    APPROVED_MOODLE_URLS = json.loads(APPROVED_MOODLE_URLS)
 if DEBUG:
-    APPROVED_MOODLE_DOMAINS.append("localhost:8888/moodle402")
+    APPROVED_MOODLE_URLS.append("http://localhost:8888/moodle402")

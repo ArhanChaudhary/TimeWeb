@@ -250,6 +250,7 @@ class SettingsModel(models.Model):
         max_length=255,
         null=True,
         blank=True,
+        verbose_name=_('Canvas Home URL'),
     )
     moodle_token = EncryptedJSONField(
         default=empty_dict,
@@ -263,6 +264,7 @@ class SettingsModel(models.Model):
         max_length=255,
         null=True,
         blank=True,
+        verbose_name=_('Moodle Home URL'),
     )
     seen_latest_changelog = models.BooleanField(
         default=True,

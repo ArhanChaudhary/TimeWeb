@@ -99,6 +99,8 @@ class SettingsForm(forms.ModelForm):
             'seen_latest_changelog': forms.HiddenInput(),
             'nudge_calendar': forms.HiddenInput(),
             'nudge_notifications': forms.HiddenInput(),
+            'canvas_instance_url': forms.TextInput(attrs={"placeholder": "school.instructure.com"}),
+            'moodle_instance_url': forms.TextInput(attrs={"placeholder": "school.edu/moodle"}),
         }
         error_messages = {
             'def_min_work_time': {
