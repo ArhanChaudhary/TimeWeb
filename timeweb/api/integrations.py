@@ -1181,6 +1181,8 @@ def create_moodle_assignments(request):
     else:
         if settings.DEBUG:
             logger.info(f"finished moodle requests in {time.perf_counter() - t}")
+        # Note that I've looked through Moodle's source code and can confirm that
+        # there is nothing important to look out for in the warnings object
         assignment_model_data = [
             assignment_model_datum
             for course in response_data.json()['courses']
