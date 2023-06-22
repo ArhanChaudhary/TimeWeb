@@ -209,17 +209,17 @@ class SettingsForm(forms.ModelForm):
         canvas_integration = cleaned_data.get("canvas_integration")
         canvas_instance_domain = cleaned_data.get("canvas_instance_domain")
         moodle_integration = cleaned_data.get("moodle_integration")
-        moodle_instance_domain = cleaned_data.get("moodle_instance_domain")
+        moodle_instance_url = cleaned_data.get("moodle_instance_url")
         if canvas_integration:
             if not canvas_instance_domain:
                 self.add_error("canvas_instance_domain", _("Please enter your institution's Canvas domain"))
             elif canvas_instance_domain not in settings.CANVAS_CREDENTIALS_JSON:
                 self.add_error("canvas_instance_domain", _("Your institution hasn't approved TimeWeb's access"))
         if moodle_integration:
-            if not moodle_instance_domain:
-                self.add_error("moodle_instance_domain", _("Please enter your institution's Moodle domain"))
-            elif moodle_instance_domain not in settings.APPROVED_MOODLE_DOMAINS:
-                self.add_error("moodle_instance_domain", _("Your institution hasn't approved TimeWeb's access"))
+            if not moodle_instance_url:
+                self.add_error("moodle_instance_url", _("Please enter your institution's Moodle domain"))
+            elif moodle_instance_url not in settings.APPROVED_MOODLE_DOMAINS:
+                self.add_error("moodle_instance_url", _("Your institution hasn't approved TimeWeb's access"))
         return cleaned_data
 
 class ContactForm(BaseContactForm):

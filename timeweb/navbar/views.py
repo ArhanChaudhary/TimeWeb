@@ -50,7 +50,7 @@ DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS = (
     'display_working_days_left', 'background_image_text_shadow_width', 'gc_assignments_always_midnight', 'loosely_enforce_minimum_work_times', 
     'priority_color_borders', 'font', 'should_alert_due_date_incremented', 'example_account', "gc_token",
     'added_canvas_assignment_ids', 'canvas_courses_cache', 'canvas_instance_domain', 'moodle_token', 'added_moodle_assignment_ids',
-    'moodle_instance_domain'
+    'moodle_instance_url'
 )
 
 assert len(EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS) + len(DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS) == len(SettingsModel._meta.fields), "update this list"
@@ -69,7 +69,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
                 'canvas_integration': 'token' in self.user.settingsmodel.canvas_token,
                 'canvas_instance_domain': self.user.settingsmodel.canvas_instance_domain,
                 'moodle_integration': 'token' in self.user.settingsmodel.moodle_token,
-                'moodle_instance_domain': self.user.settingsmodel.moodle_instance_domain,
+                'moodle_instance_url': self.user.settingsmodel.moodle_instance_url,
             }
             self.context['form'] = SettingsForm(initial=initial, instance=self.user.settingsmodel)
         self.context['default_settings'] = model_to_dict(SettingsForm().save(commit=False),
@@ -111,7 +111,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             disabled_canvas_integration = True
             enabled_canvas_integration = True
         if (
-            self.form.cleaned_data.get("moodle_instance_domain") != self.old_settings.moodle_instance_domain
+            self.form.cleaned_data.get("moodle_instance_url") != self.old_settings.moodle_instance_url
             and self.form.cleaned_data.get("moodle_integration")
             and 'token' in self.user.settingsmodel.moodle_token
         ):

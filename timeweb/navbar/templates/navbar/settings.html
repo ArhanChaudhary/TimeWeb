@@ -62,7 +62,7 @@
                         {% endif %}
                     </span>
             {% endif %}
-            {% if field.name != "assignment_sorting" and field.name != "canvas_instance_domain" and field.name != "moodle_instance_domain" %}
+            {% if field.name != "assignment_sorting" and field.name != "canvas_instance_domain" and field.name != "moodle_instance_url" %}
                 <div class="field-container">
                     <span class="left-side-of-field">
                         {{ field.label }}
@@ -110,10 +110,10 @@
                                 {{ form.canvas_instance_domain }}
                             {% endif %}
                             {% if field.name == "moodle_integration" %}
-                                {% for error in form.moodle_instance_domain.errors %}
+                                {% for error in form.moodle_instance_url.errors %}
                                     <h3 class="error-note">{{ error|escape }}</h3>
                                 {% endfor %}
-                                {{ form.moodle_instance_domain }}
+                                {{ form.moodle_instance_url }}
                             {% endif %}
                         {% endif %}
                     </span>

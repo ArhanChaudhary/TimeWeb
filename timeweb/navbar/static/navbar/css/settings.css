@@ -138,11 +138,11 @@ body {
     --nothing-height: auto;
 }
 #id_canvas_instance_domain,
-#id_moodle_instance_domain {
+#id_moodle_instance_url {
     margin-top: 7px;
 }
 .error-note + #id_canvas_instance_domain,
-.error-note + #id_moodle_instance_domain {
+.error-note + #id_moodle_instance_url {
     margin-top: 0;
 }
 #canvas-instance-domain-wrapper,

@@ -1071,10 +1071,8 @@ def update_canvas_courses(request):
 # MOODLE INTEGRATION
 # 
 
-def moodle_instance_url(request):
-    return f'http{"" if settings.DEBUG else "s"}://{request.user.settingsmodel.moodle_instance_domain}'
-
 def generate_moodle_authorization_url(request, *, next_url, current_url):
+    pass
 
 def disable_moodle_integration(request, *, save=True):
     request.user.settingsmodel.moodle_token = {}
@@ -1133,7 +1131,7 @@ def create_moodle_assignments(request):
         # intro is optional so use .get
         if description := assignment.get('intro'):
             description = utils.simplify_whitespace(html2text.html2text(description))
-        external_link = f"{moodle_instance_url(request)}/mod/assign/view.php?id={assignment['cmid']}"
+        external_link = f"{request.user.settingsmodel.moodle_instance_url}/mod/assign/view.php?id={assignment['cmid']}"
         adjusted_blue_line = app_utils.adjust_blue_line(request,
             old_data=None,
             assignment_date=assignment_date,
@@ -1168,7 +1166,7 @@ def create_moodle_assignments(request):
         t = time.perf_counter()
     try:
         response_data = requests.get(
-            f"{moodle_instance_url(request)}/webservice/rest/server.php",
+            f"{request.user.settingsmodel.moodle_instance_url}/webservice/rest/server.php",
             params={
                 'wstoken': request.user.settingsmodel.moodle_token['token'],
                 'wsfunction': 'mod_assign_get_assignments',
