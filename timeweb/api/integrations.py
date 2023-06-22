@@ -1126,8 +1126,11 @@ def create_moodle_assignments(request):
         tags.insert(0, course_name)
         # introformat int  Optional //intro format (1 = HTML, 0 = MOODLE, 2 = PLAIN, or 4 = MARKDOWN
         # intro is optional so use .get
-        if description := assignment.get('intro'):
-            description = utils.simplify_whitespace(html2text.html2text(description))
+        if assignment.get('intro'):
+            description = utils.simplify_whitespace(html2text.html2text(assignment.get('intro')))
+        else:
+            # don't set description to assignment.get('intro') because intro can be '' and we want None instead
+            description = None
         external_link = f"{request.user.settingsmodel.moodle_instance_url}/mod/assign/view.php?id={assignment['cmid']}"
         adjusted_blue_line = app_utils.adjust_blue_line(request,
             old_data=None,
