@@ -206,6 +206,27 @@ class SettingsForm(forms.ModelForm):
             raise forms.ValidationError(_('This file is too big (>%(amount)d megabytes)') % {'amount': settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE/1048576})
         return background_image
 
+    @staticmethod
+    def deduce_instance_url(url, valid_urls):
+        urlprefixes = (
+            "",
+            "www.",
+            "http://",
+            "http://www.",
+            "https://",
+            "https://www.",
+        )
+        possible_variations = {
+            add_prefix + url.removeprefix(remove_prefix)
+            for remove_prefix in urlprefixes
+            for add_prefix in urlprefixes
+        }
+        for valid_url in valid_urls:
+            for variation in possible_variations:
+                if variation.startswith(valid_url):
+                    return valid_url
+        return None
+
     def clean(self):
         cleaned_data = super().clean()
         canvas_integration = cleaned_data.get("canvas_integration")
@@ -214,14 +235,18 @@ class SettingsForm(forms.ModelForm):
         moodle_instance_url = cleaned_data.get("moodle_instance_url")
         if canvas_integration:
             if not canvas_instance_url:
-                self.add_error("canvas_instance_url", _("Please enter your institution's Canvas domain"))
-            elif canvas_instance_url not in settings.CANVAS_CREDENTIALS_JSON:
-                self.add_error("canvas_instance_url", _("Your institution hasn't approved TimeWeb's access"))
+                self.add_error("canvas_instance_url", _("Please enter your institution's Canvas home URL"))
+            elif (canvas_instance_url := self.deduce_instance_url(canvas_instance_url, settings.CANVAS_CREDENTIALS_JSON)) is None:
+                self.add_error("canvas_instance_url", _("Your institution hasn't yet approved TimeWeb's access"))
+            else:
+                cleaned_data["canvas_instance_url"] = canvas_instance_url
         if moodle_integration:
             if not moodle_instance_url:
-                self.add_error("moodle_instance_url", _("Please enter your institution's Moodle domain"))
-            elif moodle_instance_url not in settings.APPROVED_MOODLE_DOMAINS:
-                self.add_error("moodle_instance_url", _("Your institution hasn't approved TimeWeb's access"))
+                self.add_error("moodle_instance_url", _("Please enter your institution's Moodle home URL"))
+            elif (moodle_instance_url := self.deduce_instance_url(moodle_instance_url, settings.APPROVED_MOODLE_URLS)) is None:
+                self.add_error("moodle_instance_url", _("Your institution hasn't yet approved TimeWeb's access"))
+            else:
+                cleaned_data["moodle_instance_url"] = moodle_instance_url
         return cleaned_data
 
 class ContactForm(BaseContactForm):
