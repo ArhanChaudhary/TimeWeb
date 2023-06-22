@@ -147,7 +147,7 @@ def update_canvas_courses_cache():
                     print("Refreshing token for", s.user.username)
                     flow = OAuth2Session()
                     authorized_token_response = flow.refresh_token(
-                        f'http{"" if settings.DEBUG else "s"}://{s.canvas_instance_domain}/login/oauth2/token',
+                        f'{s.canvas_instance_url}/login/oauth2/token',
                         client_id=settings.CANVAS_CREDENTIALS_JSON['client_id'],
                         client_secret=settings.CANVAS_CREDENTIALS_JSON['client_secret'],
                         refresh_token=s.canvas_token['refresh_token'],
@@ -156,7 +156,7 @@ def update_canvas_courses_cache():
                     s.canvas_token['token'] = authorized_token_response['access_token']
                     s.canvas_token['expires_at'] = authorized_token_response['expires_at']
                 canvas = Canvas(
-                    f'http{"" if settings.DEBUG else "s"}://{s.canvas_instance_domain}',
+                    s.canvas_instance_url,
                     s.canvas_token['token'],
                 )
                 print("Fetching courses for", s.user.username)

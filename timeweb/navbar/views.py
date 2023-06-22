@@ -49,7 +49,7 @@ DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS = (
     'nudge_calendar', 'nudge_notifications', 'user', 'gc_courses_cache', 'device_uuid', 'device_uuid_api_timestamp',
     'display_working_days_left', 'background_image_text_shadow_width', 'gc_assignments_always_midnight', 'loosely_enforce_minimum_work_times', 
     'priority_color_borders', 'font', 'should_alert_due_date_incremented', 'example_account', "gc_token",
-    'added_canvas_assignment_ids', 'canvas_courses_cache', 'canvas_instance_domain', 'moodle_token', 'added_moodle_assignment_ids',
+    'added_canvas_assignment_ids', 'canvas_courses_cache', 'canvas_instance_url', 'moodle_token', 'added_moodle_assignment_ids',
     'moodle_instance_url'
 )
 
@@ -67,7 +67,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             initial = {
                 'gc_integration': 'token' in self.user.settingsmodel.gc_token,
                 'canvas_integration': 'token' in self.user.settingsmodel.canvas_token,
-                'canvas_instance_domain': self.user.settingsmodel.canvas_instance_domain,
+                'canvas_instance_url': self.user.settingsmodel.canvas_instance_url,
                 'moodle_integration': 'token' in self.user.settingsmodel.moodle_token,
                 'moodle_instance_url': self.user.settingsmodel.moodle_instance_url,
             }
@@ -104,7 +104,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         enabled_moodle_integration = self.form.cleaned_data.get("moodle_integration") and not 'token' in self.user.settingsmodel.moodle_token
         disabled_moodle_integration = not self.form.cleaned_data.get("moodle_integration") and 'token' in self.user.settingsmodel.moodle_token
         if (
-            self.form.cleaned_data.get("canvas_instance_domain") != self.old_settings.canvas_instance_domain
+            self.form.cleaned_data.get("canvas_instance_url") != self.old_settings.canvas_instance_url
             and self.form.cleaned_data.get("canvas_integration")
             and 'token' in self.user.settingsmodel.canvas_token
         ):

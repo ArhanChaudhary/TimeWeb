@@ -770,17 +770,14 @@ def format_canvas_courses(courses, include_name=True):
         for course in courses
     ]
 
-def canvas_instance_url(request):
-    return f'http{"" if settings.DEBUG else "s"}://{request.user.settingsmodel.canvas_instance_domain}'
-
 def generate_canvas_authorization_url(request, *, next_url, current_url):
     flow = OAuth2Session(
-        client_id=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_domain]['client_id'],
+        client_id=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_url]['client_id'],
         redirect_uri=settings.CANVAS_REDIRECT_URI,
         scope=settings.CANVAS_SCOPES,
     )
     authorization_url, state = flow.authorization_url(
-        f'{canvas_instance_url(request)}/login/oauth2/auth',
+        f'{request.user.settingsmodel.canvas_instance_url}/login/oauth2/auth',
         force_login='1',
     )
     integration_session_urls_init(request, next_url, current_url)
@@ -798,7 +795,7 @@ def canvas_auth_callback(request):
 
     state = request.session.get("canvas-oauth-state")
     flow = OAuth2Session(
-        client_id=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_domain]['client_id'],
+        client_id=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_url]['client_id'],
         redirect_uri=settings.CANVAS_REDIRECT_URI,
         scope=settings.CANVAS_SCOPES,
         state=state,
@@ -807,9 +804,9 @@ def canvas_auth_callback(request):
     authorization_response = request.build_absolute_uri()
     try:
         authorized_token_response = flow.fetch_token(
-            f'{canvas_instance_url(request)}/login/oauth2/token',
+            f'{request.user.settingsmodel.canvas_instance_url}/login/oauth2/token',
             authorization_response=authorization_response,
-            client_secret=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_domain]['client_secret'],
+            client_secret=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_url]['client_secret'],
             timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
         )
     except (
@@ -821,7 +818,7 @@ def canvas_auth_callback(request):
         return callback_failed()
 
     canvas = Canvas(
-        canvas_instance_url(request),
+        request.user.settingsmodel.canvas_instance_url,
         authorized_token_response['access_token'],
         default_timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
     )
@@ -848,7 +845,7 @@ def disable_canvas_integration(request, *, save=True):
     flow = OAuth2Session()
     try:
         flow.delete(
-            f'{canvas_instance_url(request)}/login/oauth2/token',
+            f'{request.user.settingsmodel.canvas_instance_url}/login/oauth2/token',
             data={
                 'access_token': request.user.settingsmodel.canvas_token['token'],
             },
@@ -881,9 +878,9 @@ async def create_canvas_assignments(request):
             t = time.perf_counter()
         try:
             authorized_token_response = await loop.run_in_executor(None, lambda: flow.refresh_token(
-                f'{canvas_instance_url(request)}/login/oauth2/token',
-                client_id=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_domain]['client_id'],
-                client_secret=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_domain]['client_secret'],
+                f'{request.user.settingsmodel.canvas_instance_url}/login/oauth2/token',
+                client_id=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_url]['client_id'],
+                client_secret=settings.CANVAS_CREDENTIALS_JSON[request.user.settingsmodel.canvas_instance_url]['client_secret'],
                 refresh_token=request.user.settingsmodel.canvas_token['refresh_token'],
                 timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
             ))
@@ -905,7 +902,7 @@ async def create_canvas_assignments(request):
         request.user.settingsmodel.canvas_token['expires_at'] = authorized_token_response['expires_at']
         await sync_to_async(request.user.settingsmodel.save)(update_fields=("canvas_token", ))
     canvas = Canvas(
-        canvas_instance_url(request),
+        request.user.settingsmodel.canvas_instance_url,
         request.user.settingsmodel.canvas_token['token'],
         default_timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
     )
@@ -1042,7 +1039,7 @@ async def create_canvas_assignments(request):
 
 def update_canvas_courses(request):
     canvas = Canvas(
-        canvas_instance_url(request),
+        request.user.settingsmodel.canvas_instance_url,
         request.user.settingsmodel.canvas_token['token'],
         default_timeout=DEFAULT_INTEGRATION_REQUEST_TIMEOUT,
     )

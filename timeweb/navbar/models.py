@@ -246,7 +246,7 @@ class SettingsModel(models.Model):
         default=empty_list,
         blank=True,
     )
-    canvas_instance_domain = models.CharField(
+    canvas_instance_url = models.CharField(
         max_length=255,
         null=True,
         blank=True,
