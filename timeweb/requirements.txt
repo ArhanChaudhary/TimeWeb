@@ -64,7 +64,7 @@ six==1.16.0
 soupsieve==2.3.2.post1
 sqlparse==0.4.4
 starkbank-ecdsa==2.0.3
-tornado==6.3.2
+tornado==6.3.3
 uritemplate==3.0.1
 uritools==4.0.1
 urlextract==1.8.0
